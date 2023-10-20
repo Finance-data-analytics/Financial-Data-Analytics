@@ -18,21 +18,21 @@ def efficient_frontier(returns):
 
     num_assets = len(returns.columns)
     args = (avg_returns, cov_matrix)
-    
+
     constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
                    {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return})
-    
+
     bounds = tuple((0, 1) for asset in range(num_assets))
-    
+
     results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)
-    
+
     return results
 
 def portfolio_volatility(weights, avg_returns, cov_matrix):
     return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
 
 # Récupérer les données
-tickers = ['AAPL', 'GOOGL', 'MSFT']
+tickers = ['AAPL', 'GOOGL', 'MSFT','TSLA','MC.PA','AI.PA']
 data = get_data(tickers, '2020-01-01', '2022-01-01')
 
 # Calculer les rendements quotidiens
