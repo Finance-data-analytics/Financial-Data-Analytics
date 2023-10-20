@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
-
+test
 def get_data(tickers, start_date, end_date):
     data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
     return data
