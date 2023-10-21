@@ -71,10 +71,15 @@ crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
 # Récupérer les données des actions
-tickers = ['AAPL', 'GOOGL', 'MSFT','TSLA','MC.PA','AI.PA']
-tickers.extend(crypto_symbols) # Ajout des symboles des cryptos à la liste tickers
+# Assuming the tickers are in a column named 'Ticker' in the all_tickers.xlsx file
+all_stocks = pd.read_excel("all_tickers.xlsx")
+first_100_stocks = all_stocks['Symbol'][:10].tolist()
 
-data = get_data(tickers, '2015-01-01', '2022-01-01')
+tickers = []
+tickers.extend(first_100_stocks)
+tickers.extend(crypto_symbols)  # Ajout des symboles des cryptos à la liste tickers
+
+data = get_data(tickers, '2015-01-01', '2023-10-01')
 
 # Calculer les rendements quotidiens
 daily_returns = calculate_returns(data)
@@ -100,10 +105,16 @@ for target_return in target_returns:
 
 portfolio_volatilities = [portfolio['fun'] for portfolio in efficient_portfolios]
 
-# Tracez la frontière efficace de Markowitz
+# Existing plotting code for efficient frontier
 plt.plot(portfolio_volatilities, target_returns, 'y-', label='Frontière Efficient de Markowitz')
+
+# New code to plot individual asset points without names
+for i, ticker in enumerate(tickers):
+    plt.scatter(risks[ticker], avg_daily_returns[ticker], marker='o', s=20)  # s=20 sets a smaller size for the scatter points
+
 plt.xlabel('Volatilité (Écart type du rendement)')
 plt.ylabel('Rendement attendu')
 plt.legend()
 plt.title('Frontière Efficient de Markowitz')
+plt.grid(True)  # This will add gridlines for better readability
 plt.show()
