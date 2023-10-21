@@ -1,8 +1,41 @@
 import yfinance as yf
 import numpy as np
 import pandas as pd
+import requests
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+
+def get_crypto_data():
+    headers = {
+        'Accepts': 'application/json',
+        'X-CMC_PRO_API_KEY': '8ec7c7d5-f5ee-44a7-9d90-99ea1fb90edf',
+    }
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15'
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    cryptos = data['data']
+
+    crypto_data = []
+    for crypto in cryptos:
+        name = crypto['name']
+        symbol = crypto['symbol']
+        market_cap = crypto['quote']['USD']['market_cap']
+        crypto_data.append({"Name": name, "Symbol": symbol, "Market Cap": market_cap})
+
+    crypto_df = pd.DataFrame(crypto_data)
+    print("Before modification:")
+    print(crypto_df.head())
+    
+    crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
+    
+    print("\nAfter modification:")
+    print(crypto_df.head())
+
+    crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
+
+# Lisez le fichier Excel contenant les cryptos
+crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
+
 def get_data(tickers, start_date, end_date):
     data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
     return data
@@ -22,17 +55,26 @@ def efficient_frontier(returns):
                    {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return})
 
     bounds = tuple((0, 1) for asset in range(num_assets))
-
     results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)
-
     return results
 
 def portfolio_volatility(weights, avg_returns, cov_matrix):
     return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
 
-# Récupérer les données
+# Récupérer les données des cryptomonnaies
+get_crypto_data()
+
+# Lisez le fichier Excel contenant les cryptos
+crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
+
+# Obtenez la liste des symboles des cryptos
+crypto_symbols = crypto_data['Symbol'].tolist()
+
+# Récupérer les données des actions
 tickers = ['AAPL', 'GOOGL', 'MSFT','TSLA','MC.PA','AI.PA']
-data = get_data(tickers, '2020-01-01', '2022-01-01')
+tickers.extend(crypto_symbols) # Ajout des symboles des cryptos à la liste tickers
+
+data = get_data(tickers, '2015-01-01', '2022-01-01')
 
 # Calculer les rendements quotidiens
 daily_returns = calculate_returns(data)
