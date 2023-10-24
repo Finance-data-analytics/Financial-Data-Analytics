@@ -128,24 +128,32 @@ plotting_data = {
     }
 }
 
+import matplotlib.cm as cm
+
 # Loop over the dictionary to plot for each asset type
 for key, data in plotting_data.items():
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
 
     # Plotting the efficient frontier
     portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
     target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
     plt.plot(portfolio_volatilities, target_returns, 'y-', label='Frontière Efficient de Markowitz')
 
+    # Generate a colormap for unique colors
+    colors = cm.rainbow(np.linspace(0, 1, len(data["symbols"])))
+
     # Plotting individual asset points with their names
-    plt.scatter(data["risks"], data["avg_daily_returns"], marker='o', s=20, color=data["color"])
-    for ticker in data["symbols"]:
+    for ticker, color in zip(data["symbols"], colors):
+        plt.scatter(data["risks"][ticker], data["avg_daily_returns"][ticker], marker='o', s=20, color=color,
+                    label=ticker)
         plt.annotate(ticker, (data["risks"][ticker], data["avg_daily_returns"][ticker]), fontsize=8, alpha=0.7)
 
     plt.xlabel('Volatilité (Écart type du rendement)')
     plt.ylabel('Rendement attendu')
     plt.title(data["title"])
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Place legend to the right of the plot
+    plt.tight_layout()  # Adjust layout so that the legend doesn't overlap with the plot
     plt.show()
+
 
