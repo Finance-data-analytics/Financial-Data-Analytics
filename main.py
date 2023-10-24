@@ -2,6 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import requests
+from matplotlib import cm
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
@@ -56,7 +57,7 @@ crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
 all_stocks = pd.read_excel("all_tickers.xlsx")
-first_100_stocks = all_stocks['Symbol'][:50].tolist()
+first_100_stocks = all_stocks['Symbol'][:80].tolist()
 
 crypto_data = get_data(crypto_symbols, '2015-01-01', '2023-10-01')
 stocks_data = get_data(first_100_stocks, '2015-01-01', '2023-10-01')
@@ -128,32 +129,53 @@ plotting_data = {
     }
 }
 
-import matplotlib.cm as cm
+# Adjust the plotting function to use the daily risk-free rate
 
-# Loop over the dictionary to plot for each asset type
-for key, data in plotting_data.items():
-    plt.figure(figsize=(12, 6))
+def plot_assets_and_cal(data_dict, rf_daily):
+    # Loop over the dictionary to plot for each asset type
+    for key, data in data_dict.items():
+        plt.figure(figsize=(12, 6))
 
-    # Plotting the efficient frontier
-    portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
-    target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
-    plt.plot(portfolio_volatilities, target_returns, 'y-', label='Frontière Efficient de Markowitz')
+        # Plotting the efficient frontier
+        portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
+        target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
+        plt.plot(portfolio_volatilities, target_returns, 'y-', label='Frontière Efficient de Markowitz')
 
-    # Generate a colormap for unique colors
-    colors = cm.rainbow(np.linspace(0, 1, len(data["symbols"])))
+        # Calculate the slope of the tangent for each portfolio on the efficient frontier
+        slopes = [(np.dot(data["avg_daily_returns"], portfolio.x) - rf_daily) / portfolio.fun for portfolio in data["efficient_portfolios"]]
 
-    # Plotting individual asset points with their names
-    for ticker, color in zip(data["symbols"], colors):
-        plt.scatter(data["risks"][ticker], data["avg_daily_returns"][ticker], marker='o', s=20, color=color,
-                    label=ticker)
-        plt.annotate(ticker, (data["risks"][ticker], data["avg_daily_returns"][ticker]), fontsize=8, alpha=0.7)
+        # Find the portfolio with the steepest slope
+        max_slope_idx = np.argmax(slopes)
+        tangent_portfolio = data["efficient_portfolios"][max_slope_idx]
 
-    plt.xlabel('Volatilité (Écart type du rendement)')
-    plt.ylabel('Rendement attendu')
-    plt.title(data["title"])
-    plt.grid(True)
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Place legend to the right of the plot
-    plt.tight_layout()  # Adjust layout so that the legend doesn't overlap with the plot
-    plt.show()
+        # Return and volatility of the tangent portfolio
+        tangent_return = np.dot(data["avg_daily_returns"], tangent_portfolio.x)
+        tangent_volatility = tangent_portfolio.fun
 
+        # Plot the CAL
+        x = np.linspace(0, max(portfolio_volatilities), 100)
+        y = rf_daily + (tangent_return - rf_daily) / tangent_volatility * x
+        plt.plot(x, y, 'g--', label='CAL')
+
+        # Generate a colormap for unique colors
+        colors = cm.rainbow(np.linspace(0, 1, len(data["symbols"])))
+
+        # Plotting individual asset points with their names
+        for ticker, color in zip(data["symbols"], colors):
+            plt.scatter(data["risks"][ticker], data["avg_daily_returns"][ticker], marker='o', s=20, color=color, label=ticker)
+
+        plt.xlabel('Volatilité (Écart type du rendement)')
+        plt.ylabel('Rendement attendu')
+        plt.title(data["title"])
+        plt.grid(True)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Place legend to the right of the plot
+        plt.tight_layout()  # Adjust layout so that the legend doesn't overlap with the plot
+        plt.show()
+# Convert the annual risk-free rate to a daily rate
+rf_annual = 0.01  # 1% annual rate
+rf_daily = (1 + rf_annual)**(1/365) - 1
+rf_daily
+
+# Plot the assets and CAL using the daily risk-free rate
+plot_assets_and_cal(plotting_data, rf_daily)
 
