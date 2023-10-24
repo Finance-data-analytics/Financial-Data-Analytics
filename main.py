@@ -56,7 +56,7 @@ crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
 all_stocks = pd.read_excel("all_tickers.xlsx")
-first_100_stocks = all_stocks['Symbol'][:10].tolist()
+first_100_stocks = all_stocks['Symbol'][:50].tolist()
 
 crypto_data = get_data(crypto_symbols, '2015-01-01', '2023-10-01')
 stocks_data = get_data(first_100_stocks, '2015-01-01', '2023-10-01')
