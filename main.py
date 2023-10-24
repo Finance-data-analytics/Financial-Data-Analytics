@@ -6,6 +6,37 @@ from matplotlib import cm
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
+
+def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns):
+    # Weighting based on investment horizon
+    if investment_horizon <= 3:  # Short term
+        target_return = stocks_avg_daily_returns.min()
+    elif investment_horizon <= 7:  # Medium term
+        target_return = stocks_avg_daily_returns.mean()
+    else:  # Long term
+        target_return = stocks_avg_daily_returns.max()
+
+    # Adjust target return based on risk tolerance
+    if risk_tolerance == "faible":
+        target_return -= 0.01
+    elif risk_tolerance == "élevée":
+        target_return += 0.01
+
+    # Select the optimal portfolio for each asset type using the efficient frontier
+    stock_portfolio = efficient_frontier(stocks_daily_returns, target_return)['x']
+    crypto_portfolio = efficient_frontier(crypto_daily_returns, target_return)['x']
+
+    # Calculate the amount to invest for each asset
+    stock_investment = capital * stock_portfolio
+    crypto_investment = capital * crypto_portfolio
+
+    return stock_investment, crypto_investment
+
+# Getting input from user
+capital = float(input("Veuillez entrer votre capital à investir: "))
+investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
+risk_tolerance = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ")
+
 def get_crypto_data():
     headers = {
         'Accepts': 'application/json',
@@ -179,3 +210,6 @@ rf_daily
 # Plot the assets and CAL using the daily risk-free rate
 plot_assets_and_cal(plotting_data, rf_daily)
 
+stock_investment, crypto_investment = recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns)
+
+print(f"Vous devriez investir : \n{stock_investment} dans les actions \n{crypto_investment} dans les cryptomonnaies.")
