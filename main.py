@@ -26,13 +26,18 @@ def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_
     stock_portfolio = efficient_frontier(stocks_daily_returns, target_return)['x']
     crypto_portfolio = efficient_frontier(crypto_daily_returns, target_return)['x']
 
-    # Calculate the amount to invest for each asset
-    stock_investment = capital * stock_portfolio
-    crypto_investment = capital * crypto_portfolio
+    # Adjusting for one stock and one crypto
+    stock_index = np.argmax(stock_portfolio)
+    crypto_index = np.argmax(crypto_portfolio)
+
+    stock_investment = np.zeros_like(stock_portfolio)
+    crypto_investment = np.zeros_like(crypto_portfolio)
+
+    stock_investment[stock_index] = capital
+    crypto_investment[crypto_index] = capital
 
     return stock_investment, crypto_investment
 
-# Getting input from user
 capital = float(input("Veuillez entrer votre capital à investir: "))
 investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
 risk_tolerance = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ")
@@ -166,7 +171,6 @@ def plot_assets_and_cal(data_dict, rf_daily):
     # Loop over the dictionary to plot for each asset type
     for key, data in data_dict.items():
         plt.figure(figsize=(12, 6))
-
         # Plotting the efficient frontier
         portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
         target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
@@ -212,4 +216,22 @@ plot_assets_and_cal(plotting_data, rf_daily)
 
 stock_investment, crypto_investment = recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns)
 
-print(f"Vous devriez investir : \n{stock_investment} dans les actions \n{crypto_investment} dans les cryptomonnaies.")
+# Récupération des noms des stocks et des cryptos depuis les fichiers Excel
+
+print(crypto_data.columns)
+crypto_names = crypto_data.columns.tolist()
+stock_data = pd.read_excel("all_tickers.xlsx")
+stock_names = stock_data['Name'][:80].tolist()
+
+# Affichage de la répartition du portefeuille d'actions
+print("\nRépartition du portefeuille d'actions :")
+for ticker, name, amount in zip(first_100_stocks, stock_names, stock_investment):
+    if amount > 0:
+        print(f"{name} ({ticker}): {amount:.2f} USD")
+
+# Affichage de la répartition du portefeuille de cryptomonnaies
+print("\nRépartition du portefeuille de cryptomonnaies :")
+for ticker, name, amount in zip(crypto_symbols, crypto_names, crypto_investment):
+    if amount > 0:
+        print(f"{name} ({ticker}): {amount:.2f} USD")
+
