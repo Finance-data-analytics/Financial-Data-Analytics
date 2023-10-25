@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 
 def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns):
-    # Weighting based on investment horizon
     if investment_horizon <= 3:  # Short term
         target_return = stocks_avg_daily_returns.min()
     elif investment_horizon <= 7:  # Medium term
@@ -16,25 +15,34 @@ def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_
     else:  # Long term
         target_return = stocks_avg_daily_returns.max()
 
-    # Adjust target return based on risk tolerance
     if risk_tolerance == "faible":
         target_return -= 0.01
-    elif risk_tolerance == "élevée":
+        max_crypto_weight = 0  # No crypto for low-risk profile
+        min_stock_diversification = 0.8  # At least 80% diversification among stocks
+    elif risk_tolerance == "moyenne":
+        max_crypto_weight = 0.2  # Up to 20% crypto for medium-risk profile
+        min_stock_diversification = 0.5  # At least 50% diversification among stocks
+    else:  # élevée
         target_return += 0.01
+        max_crypto_weight = 0.5  # Up to 50% crypto for high-risk profile
+        min_stock_diversification = 0.2  # At least 20% diversification among stocks
 
-    # Select the optimal portfolio for each asset type using the efficient frontier
-    stock_portfolio = efficient_frontier(stocks_daily_returns, target_return)['x']
+    stock_portfolio = efficient_frontier(stocks_daily_returns, target_return, min_diversification=min_stock_diversification)['x']
     crypto_portfolio = efficient_frontier(crypto_daily_returns, target_return)['x']
 
-    # Adjusting for one stock and one crypto
-    stock_index = np.argmax(stock_portfolio)
-    crypto_index = np.argmax(crypto_portfolio)
+    # Ensure we don't exceed the max_crypto_weight for the risk profile
+    total_crypto_weight = np.sum(crypto_portfolio)
+    if total_crypto_weight > max_crypto_weight:
+        crypto_portfolio = (crypto_portfolio / total_crypto_weight) * max_crypto_weight
 
-    stock_investment = np.zeros_like(stock_portfolio)
-    crypto_investment = np.zeros_like(crypto_portfolio)
+    # Remaining weight is for stocks
+    total_stock_weight = 1 - total_crypto_weight
 
-    stock_investment[stock_index] = capital
-    crypto_investment[crypto_index] = capital
+    total_stock_investment = capital * total_stock_weight
+    total_crypto_investment = capital * total_crypto_weight
+    
+    stock_investment = stock_portfolio * total_stock_investment
+    crypto_investment = crypto_portfolio * total_crypto_investment
 
     return stock_investment, crypto_investment
 
@@ -71,12 +79,15 @@ def calculate_returns(data):
     returns = data.pct_change().dropna()
     return returns
 
-def efficient_frontier(returns,target_return_):
+def efficient_frontier(returns,target_return_,min_diversification=0):
     cov_matrix = returns.cov()
     avg_returns = returns.mean()
 
     num_assets = len(returns.columns)
     args = (avg_returns, cov_matrix)
+
+    if min_diversification > 0:
+        cons = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - min_diversification},)
 
     constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
                    {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return_})
@@ -214,14 +225,14 @@ rf_daily
 # Plot the assets and CAL using the daily risk-free rate
 plot_assets_and_cal(plotting_data, rf_daily)
 
-stock_investment, crypto_investment = recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns)
-
 # Récupération des noms des stocks et des cryptos depuis les fichiers Excel
-
 print(crypto_data.columns)
 crypto_names = crypto_data.columns.tolist()
 stock_data = pd.read_excel("all_tickers.xlsx")
-stock_names = stock_data['Name'][:80].tolist()
+stock_names = stock_data['Name'][:80].tolist()  # En supposant que votre fichier Excel pour les actions contienne une colonne 'Name' pour les noms des actions.
+
+# Récupération de l'investissement recommandé
+stock_investment, crypto_investment = recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns)
 
 # Affichage de la répartition du portefeuille d'actions
 print("\nRépartition du portefeuille d'actions :")
@@ -234,4 +245,3 @@ print("\nRépartition du portefeuille de cryptomonnaies :")
 for ticker, name, amount in zip(crypto_symbols, crypto_names, crypto_investment):
     if amount > 0:
         print(f"{name} ({ticker}): {amount:.2f} USD")
-
