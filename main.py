@@ -42,6 +42,7 @@ capital = float(input("Veuillez entrer votre capital à investir: "))
 investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
 risk_tolerance = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ")
 
+
 def get_crypto_data():
     headers = {
         'Accepts': 'application/json',
@@ -93,10 +94,11 @@ crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
 all_stocks = pd.read_excel("all_tickers.xlsx")
-first_100_stocks = all_stocks['Symbol'][:80].tolist()
+first_100_stocks = all_stocks['Symbol'][:500].tolist()
+first_100_stocks = [str(ticker) for ticker in first_100_stocks]
 
-crypto_data = get_data(crypto_symbols, '2015-01-01', '2023-10-01')
-stocks_data = get_data(first_100_stocks, '2015-01-01', '2023-10-01')
+crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
+stocks_data = get_data(first_100_stocks, '2019-01-01', '2023-10-01')
 
 crypto_daily_returns = calculate_returns(crypto_data)
 stocks_daily_returns = calculate_returns(stocks_data)
@@ -106,7 +108,6 @@ stocks_avg_daily_returns = stocks_daily_returns.mean()
 
 crypto_risks = crypto_daily_returns.std()
 stocks_risks = stocks_daily_returns.std()
-
 
 # # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action
 # Create dictionary of results
@@ -125,7 +126,6 @@ results_dict = {
 with pd.ExcelWriter("rendements_et_risques.xlsx") as writer:
     for sheet_name, result in results_dict.items():
         result.to_excel(writer, sheet_name=sheet_name)
-#
 # # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux
 target_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)
 target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)
@@ -172,12 +172,33 @@ def plot_assets_and_cal(data_dict, rf_daily):
     for key, data in data_dict.items():
         plt.figure(figsize=(12, 6))
         # Plotting the efficient frontier
+import plotly.graph_objects as go
+
+
+def plot_assets_and_cal_plotly(data_dict, rf_daily):
+    for key, data in data_dict.items():
+        # Create a scatter plot for assets
+        fig = go.Figure()
+
+        # Plotting individual asset points with their names
+        for ticker in data["symbols"]:
+            if ticker == 'nan' or ticker == '':
+                continue  # Skip this iteration if the ticker is 'nan' or an empty string
+
+            fig.add_trace(go.Scatter(x=[data["risks"][ticker]],
+                                     y=[data["avg_daily_returns"][ticker]],
+                                     mode='markers',
+                                     name=ticker))
+
+            # Plotting the efficient frontier
         portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
         target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
-        plt.plot(portfolio_volatilities, target_returns, 'y-', label='Frontière Efficient de Markowitz')
+        fig.add_trace(go.Scatter(x=portfolio_volatilities, y=target_returns, mode='lines',
+                                 name='Frontière Efficient de Markowitz', line=dict(color='yellow')))
 
         # Calculate the slope of the tangent for each portfolio on the efficient frontier
-        slopes = [(np.dot(data["avg_daily_returns"], portfolio.x) - rf_daily) / portfolio.fun for portfolio in data["efficient_portfolios"]]
+        slopes = [(np.dot(data["avg_daily_returns"], portfolio.x) - rf_daily) / portfolio.fun for portfolio in
+                  data["efficient_portfolios"]]
 
         # Find the portfolio with the steepest slope
         max_slope_idx = np.argmax(slopes)
@@ -190,29 +211,21 @@ def plot_assets_and_cal(data_dict, rf_daily):
         # Plot the CAL
         x = np.linspace(0, max(portfolio_volatilities), 100)
         y = rf_daily + (tangent_return - rf_daily) / tangent_volatility * x
-        plt.plot(x, y, 'g--', label='CAL')
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers', name='CAL', line=dict(color='green', dash='dash')))
 
-        # Generate a colormap for unique colors
-        colors = cm.rainbow(np.linspace(0, 1, len(data["symbols"])))
+        # Layout settings
+        fig.update_layout(title=data["title"], xaxis_title='Volatilité (Écart type du rendement)',
+                          yaxis_title='Rendement attendu')
+        fig.show()
 
-        # Plotting individual asset points with their names
-        for ticker, color in zip(data["symbols"], colors):
-            plt.scatter(data["risks"][ticker], data["avg_daily_returns"][ticker], marker='o', s=20, color=color, label=ticker)
 
-        plt.xlabel('Volatilité (Écart type du rendement)')
-        plt.ylabel('Rendement attendu')
-        plt.title(data["title"])
-        plt.grid(True)
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Place legend to the right of the plot
-        plt.tight_layout()  # Adjust layout so that the legend doesn't overlap with the plot
-        plt.show()
 # Convert the annual risk-free rate to a daily rate
 rf_annual = 0.01  # 1% annual rate
 rf_daily = (1 + rf_annual)**(1/365) - 1
 rf_daily
 
 # Plot the assets and CAL using the daily risk-free rate
-plot_assets_and_cal(plotting_data, rf_daily)
+plot_assets_and_cal_plotly(plotting_data, rf_daily)
 
 stock_investment, crypto_investment = recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns)
 
