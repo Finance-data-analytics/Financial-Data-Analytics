@@ -5,6 +5,7 @@ import requests
 from matplotlib import cm
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 
 def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns):
@@ -183,7 +184,7 @@ def plot_assets_and_cal(data_dict, rf_daily):
     for key, data in data_dict.items():
         plt.figure(figsize=(12, 6))
         # Plotting the efficient frontier
-import plotly.graph_objects as go
+
 
 
 def plot_assets_and_cal_plotly(data_dict, rf_daily):
