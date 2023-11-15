@@ -1,6 +1,7 @@
 from config import *
 from portfolio_analysis import calculate_returns, efficient_frontier
 
+
 def get_crypto_data():
     headers = {
         'Accepts': 'application/json',
@@ -27,40 +28,87 @@ def get_crypto_data():
     crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
     crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
 
-def get_data(tickers, start_date, end_date):
-    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
-    return data
 
 get_crypto_data()
 crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
-all_stocks = pd.read_excel("all_tickers.xlsx")
-first_100_stocks = all_stocks['Symbol'][:5].tolist()
-first_100_stocks = [str(ticker) for ticker in first_100_stocks]
 
-crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
-stocks_data = get_data(first_100_stocks, '2019-01-01', '2023-10-01')
+def get_data_crypto(tickers, start_date, end_date):
+    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+    return data
+
+
+def get_data_stocks(tickers, isins, start_date, end_date):
+    successful_retrievals = []
+    data_list = []
+
+    for index, (ticker, isin) in enumerate(zip(tickers, isins)):
+        try:
+            print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")
+            data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
+
+            if data.empty or data.isna().any():
+                data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
+
+            if not data.empty and not data.isna().any():
+                successful_retrievals.append(ticker)  # Use isin if ISIN was successful
+                data.name = ticker  # Use isin as the name if ISIN was successful
+                data_list.append(data)
+            else:
+                print(f"Data for {ticker}/{isin} was still empty or contained NaNs after retrieval.")
+
+        except Exception as e:
+            print(f"Failed to retrieve data for {ticker}/{isin}: {e}")
+
+    if data_list:
+        all_data = pd.concat(data_list, axis=1)
+    else:
+        all_data = pd.DataFrame()
+
+    return all_data, successful_retrievals
+
+
+all_stocks = pd.read_excel("stocks.xlsx")
+ticker = all_stocks['ticker'][:200].tolist()
+isin = all_stocks['isin'][:200].tolist()
+list_ticker = [str(ticker) for ticker in ticker]
+
+crypto_data = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
+stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', '2023-10-01')
 
 crypto_daily_returns = calculate_returns(crypto_data)
 stocks_daily_returns = calculate_returns(stocks_data)
 
+# Calculate average daily returns and risks for crypto and stocks
 crypto_avg_daily_returns = crypto_daily_returns.mean()
 stocks_avg_daily_returns = stocks_daily_returns.mean()
 
 crypto_risks = crypto_daily_returns.std()
 stocks_risks = stocks_daily_returns.std()
 
-# # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action
-# Create dictionary of results
+# Filter out assets with zero avg return and risk in crypto data
+crypto_to_keep = ~(crypto_avg_daily_returns == 0) | ~(crypto_risks == 0)
+crypto_daily_returns_filtered = crypto_daily_returns.loc[:, crypto_to_keep]
+crypto_avg_daily_returns_filtered = crypto_avg_daily_returns[crypto_to_keep]
+crypto_risks_filtered = crypto_risks[crypto_to_keep]
+
+# Filter out assets with zero avg return and risk in stocks data
+stocks_to_keep = ~(stocks_avg_daily_returns == 0) | ~(stocks_risks == 0)
+stocks_daily_returns_filtered = stocks_daily_returns.loc[:, stocks_to_keep]
+stocks_avg_daily_returns_filtered = stocks_avg_daily_returns[stocks_to_keep]
+stocks_risks_filtered = stocks_risks[stocks_to_keep]
+
+
+# Create dictionary of results with filtered data
 results_dict = {
     "Stocks": pd.DataFrame({
-        "Rendement moyen": stocks_avg_daily_returns,
-        "Risque": stocks_risks
+        "Rendement moyen": stocks_avg_daily_returns_filtered,
+        "Risque": stocks_risks_filtered
     }),
     "Crypto": pd.DataFrame({
-        "Rendement moyen": crypto_avg_daily_returns,
-        "Risque": crypto_risks
+        "Rendement moyen": crypto_avg_daily_returns_filtered,
+        "Risque": crypto_risks_filtered
     })
 }
 
@@ -74,8 +122,8 @@ target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_d
 
 # Dictionary containing average daily returns and daily returns for each asset type
 data_dict = {
-    "Stocks": (stocks_avg_daily_returns, stocks_daily_returns),
-    "Crypto": (crypto_avg_daily_returns, crypto_daily_returns)
+    "Stocks": (stocks_avg_daily_returns_filtered, stocks_daily_returns_filtered),
+    "Crypto": (crypto_avg_daily_returns_filtered, crypto_daily_returns_filtered)
 }
 
 # Empty dictionary to store efficient portfolios for each asset type
@@ -89,24 +137,35 @@ for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
 
 
 # Convert the annual risk-free rate to a daily rate
-rf_annual = 0.01  # 1% annual rate
+rf_annual = 0.0455  # 1% annual rate
 rf_daily = (1 + rf_annual)**(1/365) - 1
 rf_daily
+
+file_path = "rendements_et_risques.xlsx"
+
+# Read the first column from the 'Stocks' sheet, skipping the first row
+stocks_actualised = pd.read_excel(file_path, sheet_name='Stocks', usecols=[0], skiprows=1)
+stocks_actualised = stocks_actualised.iloc[:, 0].tolist()
+
+# Read the first column from the 'Crypto' sheet, skipping the first row
+crypto_actualised = pd.read_excel(file_path, sheet_name='Crypto', usecols=[0], skiprows=1)
+crypto_actualised = crypto_actualised.iloc[:, 0].tolist()
+
 
 # Dictionary containing data for plotting
 plotting_data = {
     "Cryptos": {
-        "risks": crypto_risks,
-        "avg_daily_returns": crypto_avg_daily_returns,
-        "symbols": crypto_symbols,
+        "risks": crypto_risks_filtered,
+        "avg_daily_returns": crypto_avg_daily_returns_filtered,
+        "symbols": crypto_actualised,
         "efficient_portfolios": efficient_portfolios_dict["Crypto"],
         "color": 'b',
         "title": 'Cryptos: Rendement vs Risque'
     },
     "Stocks": {
-        "risks": stocks_risks,
-        "avg_daily_returns": stocks_avg_daily_returns,
-        "symbols": first_100_stocks,
+        "risks": stocks_risks_filtered,
+        "avg_daily_returns": stocks_avg_daily_returns_filtered,
+        "symbols": stocks_actualised,
         "efficient_portfolios": efficient_portfolios_dict["Stocks"],
         "color": 'r',
         "title": 'Stocks: Rendement vs Risque'

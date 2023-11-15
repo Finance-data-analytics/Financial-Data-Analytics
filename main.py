@@ -11,12 +11,11 @@ crypto_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Crypto")
 stocks_avg_daily_returns = stocks_data["Rendement moyen"]
 crypto_avg_daily_returns = crypto_data["Rendement moyen"]
 
+# Plot the assets and CAL using the daily risk-free rate
+plot_assets_and_cal_plotly(plotting_data, rf_daily)
 # capital = float(input("Veuillez entrer votre capital à investir: "))
 # investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
 # risk_tolerance = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ")
-
-# Plot the assets and CAL using the daily risk-free rate
-plot_assets_and_cal_plotly(plotting_data, rf_daily)
 #
 # # Récupération des noms des stocks et des cryptos depuis les fichiers Excel
 # print(crypto_data.columns)

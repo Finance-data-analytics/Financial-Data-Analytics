@@ -7,13 +7,24 @@ def portfolio_volatility(weights, avg_returns, cov_matrix):
 
 
 def calculate_returns(data):
-    # Forward filling NaNs and then calculating percentage change
-    returns = data.ffill().pct_change().dropna()
+    # Forward fill missing values
+    data_ffilled = data.ffill()
 
-    # Additional check to drop any rows that still have NaNs or Infinities
-    returns = returns.replace([np.inf, -np.inf], np.nan).dropna()
+    # Calculate percentage change
+    returns = data_ffilled.ffill().pct_change()
 
-    return returns
+    # Drop any remaining NaN values
+    returns_cleaned = returns.dropna()
+
+    # Create an explicit copy to avoid SettingWithCopyWarning
+    returns_cleaned = returns_cleaned.copy()
+
+    # Replace infinities and recheck for NaNs
+    returns_cleaned.replace([np.inf, -np.inf], np.nan, inplace=True)
+    returns_cleaned.dropna(inplace=True)
+
+    return returns_cleaned
+
 
 
 def efficient_frontier(returns, target_return_, min_diversification=0):
