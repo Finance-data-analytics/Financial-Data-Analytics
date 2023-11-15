@@ -21,8 +21,8 @@ plot_assets_and_cal_plotly(plotting_data, rf_daily)
 # Récupération des noms des stocks et des cryptos depuis les fichiers Excel
 print(crypto_data.columns)
 crypto_names = crypto_data.columns.tolist()
-stock_data = pd.read_excel("all_tickers.xlsx")
-stock_names = stock_data['Name'][:80].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.
+stock_data = pd.read_excel("stocks.xlsx")
+stock_names = stock_data['Name'].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.
 
 # Récupération de l'investissement recommandé
 stock_investment, crypto_investment = recommend_portfolio(
