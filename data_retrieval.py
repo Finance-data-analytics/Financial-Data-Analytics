@@ -1,7 +1,6 @@
 from config import *
 from portfolio_analysis import calculate_returns, efficient_frontier
 
-
 def get_crypto_data():
     headers = {
         'Accepts': 'application/json',
@@ -13,7 +12,7 @@ def get_crypto_data():
     cryptos = data['data']
 
     # Liste des symboles des stablecoins à exclure
-    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP', 'UNI']
+    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP','UNI']
 
     crypto_data = []
     for crypto in cryptos:
@@ -28,22 +27,16 @@ def get_crypto_data():
     crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
     crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
 
+def get_data(tickers, start_date, end_date):
+    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+    return data
 
 get_crypto_data()
 crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
 crypto_symbols = crypto_data['Symbol'].tolist()
 
-
-def get_data(tickers, start_date, end_date):
-    try:
-        data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
-        return data
-    except Exception as e:
-        print(f"Failed to fetch data for ticker {tickers}: {e}")
-
-
-all_stocks = pd.read_excel("stocks.xlsx")
-first_100_stocks = all_stocks['ticker'].tolist()
+all_stocks = pd.read_excel("all_tickers.xlsx")
+first_100_stocks = all_stocks['Symbol'][:5].tolist()
 first_100_stocks = [str(ticker) for ticker in first_100_stocks]
 
 crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
@@ -94,9 +87,10 @@ for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
     efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
     efficient_portfolios_dict[asset_type] = efficient_portfolios
 
+
 # Convert the annual risk-free rate to a daily rate
 rf_annual = 0.01  # 1% annual rate
-rf_daily = (1 + rf_annual) ** (1 / 365) - 1
+rf_daily = (1 + rf_annual)**(1/365) - 1
 rf_daily
 
 # Dictionary containing data for plotting
