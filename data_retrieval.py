@@ -1,5 +1,5 @@
 from config import *
-from portfolio_analysis import calculate_returns
+from portfolio_analysis import calculate_returns, efficient_frontier
 
 def get_crypto_data():
     headers = {
@@ -46,3 +46,64 @@ stocks_avg_daily_returns = stocks_daily_returns.mean()
 crypto_risks = crypto_daily_returns.std()
 stocks_risks = stocks_daily_returns.std()
 
+# # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action
+# Create dictionary of results
+results_dict = {
+    "Stocks": pd.DataFrame({
+        "Rendement moyen": stocks_avg_daily_returns,
+        "Risque": stocks_risks
+    }),
+    "Crypto": pd.DataFrame({
+        "Rendement moyen": crypto_avg_daily_returns,
+        "Risque": crypto_risks
+    })
+}
+
+# Use ExcelWriter to save these DataFrames into separate sheets of the same Excel file
+with pd.ExcelWriter("rendements_et_risques.xlsx") as writer:
+    for sheet_name, result in results_dict.items():
+        result.to_excel(writer, sheet_name=sheet_name)
+# # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux
+target_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)
+target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)
+
+# Dictionary containing average daily returns and daily returns for each asset type
+data_dict = {
+    "Stocks": (stocks_avg_daily_returns, stocks_daily_returns),
+    "Crypto": (crypto_avg_daily_returns, crypto_daily_returns)
+}
+
+# Empty dictionary to store efficient portfolios for each asset type
+efficient_portfolios_dict = {}
+
+# Loop over the dictionary
+for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
+    target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)
+    efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
+    efficient_portfolios_dict[asset_type] = efficient_portfolios
+
+
+# Convert the annual risk-free rate to a daily rate
+rf_annual = 0.01  # 1% annual rate
+rf_daily = (1 + rf_annual)**(1/365) - 1
+rf_daily
+
+# Dictionary containing data for plotting
+plotting_data = {
+    "Cryptos": {
+        "risks": crypto_risks,
+        "avg_daily_returns": crypto_avg_daily_returns,
+        "symbols": crypto_symbols,
+        "efficient_portfolios": efficient_portfolios_dict["Crypto"],
+        "color": 'b',
+        "title": 'Cryptos: Rendement vs Risque'
+    },
+    "Stocks": {
+        "risks": stocks_risks,
+        "avg_daily_returns": stocks_avg_daily_returns,
+        "symbols": first_100_stocks,
+        "efficient_portfolios": efficient_portfolios_dict["Stocks"],
+        "color": 'r',
+        "title": 'Stocks: Rendement vs Risque'
+    }
+}

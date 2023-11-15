@@ -1,9 +1,6 @@
 from config import *
 from portfolio_analysis import *
 
-
-stocks_avg_daily_returns = get_stocks_avg_daily_returns(stock_data)
-
 def plot_assets_and_cal(data_dict, rf_daily):
     # Loop over the dictionary to plot for each asset type
     for key, data in data_dict.items():
@@ -53,23 +50,5 @@ def plot_assets_and_cal_plotly(data_dict, rf_daily):
                           yaxis_title='Rendement attendu')
         fig.show()
 
-# Dictionary containing data for plotting
-plotting_data = {
-    "Cryptos": {
-        "risks": crypto_risks,
-        "avg_daily_returns": crypto_avg_daily_returns,
-        "symbols": crypto_symbols,
-        "efficient_portfolios": efficient_portfolios_dict["Crypto"],
-        "color": 'b',
-        "title": 'Cryptos: Rendement vs Risque'
-    },
-    "Stocks": {
-        "risks": stocks_risks,
-        "avg_daily_returns": stocks_avg_daily_returns,
-        "symbols": first_100_stocks,
-        "efficient_portfolios": efficient_portfolios_dict["Stocks"],
-        "color": 'r',
-        "title": 'Stocks: Rendement vs Risque'
-    }
-}
+
 
