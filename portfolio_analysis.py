@@ -15,7 +15,7 @@ def efficient_frontier(returns,target_return_,min_diversification=0):
     num_assets = len(returns.columns)
     args = (avg_returns, cov_matrix)
 
-    if min_diversification > 0:
+    if min_diversification:
         cons = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - min_diversification},)
 
     constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
@@ -25,10 +25,7 @@ def efficient_frontier(returns,target_return_,min_diversification=0):
     results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)
     return results
 
-
-
-
-def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns):
+def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns,stocks_daily_returns,crypto_daily_returns):
     if investment_horizon <= 3:  # Short term
         target_return = stocks_avg_daily_returns.min()
     elif investment_horizon <= 7:  # Medium term

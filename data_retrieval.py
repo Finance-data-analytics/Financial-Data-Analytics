@@ -6,17 +6,22 @@ def get_crypto_data():
         'Accepts': 'application/json',
         'X-CMC_PRO_API_KEY': '8ec7c7d5-f5ee-44a7-9d90-99ea1fb90edf',
     }
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15'
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=30'
     response = requests.get(url, headers=headers)
     data = response.json()
     cryptos = data['data']
+
+    # Liste des symboles des stablecoins à exclure
+    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP','UNI']
 
     crypto_data = []
     for crypto in cryptos:
         name = crypto['name']
         symbol = crypto['symbol']
-        market_cap = crypto['quote']['USD']['market_cap']
-        crypto_data.append({"Name": name, "Symbol": symbol, "Market Cap": market_cap})
+        # Excluez les cryptos si elles sont dans la liste des stablecoins
+        if symbol not in stablecoins:
+            market_cap = crypto['quote']['USD']['market_cap']
+            crypto_data.append({"Name": name, "Symbol": symbol, "Market Cap": market_cap})
 
     crypto_df = pd.DataFrame(crypto_data)
     crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')

@@ -1,5 +1,4 @@
 import time
-
 import psycopg2
 import requests
 from bs4 import BeautifulSoup
@@ -152,7 +151,6 @@ class ZoneBourseScraper:
                     self.insert_into_db(name, ticker, isin)  # Wrap the tuple in a list
 
         self.driver.quit()
-
 
 if __name__ == "__main__":
     scraper = ZoneBourseScraper("Hugo.lemonnier02@gmail.com", "&qyHE#$fz$p2j+H")
