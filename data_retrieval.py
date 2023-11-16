@@ -144,11 +144,11 @@ rf_daily
 file_path = "rendements_et_risques.xlsx"
 
 # Read the first column from the 'Stocks' sheet, skipping the first row
-stocks_actualised = pd.read_excel(file_path, sheet_name='Stocks', usecols=[0], skiprows=1)
+stocks_actualised = pd.read_excel(file_path, sheet_name='Stocks', usecols=[0], skiprows=0)
 stocks_actualised = stocks_actualised.iloc[:, 0].tolist()
 
 # Read the first column from the 'Crypto' sheet, skipping the first row
-crypto_actualised = pd.read_excel(file_path, sheet_name='Crypto', usecols=[0], skiprows=1)
+crypto_actualised = pd.read_excel(file_path, sheet_name='Crypto', usecols=[0], skiprows=0)
 crypto_actualised = crypto_actualised.iloc[:, 0].tolist()
 
 
