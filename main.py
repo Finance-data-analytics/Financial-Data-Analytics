@@ -12,6 +12,8 @@ crypto_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Crypto")
 stocks_avg_daily_returns = stocks_data["Rendement moyen"]
 crypto_avg_daily_returns = crypto_data["Rendement moyen"]
 
+stocks_volatility = stocks_data["Risque"]
+crypto_volatility = crypto_data["Risque"]
 # Plot the assets and CAL using the daily risk-free rate
 plot_assets_and_cal_plotly(plotting_data, rf_daily)
 
@@ -35,13 +37,17 @@ stock_investment, crypto_investment = recommend_portfolio(
     total_score,
     capital,
     investment_horizon,
-    stocks_avg_daily_returns.values,  # Ensure these are numpy arrays
+    stocks_avg_daily_returns.values,
+    stocks_volatility,# Ensure these are numpy arrays
     crypto_avg_daily_returns.values,
+    crypto_volatility,
     rf_daily  # You need to define this variable or replace it with the actual risk-free rate
 )
 
 # Récupérer les noms des stocks depuis le dictionnaire plotting_data
 stock_names = plotting_data["Stocks"]["symbols"]
+crypto_names = plotting_data["Cryptos"]["symbols"]
+
 # Vérification de la longueur de la liste des noms de stocks
 if len(stock_names) != len(stock_investment):
     print("Erreur : Le nombre de noms de stocks ne correspond pas au nombre d'investissements.")
@@ -57,4 +63,4 @@ else:
 print("\nRépartition du portefeuille de cryptomonnaies:")
 for i, amount in enumerate(crypto_investment):
     if amount > 0:
-        print(f"Crypto {i}: {amount:.2f} USD")
+        print(f"{crypto_names[i]}: {amount:.2f} USD")

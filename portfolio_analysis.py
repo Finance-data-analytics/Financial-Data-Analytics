@@ -55,62 +55,75 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
     results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, method='SLSQP', constraints=constraints, bounds=bounds)
     return results
 
-def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, crypto_avg_daily_returns, rf_daily):
-    # Define the risk tolerance based on the score
+import numpy as np
+from scipy.optimize import minimize
+
+import numpy as np
+from scipy.optimize import minimize
+
+import numpy as np
+from scipy.optimize import minimize
+
+
+import numpy as np
+from scipy.optimize import minimize
+
+def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily):
+    # Définition de la tolérance au risque basée sur le score
+    max_crypto_weight = 0.0  # Initialisation à 0 pour le cas à faible risque
     if score <= 5:
         risk_tolerance = 'low'
-        max_crypto_weight = 0.0  # No crypto for low-risk profile
     elif 6 <= score <= 10:
         risk_tolerance = 'medium'
-        max_crypto_weight = 0.2  # Up to 20% crypto for medium-risk profile
+        max_crypto_weight = 0.2 if investment_horizon > 5 else 0.1  # Poids plus faible si l'horizon est court
     else:
         risk_tolerance = 'high'
-        max_crypto_weight = 0.5  # Up to 50% crypto for high-risk profile
-    
-    # Define target return based on risk tolerance and investment horizon
-    if investment_horizon < 5:  # Short term
-        target_return = stocks_avg_daily_returns.min()
-    elif investment_horizon < 10:  # Medium term
-        target_return = np.mean([stocks_avg_daily_returns.mean(), crypto_avg_daily_returns.mean()])
-    else:  # Long term
-        target_return = stocks_avg_daily_returns.max()
+        max_crypto_weight = 0.5 if investment_horizon > 5 else 0.25  # Poids plus faible si l'horizon est court
 
-    # Optimization function for portfolio allocation
-    def portfolio_volatility(weights, stocks_returns, crypto_returns):
-        # Combine the stock and crypto returns
-        portfolio_returns = np.dot(weights, np.concatenate([stocks_returns, crypto_returns]))
-        return np.std(portfolio_returns)
+    num_stocks = len(stocks_avg_daily_returns)
+    num_cryptos = len(crypto_avg_daily_returns)
 
-    # Constraint: the sum of weights is 1
-    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
-    
-    # Bounds for each asset in portfolio: 0% to 100%
-    bounds = tuple((0, 1) for asset in range(len(stocks_avg_daily_returns) + len(crypto_avg_daily_returns)))
-    
-    # Initial guess for the weights (evenly distributed)
-    init_guess = [1.0 / (len(stocks_avg_daily_returns) + len(crypto_avg_daily_returns))] * \
-                 (len(stocks_avg_daily_returns) + len(crypto_avg_daily_returns))
+    # Fonction pour calculer le ratio de Sharpe négatif
+    def negative_sharpe_ratio(weights, stocks_returns, stocks_vol, crypto_returns, crypto_vol, rf_rate):
+        # Calcul des rendements et volatilité pondérés du portefeuille
+        portfolio_return = np.dot(weights[:num_stocks], stocks_returns) + np.dot(weights[num_stocks:], crypto_returns)
+        portfolio_vol = np.sqrt(np.dot(weights[:num_stocks]**2, stocks_vol**2) + np.dot(weights[num_stocks:]**2, crypto_vol**2))
+        sharpe_ratio = (portfolio_return - rf_rate) / portfolio_vol
+        return -sharpe_ratio  # Minimiser pour maximiser le ratio de Sharpe
 
-    # Optimization to minimize volatility for the given target return
-    opt_results = minimize(portfolio_volatility, init_guess, args=(stocks_avg_daily_returns, crypto_avg_daily_returns), 
-                           method='SLSQP', constraints=constraints, bounds=bounds)
+    # Contraintes: la somme des poids est 1 et la pondération de la crypto ne dépasse pas le maximum autorisé
+    constraints = [
+        {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},  # Somme des poids = 1
+        {'type': 'ineq', 'fun': lambda x: max_crypto_weight - np.sum(x[num_stocks:])},  # Poids crypto <= max_crypto_weight
+        {'type': 'ineq', 'fun': lambda x: capital - np.dot(x, np.concatenate((np.ones(num_stocks) * capital, np.ones(num_cryptos) * (capital * max_crypto_weight))))}  # Contrainte de budget
+    ]
 
-    # Extract the optimal weights for stocks and cryptos
-    stock_weights = opt_results.x[:len(stocks_avg_daily_returns)]
-    crypto_weights = opt_results.x[len(stocks_avg_daily_returns):]
+    bounds = tuple((0, 1) for _ in range(num_stocks + num_cryptos))
 
-    # Adjust crypto weights according to max allowed based on risk tolerance
-    total_crypto_weight = np.sum(crypto_weights)
-    if total_crypto_weight > max_crypto_weight:
-        excess_weight = total_crypto_weight - max_crypto_weight
-        # Scale down crypto weights
-        crypto_weights = crypto_weights - (crypto_weights / total_crypto_weight * excess_weight)
-        # Add the excess weight back to stocks
-        stock_weights = stock_weights + (stock_weights / np.sum(stock_weights) * excess_weight)
+    init_guess = [1.0 / (num_stocks + num_cryptos)] * (num_stocks + num_cryptos)
 
-    # Calculate the capital allocation
+    opt_results = minimize(
+        negative_sharpe_ratio, init_guess,
+        args=(stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily),
+        method='SLSQP', bounds=bounds, constraints=constraints
+    )
+
+    optimal_weights = opt_results.x
+    stock_weights = optimal_weights[:num_stocks]
+    crypto_weights = optimal_weights[num_stocks:]
+
+    # Ajustement des poids pour respecter le capital total
+    if np.sum(stock_weights) + np.sum(crypto_weights) > 1:
+        total_weights = np.sum(stock_weights) + np.sum(crypto_weights)
+        stock_weights = stock_weights / total_weights
+        crypto_weights = crypto_weights / total_weights
+
     stock_investment = capital * stock_weights
     crypto_investment = capital * crypto_weights
 
     return stock_investment, crypto_investment
+
+
+
+
 
