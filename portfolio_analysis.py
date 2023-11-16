@@ -70,6 +70,12 @@ def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_ret
         risk_tolerance = 'high'
         max_crypto_weight = 0.5 if investment_horizon > 5 else 0.25  # Poids plus faible si l'horizon est court
 
+    stock_prices = {}
+    for identifier in stocks_info:
+        data = yf.download(identifier, period="5d")
+        stock_prices[identifier] = data['Adj Close'][-1] if not data.empty else None
+    print(stock_prices)
+
     num_stocks = len(stocks_avg_daily_returns)
     num_cryptos = len(crypto_avg_daily_returns)
 
