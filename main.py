@@ -1,47 +1,53 @@
 from config import *
-from data_retrieval import *
-from portfolio_analysis import *
+from data_retrieval import *  # Make sure this imports data for stocks and cryptos
+from portfolio_analysis import recommend_portfolio
 from plotting import *
+from survey import evaluate_risk_aversion, suggest_portfolio
 
 # Load the data back into a DataFrame
 stocks_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Stocks")
 crypto_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Crypto")
 
-# Now you can access `stocks_avg_daily_returns` and `crypto_avg_daily_returns` from the DataFrames
+# Access the 'stocks_avg_daily_returns' and 'crypto_avg_daily_returns' from the DataFrames
 stocks_avg_daily_returns = stocks_data["Rendement moyen"]
 crypto_avg_daily_returns = crypto_data["Rendement moyen"]
 
 # Plot the assets and CAL using the daily risk-free rate
 plot_assets_and_cal_plotly(plotting_data, rf_daily)
-# capital = float(input("Veuillez entrer votre capital à investir: "))
-# investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
-# risk_tolerance = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ")
-#
-# # Récupération des noms des stocks et des cryptos depuis les fichiers Excel
-# print(crypto_data.columns)
-# crypto_names = crypto_data.columns.tolist()
-# stock_data = pd.read_excel("all_tickers.xlsx")
-# stock_names = stock_data['Name'][:80].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.
-#
-# # Récupération de l'investissement recommandé
-# stock_investment, crypto_investment = recommend_portfolio(
-#     capital,
-#     investment_horizon,
-#     risk_tolerance,
-#     stocks_avg_daily_returns,
-#     crypto_avg_daily_returns,
-#     stocks_daily_returns, # Assuming this is needed based on your portfolio_analysis.py
-#     crypto_daily_returns  # Assuming this is needed based on your portfolio_analysis.py
-# )
-#
-# # Affichage de la répartition du portefeuille d'actions
-# print("\nRépartition du portefeuille d'actions :")
-# for ticker, name, amount in zip(first_100_stocks, stock_names, stock_investment):
-#     if amount > 0:
-#         print(f"{name} ({ticker}): {amount:.2f} USD")
-#
-# # Affichage de la répartition du portefeuille de cryptomonnaies
-# print("\nRépartition du portefeuille de cryptomonnaies :")
-# for ticker, name, amount in zip(crypto_symbols, crypto_names, crypto_investment):
-#     if amount > 0:
-#         print(f"{name} ({ticker}): {amount:.2f} USD")
+
+# Evaluate the user's risk aversion
+total_score = evaluate_risk_aversion()
+
+# Then get the portfolio suggestion based on the survey score
+portfolio_suggestion = suggest_portfolio(total_score)
+
+# Prompt user for their capital and investment horizon
+capital = float(input("Veuillez entrer votre capital à investir: "))
+investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
+
+# Convert risk tolerance input to match expected values in recommend_portfolio
+risk_tolerance_map = {'faible': 'low', 'moyenne': 'medium', 'élevée': 'high'}
+risk_tolerance_input = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ").lower()
+risk_tolerance = risk_tolerance_map.get(risk_tolerance_input, 'low')
+
+# Call the recommend_portfolio function with the user inputs
+stock_investment, crypto_investment = recommend_portfolio(
+    total_score,
+    capital,
+    investment_horizon,
+    stocks_avg_daily_returns.values,  # Ensure these are numpy arrays
+    crypto_avg_daily_returns.values,
+    rf_daily  # You need to define this variable or replace it with the actual risk-free rate
+)
+
+# Display the suggested investment in stocks
+print("\nRépartition du portefeuille d'actions:")
+for i, amount in enumerate(stock_investment):
+    if amount > 0:
+        print(f"Stock {i}: {amount:.2f} USD")
+
+# Display the suggested investment in cryptos
+print("\nRépartition du portefeuille de cryptomonnaies:")
+for i, amount in enumerate(crypto_investment):
+    if amount > 0:
+        print(f"Crypto {i}: {amount:.2f} USD")

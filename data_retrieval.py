@@ -70,8 +70,8 @@ def get_data_stocks(tickers, isins, start_date, end_date):
 
 
 all_stocks = pd.read_excel("stocks.xlsx")
-ticker = all_stocks['ticker'][:200].tolist()
-isin = all_stocks['isin'][:200].tolist()
+ticker = all_stocks['ticker'][:10].tolist()
+isin = all_stocks['isin'][:10].tolist()
 list_ticker = [str(ticker) for ticker in ticker]
 
 crypto_data = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
