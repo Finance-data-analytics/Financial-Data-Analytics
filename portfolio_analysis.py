@@ -57,7 +57,8 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
     return results
 
 
-def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily):
+
+def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily,stocks_info,crypto_info):
     # Définition de la tolérance au risque basée sur le score
     max_crypto_weight = 0.0  # Initialisation à 0 pour le cas à faible risque
     if score <= 5:

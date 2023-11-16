@@ -41,7 +41,10 @@ stock_investment, crypto_investment = recommend_portfolio(
     stocks_volatility,# Ensure these are numpy arrays
     crypto_avg_daily_returns.values,
     crypto_volatility,
-    rf_daily  # You need to define this variable or replace it with the actual risk-free rate
+    rf_daily,  # You need to define this variable or replace it with the actual risk-free rate
+    plotting_data["Stocks"]["list_ticker_isin"],
+    plotting_data["Cryptos"]["list_crypto"]
+
 )
 
 # Récupérer les noms des stocks depuis le dictionnaire plotting_data

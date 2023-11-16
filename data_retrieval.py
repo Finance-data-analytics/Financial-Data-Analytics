@@ -35,26 +35,36 @@ crypto_symbols = crypto_data['Symbol'].tolist()
 
 
 def get_data_crypto(tickers, start_date, end_date):
-    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
-    return data
+    successful_crypto = []
+    try:
+        data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+        if not data.empty and not data.isna().any():
+            successful_crypto.append(tickers)
+    except Exception as e:
+        print(f"Failed to retrieve data for {tickers}: {e}")
+    return data,successful_crypto
 
 
 def get_data_stocks(tickers, isins, start_date, end_date):
     successful_retrievals = []
     data_list = []
+
     for index, (ticker, isin) in enumerate(zip(tickers, isins)):
         try:
             print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")
-            data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
+            data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
 
             if data.empty or data.isna().any():
-                data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
-            if not data.empty and not data.isna().any():
-                successful_retrievals.append(ticker)  # Use isin if ISIN was successful
-                data.name = ticker  # Use isin as the name if ISIN was successful
-                data_list.append(data)
+                # Si les données du ticker sont vides ou contiennent des NaN, essayez l'ISIN
+                data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
+                if not data.empty and not data.isna().any():
+                    successful_retrievals.append(ticker)  # Ajouter l'ISIN à la liste de réussite
+                    data.name = ticker  # Utiliser l'ISIN comme nom si la récupération ISIN a réussi
+                    data_list.append(data)
             else:
-                print(f"Data for {ticker}/{isin} was still empty or contained NaNs after retrieval.")
+                successful_retrievals.append(isin)  # Ajouter le ticker à la liste de réussite
+                data.name = ticker  # Utiliser le ticker comme nom
+                data_list.append(data)
 
         except Exception as e:
             print(f"Failed to retrieve data for {ticker}/{isin}: {e}")
@@ -72,7 +82,7 @@ ticker = all_stocks['ticker'][:10].tolist()
 isin = all_stocks['isin'][:10].tolist()
 list_ticker = [str(ticker) for ticker in ticker]
 
-crypto_data = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
+crypto_data,successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
 stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', '2023-10-01')
 
 crypto_daily_returns = calculate_returns(crypto_data)
@@ -158,7 +168,9 @@ plotting_data = {
         "symbols": crypto_actualised,
         "efficient_portfolios": efficient_portfolios_dict["Crypto"],
         "color": 'b',
-        "title": 'Cryptos: Rendement vs Risque'
+        "title": 'Cryptos: Rendement vs Risque',
+        "list_crypto":successful_crypto
+
     },
     "Stocks": {
         "risks": stocks_risks_filtered,
