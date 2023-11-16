@@ -1,5 +1,6 @@
 from config import *
 from data_retrieval import *
+from scipy.optimize import minimize
 
 
 def portfolio_volatility(weights, avg_returns, cov_matrix):
@@ -55,18 +56,6 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
     results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, method='SLSQP', constraints=constraints, bounds=bounds)
     return results
 
-import numpy as np
-from scipy.optimize import minimize
-
-import numpy as np
-from scipy.optimize import minimize
-
-import numpy as np
-from scipy.optimize import minimize
-
-
-import numpy as np
-from scipy.optimize import minimize
 
 def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily):
     # Définition de la tolérance au risque basée sur le score

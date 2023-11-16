@@ -42,7 +42,6 @@ def get_data_crypto(tickers, start_date, end_date):
 def get_data_stocks(tickers, isins, start_date, end_date):
     successful_retrievals = []
     data_list = []
-
     for index, (ticker, isin) in enumerate(zip(tickers, isins)):
         try:
             print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")
@@ -50,7 +49,6 @@ def get_data_stocks(tickers, isins, start_date, end_date):
 
             if data.empty or data.isna().any():
                 data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
-
             if not data.empty and not data.isna().any():
                 successful_retrievals.append(ticker)  # Use isin if ISIN was successful
                 data.name = ticker  # Use isin as the name if ISIN was successful
@@ -168,6 +166,7 @@ plotting_data = {
         "symbols": stocks_actualised,
         "efficient_portfolios": efficient_portfolios_dict["Stocks"],
         "color": 'r',
-        "title": 'Stocks: Rendement vs Risque'
+        "title": 'Stocks: Rendement vs Risque',
+        "list_ticker_isin":successful_symbols
     }
 }

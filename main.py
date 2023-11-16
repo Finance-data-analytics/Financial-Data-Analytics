@@ -48,6 +48,8 @@ stock_investment, crypto_investment = recommend_portfolio(
 stock_names = plotting_data["Stocks"]["symbols"]
 crypto_names = plotting_data["Cryptos"]["symbols"]
 
+threshold = 0.01
+
 # Vérification de la longueur de la liste des noms de stocks
 if len(stock_names) != len(stock_investment):
     print("Erreur : Le nombre de noms de stocks ne correspond pas au nombre d'investissements.")
@@ -55,12 +57,12 @@ else:
     # Modification dans l'affichage pour utiliser les noms des stocks
     print("\nRépartition du portefeuille d'actions:")
     for i, amount in enumerate(stock_investment):
-        if amount > 0:  # Afficher uniquement les stocks avec un investissement
+        if amount >= threshold:  # Afficher uniquement les stocks avec un investissement
             print(f"{stock_names[i]}: {amount:.2f} USD")
 
 
 # Display the suggested investment in cryptos
 print("\nRépartition du portefeuille de cryptomonnaies:")
 for i, amount in enumerate(crypto_investment):
-    if amount > 0:
+    if amount >= threshold:
         print(f"{crypto_names[i]}: {amount:.2f} USD")
