@@ -52,7 +52,7 @@ stock_names = plotting_data["Stocks"]["symbols"]
 crypto_names = plotting_data["Cryptos"]["symbols"]
 
 threshold = 0.01
-
+print(stock_investment)
 # Vérification de la longueur de la liste des noms de stocks
 if len(stock_names) != len(stock_investment):
     print("Erreur : Le nombre de noms de stocks ne correspond pas au nombre d'investissements.")

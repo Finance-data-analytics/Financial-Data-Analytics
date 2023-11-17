@@ -41,6 +41,7 @@ def evaluate_risk_aversion():
     if last_answer_critical:
         return 0  # Retourne 0 si la dernière réponse est 'c'
     else:
+        print(total_score)
         return total_score  # Retourne le score total sinon
 
 

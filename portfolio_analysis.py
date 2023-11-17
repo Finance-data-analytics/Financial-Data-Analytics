@@ -58,62 +58,68 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
 
 
 
-def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily,stocks_info,crypto_info):
-    # Définition de la tolérance au risque basée sur le score
-    max_crypto_weight = 0.0  # Initialisation à 0 pour le cas à faible risque
-    if score <= 5:
+def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily, stocks_info, crypto_info):
+    # Définition de la tolérance au risque et du poids maximum en crypto
+    if score <= 6:
         risk_tolerance = 'low'
-    elif 6 <= score <= 10:
+        max_crypto_weight = 0.0  # Aucune allocation en crypto pour un risque faible
+    elif 7 <= score <= 10:
         risk_tolerance = 'medium'
-        max_crypto_weight = 0.2 if investment_horizon > 5 else 0.1  # Poids plus faible si l'horizon est court
+        max_crypto_weight = 0.2 if investment_horizon > 5 else 0.1
     else:
         risk_tolerance = 'high'
-        max_crypto_weight = 0.5 if investment_horizon > 5 else 0.25  # Poids plus faible si l'horizon est court
+        max_crypto_weight = 0.5 if investment_horizon > 5 else 0.25
 
-    stock_prices = {}
-    for identifier in stocks_info:
-        data = yf.download(identifier, period="5d")
-        stock_prices[identifier] = data['Adj Close'][-1] if not data.empty else None
-    print(stock_prices)
+    # Téléchargement des données des stocks
+    #stock_prices = {identifier: yf.download(identifier, period="5d")['Adj Close'][-1] for identifier in stocks_info}
 
     num_stocks = len(stocks_avg_daily_returns)
     num_cryptos = len(crypto_avg_daily_returns)
 
     # Fonction pour calculer le ratio de Sharpe négatif
-    def negative_sharpe_ratio(weights, stocks_returns, stocks_vol, crypto_returns, crypto_vol, rf_rate):
-        # Calcul des rendements et volatilité pondérés du portefeuille
-        portfolio_return = np.dot(weights[:num_stocks], stocks_returns) + np.dot(weights[num_stocks:], crypto_returns)
-        portfolio_vol = np.sqrt(np.dot(weights[:num_stocks]**2, stocks_vol**2) + np.dot(weights[num_stocks:]**2, crypto_vol**2))
+    def negative_sharpe_ratio(weights, risk_tolerance, stocks_returns, stocks_vol, crypto_returns, crypto_vol, rf_rate):
+        if risk_tolerance == 'low':
+            adjusted_stocks_returns = stocks_returns * 0.5
+            adjusted_crypto_returns = crypto_returns * 0.5
+        elif risk_tolerance == 'medium':
+            adjusted_stocks_returns = stocks_returns * 0.75
+            adjusted_crypto_returns = crypto_returns * 0.75
+        elif risk_tolerance == 'high':
+            # Pour une tolérance au risque élevée, on ne modifie pas les rendements attendus
+            adjusted_stocks_returns = stocks_returns
+            adjusted_crypto_returns = crypto_returns
+
+            # Calcul des rendements et volatilité pondérés du portefeuille
+        portfolio_return = np.dot(weights[:num_stocks], adjusted_stocks_returns) + np.dot(weights[num_stocks:],
+                                                                                          adjusted_crypto_returns)
+        portfolio_vol = np.sqrt(
+            np.dot(weights[:num_stocks] ** 2, stocks_vol ** 2) + np.dot(weights[num_stocks:] ** 2, crypto_vol ** 2))
         sharpe_ratio = (portfolio_return - rf_rate) / portfolio_vol
-        return -sharpe_ratio  # Minimiser pour maximiser le ratio de Sharpe
+        return -sharpe_ratio
 
-    # Contraintes: la somme des poids est 1 et la pondération de la crypto ne dépasse pas le maximum autorisé
+    # Contraintes et bornes
     constraints = [
-        {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},  # Somme des poids = 1
-        {'type': 'ineq', 'fun': lambda x: max_crypto_weight - np.sum(x[num_stocks:])},  # Poids crypto <= max_crypto_weight
-        {'type': 'ineq', 'fun': lambda x: capital - np.dot(x, np.concatenate((np.ones(num_stocks) * capital, np.ones(num_cryptos) * (capital * max_crypto_weight))))}  # Contrainte de budget
+        {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
+        {'type': 'ineq', 'fun': lambda x: max_crypto_weight - np.sum(x[num_stocks:])}
     ]
-
     bounds = tuple((0, 1) for _ in range(num_stocks + num_cryptos))
 
+    # Point de départ pour l'optimisation
     init_guess = [1.0 / (num_stocks + num_cryptos)] * (num_stocks + num_cryptos)
 
+    # Optimisation
     opt_results = minimize(
         negative_sharpe_ratio, init_guess,
-        args=(stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily),
+        args=(risk_tolerance, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily),
         method='SLSQP', bounds=bounds, constraints=constraints
     )
 
+    # Récupération des poids optimaux
     optimal_weights = opt_results.x
     stock_weights = optimal_weights[:num_stocks]
     crypto_weights = optimal_weights[num_stocks:]
 
-    # Ajustement des poids pour respecter le capital total
-    if np.sum(stock_weights) + np.sum(crypto_weights) > 1:
-        total_weights = np.sum(stock_weights) + np.sum(crypto_weights)
-        stock_weights = stock_weights / total_weights
-        crypto_weights = crypto_weights / total_weights
-
+    # Calcul de l'allocation d'investissement
     stock_investment = capital * stock_weights
     crypto_investment = capital * crypto_weights
 
