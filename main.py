@@ -3,6 +3,11 @@ from data_retrieval import *  # Make sure this imports data for stocks and crypt
 from portfolio_analysis import recommend_portfolio
 from plotting import *
 from survey import evaluate_risk_aversion, suggest_portfolio
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+
+pe_ratios_from_iex = get_pe_ratio_iex(tickers_from_names_iex)
+print(pe_ratios_from_iex)
 
 # Load the data back into a DataFrame
 stocks_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Stocks")
@@ -50,6 +55,7 @@ stock_investment, crypto_investment = recommend_portfolio(
 # Récupérer les noms des stocks depuis le dictionnaire plotting_data
 stock_names = plotting_data["Stocks"]["symbols"]
 crypto_names = plotting_data["Cryptos"]["symbols"]
+
 
 threshold = 0.01
 print(stock_investment)
