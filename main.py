@@ -4,76 +4,75 @@ from portfolio_analysis import recommend_portfolio
 from plotting import *
 from survey import evaluate_risk_aversion, suggest_portfolio
 
-# Load the data back into a DataFrame
-stocks_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Stocks")
-crypto_data = pd.read_excel("rendements_et_risques.xlsx", sheet_name="Crypto")
 
-# Access the 'stocks_avg_daily_returns' and 'crypto_avg_daily_returns' from the DataFrames
-stocks_avg_daily_returns = stocks_data["Rendement moyen"]
-crypto_avg_daily_returns = crypto_data["Rendement moyen"]
+# Define a function to load data and extract relevant columns
+def load_data(file_path, sheet_name, return_col, risk_col):
+    data = pd.read_excel(file_path, sheet_name=sheet_name)
+    avg_daily_returns = data[return_col]
+    volatility = data[risk_col]
+    return avg_daily_returns, volatility
 
-stocks_volatility = stocks_data["Risque"]
-crypto_volatility = crypto_data["Risque"]
-# Plot the assets and CAL using the daily risk-free rate
-plot_assets_and_cal_plotly(plotting_data, rf_daily)
+
+# File path and column names
+file_path = "rendements_et_risques.xlsx"
+return_col = "Rendement moyen"
+risk_col = "Risque"
+
+# Load and process data for stocks and crypto
+stocks_avg_daily_returns, stocks_volatility = load_data(file_path, "Stocks", return_col, risk_col)
+crypto_avg_daily_returns, crypto_volatility = load_data(file_path, "Crypto", return_col, risk_col)
+
 
 # Evaluate the user's risk aversion
-total_score = evaluate_risk_aversion()
+def user_interaction_and_evaluation():
+    total_score = evaluate_risk_aversion()
+    portfolio_suggestion = suggest_portfolio(total_score)
+    print(portfolio_suggestion)
 
-# Then get the portfolio suggestion based on the survey score
-portfolio_suggestion = suggest_portfolio(total_score)
+    capital = float(input("Veuillez entrer votre capital à investir: "))
+    investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
+    nb_stocks = int(input("Veuillez entrer un nombre de stocks que vous desirez avoir dans votre portefeuille: "))
 
-# Prompt user for their capital and investment horizon
-capital = float(input("Veuillez entrer votre capital à investir: "))
-investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
+    return total_score, capital, investment_horizon, nb_stocks
 
-# Convert risk tolerance input to match expected values in recommend_portfolio
-# risk_tolerance_map = {'faible': 'low', 'moyenne': 'medium', 'élevée': 'high'}
-# risk_tolerance_input = input("Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): ").lower()
-# risk_tolerance = risk_tolerance_map.get(risk_tolerance_input, 'low')
 
-# Call the recommend_portfolio function with the user inputs
-stock_investment, crypto_investment = recommend_portfolio(
-    total_score,
-    capital,
-    investment_horizon,
-    stocks_avg_daily_returns.values,
-    stocks_volatility,# Ensure these are numpy arrays
-    crypto_avg_daily_returns.values,
-    crypto_volatility,
-    rf_daily,  # You need to define this variable or replace it with the actual risk-free rate
-    plotting_data["Stocks"]["list_ticker_isin"],
-    plotting_data["Cryptos"]["list_crypto"]
-)
+def recommend_and_display_portfolio(total_score, capital, investment_horizon, nb_stocks):
+    # Call the recommend_portfolio function with the user inputs
+    stock_investment, crypto_investment = recommend_portfolio(
+        total_score,
+        capital,
+        investment_horizon,
+        stocks_avg_daily_returns.values,
+        stocks_volatility,
+        crypto_avg_daily_returns.values,
+        crypto_volatility,
+        rf_daily,  # This should be defined or replaced with the actual risk-free rate
+        plotting_data["Stocks"]["list_ticker_isin"],
+        plotting_data["Cryptos"]["list_crypto"],
+        nb_stocks
+    )
 
-# Récupérer les noms des stocks depuis le dictionnaire plotting_data
-# Récupérer les noms des stocks depuis le dictionnaire plotting_data
-stock_names = plotting_data["Stocks"]["symbols"]
-crypto_names = plotting_data["Cryptos"]["symbols"]
+    # Displaying the portfolio allocation
+    print("\nRecommended Portfolio Allocation:")
 
-threshold = 0.01
-# Vérification de la longueur de la liste des noms de stocks
-if len(stock_names) != len(stock_investment):
-    print("Erreur : Le nombre de noms de stocks ne correspond pas au nombre d'investissements.")
-else:
-    # Modification dans l'affichage pour utiliser les noms des stocks et afficher les pourcentages
-    print("\nRépartition du portefeuille d'actions:")
-    for i, amount in enumerate(stock_investment):
-        if amount >= threshold:  # Afficher uniquement les stocks avec un investissement
-            percentage = (amount / capital) * 100  # Calcul du pourcentage
-            print(f"{stock_names[i]}: {amount:.2f} USD ({percentage:.2f}%)")
+    # Display for stocks
+    print("\nStocks Investment:")
+    for stock, amount in zip(plotting_data["Stocks"]["symbols"], stock_investment):
+        if amount > 0:
+            print(f"{stock}: {amount:.2f} USD")
 
-# Affichage de la répartition en cryptomonnaies avec pourcentages
-print("\nRépartition du portefeuille de cryptomonnaies:")
-for i, amount in enumerate(crypto_investment):
-    if amount >= threshold:
-        percentage = (amount / capital) * 100  # Calcul du pourcentage
-        print(f"{crypto_names[i]}: {amount:.2f} USD ({percentage:.2f}%)")
+    # Display for cryptocurrencies
+    print("\nCryptocurrency Investment:")
+    for crypto, amount in zip(plotting_data["Cryptos"]["symbols"], crypto_investment):
+        if amount > 0:
+            print(f"{crypto}: {amount:.2f} USD")
 
-# Convertir en pourcentages
-percentage_in_stocks = (sum(stock_investment) / capital) * 100
-percentage_in_cryptos = (sum(crypto_investment) / capital) * 100
+    # Calculate and display the total percentage invested in stocks and cryptos
+    percentage_in_stocks = (sum(stock_investment) / capital) * 100
+    percentage_in_cryptos = (sum(crypto_investment) / capital) * 100
 
-# Affichage des pourcentages
-print(f"\nRépartition totale du portefeuille:\n Crypto: {percentage_in_cryptos:.2f}%\n Stock: {percentage_in_stocks:.2f}%")
+    print(f"\nTotal Portfolio Distribution:\n - Stocks: {percentage_in_stocks:.2f}%\n - Cryptocurrencies: {percentage_in_cryptos:.2f}%")
 
+
+# Plot the assets and CAL using the daily risk-free rate
+plot_assets_and_cal_plotly(plotting_data, rf_daily)

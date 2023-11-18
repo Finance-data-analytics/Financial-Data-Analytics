@@ -50,24 +50,28 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
     bounds = tuple((0, 1) for _ in range(num_assets))
 
     # Consider adding options to the minimize function for better convergence
-    results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, method='SLSQP', constraints=constraints, bounds=bounds)
+    results = minimize(portfolio_volatility, num_assets * [1. / num_assets, ], args=args, method='SLSQP',
+                       constraints=constraints, bounds=bounds)
     return results
 
 
-def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily, stocks_info, crypto_info):
+def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility,
+                        crypto_avg_daily_returns, crypto_volatility, rf_daily, stocks_info, crypto_info, nb_stocks):
+    
     max_crypto_weight, risk_tolerance = define_max_crypto_weight(score, investment_horizon)
 
     # Récupération des prix des stocks
-    #stock_prices = {identifier: yf.download(identifier, period="5d")['Adj Close'].iloc[-1] for identifier in stocks_info}
-
+    # stock_prices = {identifier: yf.download(identifier, period="5d")['Adj Close'].iloc[-1] for identifier in stocks_info}
 
     # Optimisation initiale du portefeuille
-    stock_weights, crypto_weights = optimize_portfolio(capital, max_crypto_weight, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily, risk_tolerance)
+    stock_weights, crypto_weights = optimize_portfolio(capital, max_crypto_weight, stocks_avg_daily_returns,
+                                                       stocks_volatility, crypto_avg_daily_returns, crypto_volatility,
+                                                       rf_daily, risk_tolerance)
 
     if not any(crypto_weight > 0 for crypto_weight in crypto_weights):
         stock_weights = optimize_only_stocks(risk_tolerance, stocks_avg_daily_returns, stocks_volatility, rf_daily)
     # Ajustement pour les parts entières et calcul du capital restant
-    #stock_weights, remaining_capital = adjust_for_whole_shares(stock_weights, stock_prices, capital)
+    # stock_weights, remaining_capital = adjust_for_whole_shares(stock_weights, stock_prices, capital)
 
     # Calcul des investissements finaux
     stock_investment = np.array(stock_weights) * capital
@@ -90,7 +94,8 @@ def adjust_for_whole_shares(stock_weights, stock_prices, capital):
     return adjusted_weights, remaining_capital
 
 
-def reoptimize_portfolio(current_weights, stock_prices, capital, stocks_avg_daily_returns, stocks_volatility, rf_daily, risk_tolerance):
+def reoptimize_portfolio(current_weights, stock_prices, capital, stocks_avg_daily_returns, stocks_volatility, rf_daily,
+                         risk_tolerance):
     remaining_capital = capital - sum(weight * capital for weight in current_weights)
     num_stocks = len(stocks_avg_daily_returns)
 
@@ -169,22 +174,25 @@ def optimize_only_stocks(risk_tolerance, stocks_avg_daily_returns, stocks_volati
 def define_max_crypto_weight(score, investment_horizon):
     if score <= 6:
         max_crypto_weight = 0.0
-        risk_tolerance="low"
+        risk_tolerance = "low"
     elif 7 <= score <= 10:
         max_crypto_weight = 0.2 if investment_horizon > 5 else 0.1
         risk_tolerance = 'medium'
     else:
         max_crypto_weight = 0.5 if investment_horizon > 5 else 0.25
         risk_tolerance = 'high'
-    return max_crypto_weight,risk_tolerance
+    return max_crypto_weight, risk_tolerance
 
 
-def optimize_portfolio(capital, max_crypto_weight, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily,risk_tolerance):
+def optimize_portfolio(capital, max_crypto_weight, stocks_avg_daily_returns, stocks_volatility,
+                       crypto_avg_daily_returns, crypto_volatility, rf_daily, risk_tolerance):
     eligible_crypto_indices = list(range(len(crypto_avg_daily_returns)))  # Utilisez les indices
     optimal_allocation_found = False
 
     while not optimal_allocation_found:
-        optimal_weights = perform_optimization(eligible_crypto_indices, risk_tolerance, max_crypto_weight, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily)
+        optimal_weights = perform_optimization(eligible_crypto_indices, risk_tolerance, max_crypto_weight,
+                                               stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns,
+                                               crypto_volatility, rf_daily)
         stock_weights = optimal_weights[:len(stocks_avg_daily_returns)]
         crypto_weights = optimal_weights[len(stocks_avg_daily_returns):]
 
@@ -199,7 +207,8 @@ def optimize_portfolio(capital, max_crypto_weight, stocks_avg_daily_returns, sto
     return stock_weights, crypto_weights
 
 
-def perform_optimization(eligible_crypto_indices, risk_tolerance, max_crypto_weight, stocks_avg_daily_returns, stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily):
+def perform_optimization(eligible_crypto_indices, risk_tolerance, max_crypto_weight, stocks_avg_daily_returns,
+                         stocks_volatility, crypto_avg_daily_returns, crypto_volatility, rf_daily):
     num_stocks = len(stocks_avg_daily_returns)
     num_cryptos = len(eligible_crypto_indices)
 
@@ -242,13 +251,3 @@ def perform_optimization(eligible_crypto_indices, risk_tolerance, max_crypto_wei
     )
 
     return opt_results.x
-
-
-
-
-
-
-
-
-
-
