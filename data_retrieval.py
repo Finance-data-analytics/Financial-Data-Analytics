@@ -2,6 +2,85 @@ from config import *
 from portfolio_analysis import calculate_returns, efficient_frontier
 
 
+import logging
+import pandas as pd
+import requests
+
+logging.basicConfig(level=logging.INFO,filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+# Charger les noms des entreprises à partir du fichier Excel
+df = pd.read_excel('stocks.xlsx')
+names_iex = df['Name'].tolist()
+
+def filter_french_companies(results):
+    # Vous pouvez ajuster cette logique selon vos besoins
+    for result in results:
+        if 'FR' in result['region'] or '.PA' in result['symbol']:
+            return result['symbol']
+    return None
+
+def get_tickers_iex(company_names):
+    tickers_iex = {}
+    otc_suffixes = ['F', 'Y']  # Ajoutez d'autres suffixes si nécessaire
+
+    for name in company_names:
+        logging.info(f"Traitement de l'entreprise : {name}")
+        try:
+            encoded_name = quote_plus(name)
+            search_url = f'https://cloud.iexapis.com/stable/search/{encoded_name}?token=pk_c98c8d89d9d24284a527a6a322006e6f'
+            response = requests.get(search_url)
+            if response.status_code == 200 and response.json():
+                results = response.json()
+                # Utilisez la fonction filter_french_companies pour les entreprises françaises
+                if "FR" in name or any(word in name for word in ["PARIS", "FRANCE"]): 
+                    ticker = filter_french_companies(results)
+                else:
+                    # Filtrer pour exclure les tickers de l'OTC Market pour les autres entreprises
+                    valid_tickers = [result['symbol'] for result in results if not any(result['symbol'].endswith(suffix) for suffix in otc_suffixes)]
+                    ticker = valid_tickers[0] if valid_tickers else None
+
+                if ticker:
+                    tickers_iex[name] = ticker
+                    logging.info(f'Ticker found for {name}: {ticker}')
+                else:
+                    tickers_iex[name] = 'N/A'
+                    logging.warning(f'No suitable ticker found for {name}')
+            else:
+                tickers_iex[name] = 'N/A'
+                logging.warning(f'No ticker found for {name}')
+        except Exception as e:
+            logging.error(f'Error retrieving ticker for {name}: {e}')
+            tickers_iex[name] = 'N/A'
+    return tickers_iex
+
+# Récupérer les tickers des entreprises
+tickers_from_names_iex = get_tickers_iex(names_iex)
+
+def save_tickers_to_excel(tickers_iex, file_path='stocks.xlsx'):
+    df = pd.read_excel(file_path)
+    # Créer une nouvelle colonne pour les tickers IEX
+    df['Ticker_IEX'] = df['Name'].map(tickers_iex)
+    # Sauvegarder le DataFrame mis à jour dans le fichier Excel
+    df.to_excel(file_path, index=False)
+    logging.info(f"Tickers IEX sauvegardés dans {file_path}")
+
+# Utiliser la fonction pour sauvegarder les tickers dans le fichier Excel
+save_tickers_to_excel(tickers_from_names_iex)
+
+def get_pe_ratio_iex(tickers):
+    pe_ratios_iex = {}
+    for name, ticker in tickers.items():
+        if ticker != 'N/A':
+            url = f'https://cloud.iexapis.com/stable/stock/{ticker}/stats/peRatio?token=pk_c98c8d89d9d24284a527a6a322006e6f'
+            response = requests.get(url)
+            if response.status_code == 200:
+                pe_ratios_iex[ticker] = response.json()
+            else:
+                pe_ratios_iex[ticker] = 'N/A'
+        else:
+            pe_ratios_iex[name] = 'N/A'
+    return pe_ratios_iex
+
 def get_crypto_data():
     headers = {
         'Accepts': 'application/json',
@@ -53,7 +132,6 @@ def get_data_stocks(tickers, isins, start_date, end_date):
         try:
             print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")
             data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
-
             if data.empty or data.isna().any():
                 # Si les données du ticker sont vides ou contiennent des NaN, essayez l'ISIN
                 data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
@@ -160,6 +238,7 @@ crypto_actualised = pd.read_excel(file_path, sheet_name='Crypto', usecols=[0], s
 crypto_actualised = crypto_actualised.iloc[:, 0].tolist()
 
 
+
 # Dictionary containing data for plotting
 plotting_data = {
     "Cryptos": {
@@ -179,6 +258,6 @@ plotting_data = {
         "efficient_portfolios": efficient_portfolios_dict["Stocks"],
         "color": 'r',
         "title": 'Stocks: Rendement vs Risque',
-        "list_ticker_isin":successful_symbols
+        "list_ticker_isin":successful_symbols,
     }
 }
