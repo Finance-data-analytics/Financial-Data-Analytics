@@ -204,11 +204,13 @@ def recommend_portfolio(nb_stocks, list_stock,list_crypto,data_stock,data_crypto
 def get_crypto_weight_limit(total_score, investment_horizon):
     # Define the logic to determine the crypto weight limit based on the total_score and investment_horizon
     # This is a placeholder function; you'll need to implement the actual logic based on your requirements
-    if total_score < 3:
+    if total_score < 10 :
+        return 0
+    elif total_score >= 10 and total_score < 15 :
         return 0.10  # Low risk tolerance
-    elif total_score < 7:
+    elif total_score >= 15 and total_score <20 :
         return 0.20  # Medium risk tolerance
-    else:
+    elif total_score > 20 :
         return 0.30  # High risk tolerance
 # def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility,
 #                         crypto_avg_daily_returns, crypto_volatility, rf_daily, stocks_info, crypto_info, nb_stocks):
