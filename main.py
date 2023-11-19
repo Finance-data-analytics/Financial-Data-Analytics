@@ -31,7 +31,7 @@ def user_interaction_and_evaluation():
 
     capital = float(input("Veuillez entrer votre capital à investir: "))
     investment_horizon = int(input("Veuillez entrer votre horizon d'investissement (en années): "))
-    nb_stocks = int(input("Veuillez entrer un nombre de stocks que vous desirez avoir dans votre portefeuille: "))
+    nb_stocks = int(input("Combien d'actif desirez vous au seins de votre portefeuille: "))
 
     return total_score, capital, investment_horizon, nb_stocks
 

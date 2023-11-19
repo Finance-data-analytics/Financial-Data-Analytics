@@ -1,3 +1,5 @@
+from dateutil.utils import today
+
 from config import *
 from portfolio_analysis import calculate_returns, efficient_frontier
 
@@ -161,8 +163,8 @@ ticker = all_stocks['ticker'][:10].tolist()
 isin = all_stocks['isin'][:10].tolist()
 list_ticker = [str(ticker) for ticker in ticker]
 
-crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
-stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', '2023-10-01')
+crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', today())
+stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', today())
 
 crypto_daily_returns = calculate_returns(crypto_data)
 stocks_daily_returns = calculate_returns(stocks_data)
