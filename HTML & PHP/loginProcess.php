@@ -1,42 +1,41 @@
-<?php 
-    session_start(); // Démarrage de la session
-    require_once 'config.php'; // On inclut la connexion à la base de données
+<?php
+session_start(); // Démarrage de la session
+require_once 'config.php'; // On inclut la connexion à la base de données
 
-    //Boucle if pour la connexion des utilisateurs (client).
-    if(!empty($_POST['email']) && !empty($_POST['password'])) // Si il existe les champs email, password et qu'il sont pas vident
-    {
-        // Patch XSS
-        $email = htmlspecialchars($_POST['email']); 
-        $password = htmlspecialchars($_POST['password']);
-        
-        $email = strtolower($email); // email transformé en minuscule
-        
-        // On regarde si l'utilisateur est inscrit dans la table utilisateurs
-        $check = $bdd->prepare('SELECT email, password, name, birthdate,idpf,picprofile FROM users WHERE email = ?');
-        $check->execute(array($email));
-        $data = $check->fetch();
-        $row = $check->rowCount();
-        // Si > à 0 alors l'utilisateur existe
-        var_dump($data);
-        if($row > 0)
-        {
-            // Si le mail est bon niveau format
-            if(filter_var($email, FILTER_VALIDATE_EMAIL))
-            {
-                // Si le mot de passe est le bon
-                if(password_verify($password, $data['password']))
-                {
-                    // On créer la session et on redirige sur landing.php
-                    $_SESSION['user'] = $data['id'];
-                    $_SESSION['email'] = $data['email'];
-                    header('Location: index.php');
-                    die();
-                }else{ header('Location:connexion.php?login_err=password'); die(); 
-                }
-            }else{ header('Location:connexion.php?login_err=email'); die(); 
+// Vérification si les champs email et password sont présents
+if(!empty($_POST['email']) && !empty($_POST['password'])) {
+    // Patch XSS
+    $email = htmlspecialchars(strtolower($_POST['email']));
+    $user_password = htmlspecialchars($_POST['password']); // Renamed variable to avoid conflict
+
+    // Préparation de la requête
+    if($stmt = $bdd->prepare("SELECT id, name, email, password FROM users WHERE email = ?")) {
+        // Liaison des paramètres
+        $stmt->bind_param("s", $email);
+
+        // Exécution de la requête
+        if($stmt->execute()) {
+            // Liaison des résultats
+            $stmt->bind_result($id, $name, $courriel, $db_password); // Corrected variable names
+            $stmt->fetch();
+
+            // Vérification du mot de passe
+            if(password_verify($user_password, $db_password)) { // Using the correct variables
+                // Gestion des rôles et redirection
+                $_SESSION['iduser'] = $id;
+                $_SESSION['email'] = $email;
+                $_SESSION['message'] = "Connexion réussie";
+                header('Location: index.php'); // Adjust the redirection as needed
+            } else {
+                $_SESSION['message'] = "Le mot de passe est invalide";
+                header('Location: connexion.php?login_err=password');
             }
-        }else{ header('Location:connexion.php?login_err=already'); die(); 
+        } else {
+            $_SESSION['message'] = "aucun compte n'existe avec cette adresse email";
+            header('Location: connexion.php?login_err=already');
         }
-    }else{ header('Location: connexion.php.php'); die();} // si le formulaire est envoyé sans aucune données
-    //Fin Boucle if/else pour la connexion des utilisateurs (client).
+    }
+} else {
+    header('Location: index.php'); // Corrected the redirection URL
+}
 ?>
