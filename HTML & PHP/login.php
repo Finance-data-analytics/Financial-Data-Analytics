@@ -45,7 +45,7 @@
             <!-- TradingView Widget END -->
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
-                    <a asp-action="Index" asp-controller="Home" class="animated-link">
+                    <a href="index.php" class="animated-link">
                         <img src="../pictures/Logo.png" alt="Logo Neoma Ventures" 
                              class="logo_esigelec">
                     </a>
