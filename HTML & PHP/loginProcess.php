@@ -12,7 +12,7 @@
         $email = strtolower($email); // email transformé en minuscule
         
         // On regarde si l'utilisateur est inscrit dans la table utilisateurs
-        $check = $bdd->prepare('SELECT email, password, token, clientadmin FROM users WHERE email = ?');
+        $check = $bdd->prepare('SELECT email, password, name, birthdate,idpf,picprofile FROM users WHERE email = ?');
         $check->execute(array($email));
         $data = $check->fetch();
         $row = $check->rowCount();
@@ -27,17 +27,16 @@
                 if(password_verify($password, $data['password']))
                 {
                     // On créer la session et on redirige sur landing.php
-                    $_SESSION['user'] = $data['token'];
-                    $_SESSION['clientadmin'] = $data['clientadmin'];
+                    $_SESSION['user'] = $data['id'];
                     $_SESSION['email'] = $data['email'];
-                    header('Location: landing.php');
+                    header('Location: index.php');
                     die();
-                }else{ header('Location:PageConnexion.php?login_err=password'); die(); 
+                }else{ header('Location:connexion.php?login_err=password'); die(); 
                 }
-            }else{ header('Location:PageConnexion.php?login_err=email'); die(); 
+            }else{ header('Location:connexion.php?login_err=email'); die(); 
             }
-        }else{ header('Location:PageConnexion.php?login_err=already'); die(); 
+        }else{ header('Location:connexion.php?login_err=already'); die(); 
         }
-    }else{ header('Location: PageConnexion.php'); die();} // si le formulaire est envoyé sans aucune données
+    }else{ header('Location: connexion.php.php'); die();} // si le formulaire est envoyé sans aucune données
     //Fin Boucle if/else pour la connexion des utilisateurs (client).
 ?>

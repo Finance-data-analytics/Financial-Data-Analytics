@@ -55,8 +55,8 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
-                        <a href="survey.php" class="animated-link">
-                            <span> Make your Portfolio </span>
+                        <a href="login.php" class="animated-link">
+                            <span> Login </span>
                         </a>
                         <a href="" class="animated-link">
                             <span> Our Team </span>

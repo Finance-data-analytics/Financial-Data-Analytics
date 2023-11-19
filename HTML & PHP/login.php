@@ -54,8 +54,8 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
-                        <a href="survey.php" class="animated-link">
-                            <span> Make your Portfolio </span>
+                        <a href="login.php" class="animated-link">
+                            <span> Login </span>
                         </a>
                         <a href="" class="animated-link">
                             <span> Our Team </span>
@@ -74,26 +74,80 @@
                 </div>
             </nav>
     </header>
+                        <?php 
+                            if(isset($_GET['reg_err']))
+                                {
+                                    $err = htmlspecialchars($_GET['reg_err']);
 
+                                    switch($err)
+                                        {
+                                            case 'success':
+                                            ?>
+                        <div class="alert alert-success">
+                            <strong>Succès</strong> inscription réussie !
+                        </div>
+                        <?php
+                                            break;
+                                            case 'password':
+                                            ?>
+                        <div class="alert alert-danger">
+                            <strong>Erreur</strong> mot de passe différent
+                        </div>
+                        <?php
+                                            break;
+
+                                            case 'email':
+                                            ?>
+                        <div class="alert alert-danger">
+                            <strong>Erreur</strong> email non valide
+                        </div>
+                        <?php
+                            break;
+                            case 'email_length':
+                            ?>
+                        <div class="alert alert-danger">
+                            <strong>Erreur</strong> email trop long
+                        </div>
+                        <?php 
+                                            break;
+
+                                            case 'pseudo_length':
+                                            ?>
+                        <div class="alert alert-danger">
+                            <strong>Erreur</strong> pseudo trop long
+                        </div>
+                        <?php 
+                                            case 'already':
+                                            ?>
+                        <div class="alert alert-danger">
+                            <strong>Erreur</strong> compte deja existant
+                        </div>
+                        <?php 
+
+                                        }
+                                    }
+                                    ?>
     <div class="container" id="container">
         <div class="form-container sign-up">
-            <form>
+            <form action=registerProcess.php method="post">
                 <h1>Create Account</h1>
                 <span>or use your email for registeration</span>
-                <input type="text" placeholder="Name">
+                <input type="text" name="name" placeholder="Name">
                 <input type="email" placeholder="Email">
-                <input type="password" placeholder="Password">
-                <button>Sign Up</button>
+                <input type="password" name="password" placeholder="Password">
+                <input type="password" name="password_retype" placeholder="Retype Your Password" require="required">
+                <input type="date" name="birthdate" placeholder="birthdate">
+                <button type="Submit">Sign Up</button>
             </form>
         </div>
         <div class="form-container sign-in">
-            <form>
+            <form action=loginProcess.php method="post">
                 <h1>Sign In</h1>
                 <span>or use your email password</span>
                 <input type="email" placeholder="Email">
                 <input type="password" placeholder="Password">
                 <a href="#">Forget Your Password?</a>
-                <button>Sign In</button>
+                <button type="Submit">Sign In</button>
             </form>
         </div>
         <div class="toggle-container">
