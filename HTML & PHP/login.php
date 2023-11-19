@@ -144,8 +144,8 @@
             <form action=loginProcess.php method="post">
                 <h1>Sign In</h1>
                 <span>or use your email password</span>
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Password">
+                <input type="email" name="email" placeholder="Email">
+                <input type="password" name="password" placeholder="Password">
                 <a href="#">Forget Your Password?</a>
                 <button type="Submit">Sign In</button>
             </form>
