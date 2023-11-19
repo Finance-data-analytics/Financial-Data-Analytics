@@ -1,9 +1,9 @@
-.html {
+html {
     scroll-behavior: smooth;
     display: flex ;
 }
 *,
-::before ::after {
+::before,::after {
     margin: 0;
     padding: 0;
 }
@@ -17,89 +17,69 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
 }
-ContainerTexteBody{
 
-    max-width : 1400px;
-    margin:100px auto 0;
-    padding : 0 20px;
+h1 {
+    text-transform: uppercase;
+    color: #faebd7;
+    font-weight: 900;
+}
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 100px 20px 0;
 }
 p {
     text-transform: uppercase;
     color: #222;
     font-weight: 900;
 }
-h1 {
-    text-transform: uppercase;
-    color: #faebd7;
-    font-weight: 900;
+p span {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    font-size: clamp(20px, 8vw, 120px);
 }
-
-    p span {
-        display: inline-block;
-        position: relative;
-        overflow: hidden;
-        font-size: clamp(20px, 8vw, 120px);
-    }
-
-        p span::after #simu{
-            content: "";
-            display: block;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            transform: translateX(-100%);
-            color : #222
-        }
-
-    p:nth-child(1) {
-        font-weight: 300;
-        animation: txt-appearance 0s 1s forwards;
-    }
-
-    p:nth-child(2) {
-        animation: txt-appearance 0s 1.25s forwards;
-    }
-
+p span::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+}
+p:nth-child(1) {
+    font-weight: 300;
+    animation: txt-appearance 0s 1s forwards;
+}
+p:nth-child(2) {
+    animation: txt-appearance 0s 1.25s forwards;
+}
 p:nth-child(1) span::after {
-    background: #c013a4;
-    animation: slide-in 0.75s ease-out forwards, slide-out 0.75s 1s ease-out forwards;
+    background: salmon;
+    animation: slide-in 0.75s ease-out forwards,
+    slide-out 0.75s 1s ease-out forwards;
 }
-
-    p:nth-child(2) span::after {
-        background: royalblue;
-        animation: slide-in 0.75s 0.3s ease-out forwards, slide-out 0.75s 1.3s ease-out forwards;
-    }
+p:nth-child(2) span::after {
+    background: royalblue;
+    animation: slide-in 0.75s 0.3s ease-out forwards,
+    slide-out 0.75s 1.3s ease-out forwards;
+}
 
 @keyframes slide-in {
     100% {
         transform: translateX(0%);
     }
 }
-
 @keyframes slide-out {
     100% {
         transform: translateX(100%)
     }
 }
-
 @keyframes txt-appearance {
     100% {
-        color: antiquewhite;
-    }
-}
-.animated {
-    animation: fadeIn 2s;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
+        color: #faebd7;
     }
 }
 
@@ -266,6 +246,7 @@ imGauche.ImageGauche{
             }
 
 footer {
+    text-align: center;
     border-top: 5px solid #fff;
     background-color: #000;
     color: #fff;
@@ -274,10 +255,20 @@ footer {
 }
 
     footer h1 {
+        text-align : center;
         font-family: 'Playfair Display', sans-serif;
         border-bottom: 1px solid #fff;
         width: 15%;
         margin-bottom: 30px;
+    }
+    footer h3 {
+        text-align: center;
+        font-family: 'Playfair Display', sans-serif;
+        margin: 0 auto;
+        display: block;
+        margin-bottom: auto;
+        line-height: normal;
+        
     }
 
     footer .mentions .mention {
@@ -322,173 +313,66 @@ footer {
         height: 50px;
     }
 
-/* Mettre une virgule pour donner les attributs*/
-/* Regarder les points , et [] pour les attributs css*/
-/* CSS class order/organization */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: black;
-}
-
-.login-container {
-    background-color: black;
-    width: 400px;
-    padding: 20px;
-    margin: 100px auto;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.login-logo {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-    .login-logo img {
-        width: 200px;
-    }
-
-h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    color:aliceblue
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-}
-
-    .login-form label {
-        margin-bottom: 5px;
-    }
-
-    .login-form input {
-        padding: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #d9d9d9;
-        
-    }
-
-    .login-form button {
-        padding: 10px;
-        background-color: #c013a4;
-        color: white;
-        font-weight: bold;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        margin-bottom: 20px;
-    }
-
-        .login-form button:hover {
-            background-color: #c013a4;
-        }
-
-p {
+footer .p {
     text-align: center;
 }
-
-.email {
-    position: relative;
+.contentJS {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-    .email label {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width:100%;
-        font-size: 16px;
-        color: #ccc;
-        transition: 0.3s;
-        pointer-events: none; /* Permet de cliquer  travers le label */
-    }
-.mdp {
-    position: relative;
+.contentJS {
+    font-family: Raleway, sans-serif;
+    font-size: 60px;
+    padding: 0.5em 0;
 }
 
-    .mdp label {
-        position: absolute;
-        top: 0;
-        left: 0;
-        font-size: 16px;
-        color: #ccc;
-        transition: 0.3s;
-        pointer-events: none; /* Permet de cliquer  travers le label */
-    }
+.contentJS p {
+    font-family: Raleway, sans-serif;
+    line-height: 1.6;
+    font-size: 18px;
+}
 
-.login-form input[type="email"] {
-    margin-bottom: 30px; /* Vous pouvez ajuster cette valeur selon vos prfrences */
-    border: none;
-    background: black;
-    outline: none;
-    border-bottom: 1px solid #ccc;
-    width:100%
+.element {
+    opacity: 0;
+    transform: translateX(-100%); /* This moves the element to the left out of view */
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out; /* Define the transition */
+  }
+  
+  .element.active {
+    opacity: 1;
+    transform: translateX(0); /* Move the element back to its original position */
+  }
     
+
+.slide-in {
+    margin: 50px auto;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 0.1s ease-in-out,opacity 0.5s ease-out;
 }
-
-.login-form input[type="password"] {
-    border: none;
-    background: black;
-    outline: none;
-    border-bottom: 1px solid #ccc;
-    width: 100%
+.slide-in.active {
+    transform: translateX(0%);
+    opacity: 1;
 }
-.email input[type="email"]::placeholder {
-    color: transparent;
+.slide-in h2 {
+    font-size: 40px;
+    text-align: center;
+    color: #f1f1f1;
 }
-.mdp input[type="password"]::placeholder {
-    color: transparent;
+.slide-in label {
+    display: block;
+    text-align: center;
+    color: #f1f1f1;
+    font-size: 20px;
+    margin: 5px 0 10px;
 }
-
-.email input[type="email"]:focus,
-.email input[type="email"]:not(:placeholder-shown) {
-    border-color: blanchedalmond;
-}
-
-    .email input[type="email"]:focus + label,
-    .email input[type="email"]:not(:placeholder-shown) + label {
-        top: -12px;
-        font-size: 12px;
-        color: blanchedalmond;
-    }
-.mdp input[type="password"]:focus,
-.mdp input[type="password"]:not(:placeholder-shown) {
-    border-color: blanchedalmond;
-}
-
-.mdp input[type="password"]:focus + label,
-.mdp input[type="password"]:not(:placeholder-shown) + label {
-    top: -12px;
-    font-size: 12px;
-    color:blanchedalmond;
-}
-
-
-
-
-
-    .login-form input[type="email"]:focus,
-    .login-form input[type="password"]:focus,
-    .login-form input[type="email"]:hover,
-    .login-form input[type="password"]:hover {
-        border-bottom: 2px solid #c013a4; /* Couleur de la ligne lorsque le champ est en focus */
-        outline: none
-    }
-
-a {
-    color: white;
-    text-decoration: none;
-    font-size:15px;
-
-}
-.widget-title {
-    font-family: inherit; /* Utilise la mme police que celle hrite de la classe parente */
-    text-decoration: underline; /* Souligne le texte */
-}
+.animate-on-scroll {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  
+  .animate-on-scroll.active {
+    opacity: 1;
+  }
