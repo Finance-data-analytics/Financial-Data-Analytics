@@ -62,7 +62,7 @@ def suggest_portfolio(score):
         return "No Crypto"
     elif score == 1:
         return "Beginner"
-    elif score <= max_score * 0.2:
+    elif score <= max_score * 0.35:
         return "Very Conservative"
     elif score <= max_score * 0.4:
         return "Balanced"
