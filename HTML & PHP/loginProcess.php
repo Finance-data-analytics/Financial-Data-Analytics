@@ -23,7 +23,7 @@ if(!empty($_POST['email']) && !empty($_POST['password'])) {
                     // On créer la session et on redirige sur landing.php
                     $_SESSION['user'] = $data['id'];
                     $_SESSION['name'] = $data['name'];
-                    header('Location: index.php?reg_err=success');
+                    header('Location: userIndex.php?reg_err=success');
                     die();
                 }else{ header('Location:login.php?login_err=password'); die(); 
                 }
