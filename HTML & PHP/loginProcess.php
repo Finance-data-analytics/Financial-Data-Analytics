@@ -5,10 +5,10 @@ require_once 'config.php'; // On inclut la connexion à la base de données
 // Vérification si les champs email et password sont présents
 if(!empty($_POST['email']) && !empty($_POST['password'])) {
     // Patch XSS
-    $email = htmlspecialchars(strtolower($_POST['email']));
+    $email = htmlspecialchars($_POST['email']);
     $password = htmlspecialchars($_POST['password']); // Renamed variable to avoid conflict
 
-    $check = $bdd->prepare('SELECT email, password, name, birthdate,idpf,picprofile FROM users WHERE email = ?');
+    $check = $bdd->prepare('SELECT id,email,password,name FROM users WHERE email = ?');
     $check->execute(array($email));
     $data = $check->fetch();
     $row = $check->rowCount();
@@ -22,8 +22,8 @@ if(!empty($_POST['email']) && !empty($_POST['password'])) {
                 {
                     // On créer la session et on redirige sur landing.php
                     $_SESSION['user'] = $data['id'];
-                    $_SESSION['nom'] = $data['nom'];
-                    header('Location: index.php');
+                    $_SESSION['name'] = $data['name'];
+                    header('Location: index.php?reg_err=success');
                     die();
                 }else{ header('Location:login.php?login_err=password'); die(); 
                 }
