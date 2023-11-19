@@ -1,12 +1,13 @@
 from config import *
 from portfolio_analysis import calculate_returns, efficient_frontier
 
-
 import logging
 import pandas as pd
 import requests
 
-logging.basicConfig(level=logging.INFO,filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logging.basicConfig(level=logging.INFO, filename='app.log', filemode='w',
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
 
 # # Charger les noms des entreprises à partir du fichier Excel
 # df = pd.read_excel('stocks.xlsx')
@@ -92,7 +93,7 @@ def get_crypto_data():
     cryptos = data['data']
 
     # Liste des symboles des stablecoins à exclure
-    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP','UNI']
+    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP', 'UNI']
 
     crypto_data = []
     for crypto in cryptos:
@@ -121,7 +122,7 @@ def get_data_crypto(tickers, start_date, end_date):
             successful_crypto.append(tickers)
     except Exception as e:
         print(f"Failed to retrieve data for {tickers}: {e}")
-    return data,successful_crypto
+    return data, successful_crypto
 
 
 def get_data_stocks(tickers, isins, start_date, end_date):
@@ -156,11 +157,11 @@ def get_data_stocks(tickers, isins, start_date, end_date):
 
 
 all_stocks = pd.read_excel("stocks.xlsx")
-ticker = all_stocks['ticker'][:50].tolist()
-isin = all_stocks['isin'][:50].tolist()
+ticker = all_stocks['ticker'][:10].tolist()
+isin = all_stocks['isin'][:10].tolist()
 list_ticker = [str(ticker) for ticker in ticker]
 
-crypto_data,successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
+crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', '2023-10-01')
 stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', '2023-10-01')
 
 crypto_daily_returns = calculate_returns(crypto_data)
@@ -184,7 +185,6 @@ stocks_to_keep = ~(stocks_avg_daily_returns == 0) | ~(stocks_risks == 0)
 stocks_daily_returns_filtered = stocks_daily_returns.loc[:, stocks_to_keep]
 stocks_avg_daily_returns_filtered = stocks_avg_daily_returns[stocks_to_keep]
 stocks_risks_filtered = stocks_risks[stocks_to_keep]
-
 
 # Create dictionary of results with filtered data
 results_dict = {
@@ -221,10 +221,9 @@ for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
     efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
     efficient_portfolios_dict[asset_type] = efficient_portfolios
 
-
 # Convert the annual risk-free rate to a daily rate
 rf_annual = 0.0455  # 1% annual rate
-rf_daily = (1 + rf_annual)**(1/365) - 1
+rf_daily = (1 + rf_annual) ** (1 / 365) - 1
 rf_daily
 
 file_path = "rendements_et_risques.xlsx"
@@ -237,8 +236,6 @@ stocks_actualised = stocks_actualised.iloc[:, 0].tolist()
 crypto_actualised = pd.read_excel(file_path, sheet_name='Crypto', usecols=[0], skiprows=0)
 crypto_actualised = crypto_actualised.iloc[:, 0].tolist()
 
-
-
 # Dictionary containing data for plotting
 plotting_data = {
     "Cryptos": {
@@ -248,7 +245,8 @@ plotting_data = {
         "efficient_portfolios": efficient_portfolios_dict["Crypto"],
         "color": 'b',
         "title": 'Cryptos: Rendement vs Risque',
-        "list_crypto":successful_crypto
+        "list_crypto": successful_crypto,
+        "data_crypto": crypto_data
 
     },
     "Stocks": {
@@ -258,6 +256,7 @@ plotting_data = {
         "efficient_portfolios": efficient_portfolios_dict["Stocks"],
         "color": 'r',
         "title": 'Stocks: Rendement vs Risque',
-        "list_ticker_isin":successful_symbols,
+        "list_ticker_isin": successful_symbols,
+        "data_stocks": stocks_data
     }
 }

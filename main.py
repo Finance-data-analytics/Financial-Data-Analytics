@@ -38,41 +38,40 @@ def user_interaction_and_evaluation():
 
 def recommend_and_display_portfolio(total_score, capital, investment_horizon, nb_stocks):
     # Call the recommend_portfolio function with the user inputs
-    stock_investment, crypto_investment = recommend_portfolio(
-        total_score,
-        capital,
-        investment_horizon,
-        stocks_avg_daily_returns.values,
-        stocks_volatility,
-        crypto_avg_daily_returns.values,
-        crypto_volatility,
-        rf_daily,  # This should be defined or replaced with the actual risk-free rate
+    recommend_portfolio(
+        nb_stocks,
         plotting_data["Stocks"]["list_ticker_isin"],
         plotting_data["Cryptos"]["list_crypto"],
-        nb_stocks
+        plotting_data["Stocks"]["data_stocks"],
+        plotting_data["Cryptos"]["data_crypto"],
+        capital,
+        total_score,
+        investment_horizon
     )
 
-    # Displaying the portfolio allocation
-    print("\nRecommended Portfolio Allocation:")
+    # # Displaying the portfolio allocation
+    # print("\nRecommended Portfolio Allocation:")
+    #
+    # # Display for stocks
+    # print("\nStocks Investment:")
+    # for stock, amount in zip(plotting_data["Stocks"]["symbols"], stock_investment):
+    #     if amount > 0.01:
+    #         print(f"{stock}: {amount:.2f} USD")
+    #
+    # # Display for cryptocurrencies
+    # print("\nCryptocurrency Investment:")
+    # for crypto, amount in zip(plotting_data["Cryptos"]["symbols"], crypto_investment):
+    #     if amount > 0.01:
+    #         print(f"{crypto}: {amount:.2f} USD")
+    #
+    # # Calculate and display the total percentage invested in stocks and cryptos
+    # percentage_in_stocks = (sum(stock_investment) / capital) * 100
+    # percentage_in_cryptos = (sum(crypto_investment) / capital) * 100
+    #
+    # print(
+    #     f"\nTotal Portfolio Distribution:\n - Stocks: {percentage_in_stocks:.2f}%\n - Cryptocurrencies: {percentage_in_cryptos:.2f}%")
 
-    # Display for stocks
-    print("\nStocks Investment:")
-    for stock, amount in zip(plotting_data["Stocks"]["symbols"], stock_investment):
-        if amount > 0:
-            print(f"{stock}: {amount:.2f} USD")
 
-    # Display for cryptocurrencies
-    print("\nCryptocurrency Investment:")
-    for crypto, amount in zip(plotting_data["Cryptos"]["symbols"], crypto_investment):
-        if amount > 0:
-            print(f"{crypto}: {amount:.2f} USD")
-
-    # Calculate and display the total percentage invested in stocks and cryptos
-    percentage_in_stocks = (sum(stock_investment) / capital) * 100
-    percentage_in_cryptos = (sum(crypto_investment) / capital) * 100
-
-    print(f"\nTotal Portfolio Distribution:\n - Stocks: {percentage_in_stocks:.2f}%\n - Cryptocurrencies: {percentage_in_cryptos:.2f}%")
-
-
-# Plot the assets and CAL using the daily risk-free rate
+total_score, capital, investment_horizon, nb_stocks = user_interaction_and_evaluation()
+recommend_and_display_portfolio(total_score, capital, investment_horizon, nb_stocks)
 plot_assets_and_cal_plotly(plotting_data, rf_daily)
