@@ -1,0 +1,494 @@
+.html {
+    scroll-behavior: smooth;
+    display: flex ;
+}
+*,
+::before ::after {
+    margin: 0;
+    padding: 0;
+}
+body {
+    width: 100%;
+    height: 100%;
+    min-width: 600px;
+    background-color: black; 
+    background-position: center;
+    font-family: Montserrat, Helvetica, sans-serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+ContainerTexteBody{
+
+    max-width : 1400px;
+    margin:100px auto 0;
+    padding : 0 20px;
+}
+p {
+    text-transform: uppercase;
+    color: #222;
+    font-weight: 900;
+}
+h1 {
+    text-transform: uppercase;
+    color: #faebd7;
+    font-weight: 900;
+}
+
+    p span {
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        font-size: clamp(20px, 8vw, 120px);
+    }
+
+        p span::after #simu{
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform: translateX(-100%);
+            color : #222
+        }
+
+    p:nth-child(1) {
+        font-weight: 300;
+        animation: txt-appearance 0s 1s forwards;
+    }
+
+    p:nth-child(2) {
+        animation: txt-appearance 0s 1.25s forwards;
+    }
+
+p:nth-child(1) span::after {
+    background: #c013a4;
+    animation: slide-in 0.75s ease-out forwards, slide-out 0.75s 1s ease-out forwards;
+}
+
+    p:nth-child(2) span::after {
+        background: royalblue;
+        animation: slide-in 0.75s 0.3s ease-out forwards, slide-out 0.75s 1.3s ease-out forwards;
+    }
+
+@keyframes slide-in {
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slide-out {
+    100% {
+        transform: translateX(100%)
+    }
+}
+
+@keyframes txt-appearance {
+    100% {
+        color: antiquewhite;
+    }
+}
+.animated {
+    animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+nav.navbar.navbar-expand-lg {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 0px 2px black;
+    font-size : 20px;
+}
+
+img.logo_esigelec {
+    height: 200px;
+    width: auto;
+}
+
+.container1 {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 2px 3px 3px black;
+    font-size: 20px;
+}
+#text{
+    font-size : 20px;
+}
+#droite {
+    float: right;
+    width: 10%;
+}
+#gauche{
+    float : left;
+    width : 20%
+}
+.container2 {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 500px;
+}
+
+.row {
+    width: 100%;
+}
+
+.texte {
+    margin-top: 25px;
+    font-size: 25px;
+    text-align: justify;
+}
+
+.animated-link {
+    display: inline-block;
+    background: black;
+    border-radius: 2px;
+    text-decoration: none;
+    margin-top: 15px;
+}
+imGauche.ImageGauche{
+    float : left;
+    margin-right : 10px;
+}
+
+    .animated-link span {
+        display: inline-block;
+        background: black;
+        color: #fff;
+        border:  solid rgb(0, 0, 0);
+        padding: 5px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 3px;
+        margin-top: 10px;
+    }
+
+    .animated-link:hover span {
+        transform: translate(-4px,-4px);
+        color: white;
+        background: #000;
+        opacity: 1;
+    }
+
+.images {
+    display: flex;
+    animation-duration: 30s;
+    animation-name: mesImages;
+    animation-iteration-count: infinite;
+}
+
+.esigelec {
+    width: 800px;
+    overflow: hidden;
+    border: 3px solid grey;
+    max-height: 600px;
+    height: auto;
+}
+.actualits h1 {
+    border-bottom: 1px solid #fff;
+}
+
+.content {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: -80px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 500px;
+    width: 100%;
+}
+
+.main {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: black;
+}
+
+    .main .content a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .main .content .card {
+        display: flex;
+        flex-wrap: wrap;
+        /* Si la rsolution ne le permet pas nous allons empiler les lements et non les aligner*/
+        justify-content: center;
+        /* Permet de centrer les lments*/
+        margin-bottom: 20px;
+        border: none;
+    }
+
+        .main .content .card .gauche {
+            flex: 0 0 30%;
+            /* Permet d'avori un flex moins grand dans la partie gauche,  savoir que flex donne la possibilit  un lment de remplir l'espace*/
+            padding-top: 170px;
+            padding-right: 110px;
+            padding-bottom: 170px;
+            padding-left: 110px;
+            background-color: black;
+            color: #fff;
+            /* Couleur de la police */
+            margin-left: 100px;
+        }
+
+            .main .content .card .gauche h1 {
+                font-family: 'Playfair Display', sans-serif;
+                border-bottom: 1px solid #fff;
+            }
+
+        .main .content .card .droite {
+            flex: 0 0 70%;
+        }
+
+            .main .content .card .droite img {
+                height: 400px;
+                width: 600px;
+                margin-top: 5px;
+            }
+
+footer {
+    border-top: 5px solid #fff;
+    background-color: #000;
+    color: #fff;
+    padding: 30px 100px;
+    /* Marge interieur */
+}
+
+    footer h1 {
+        font-family: 'Playfair Display', sans-serif;
+        border-bottom: 1px solid #fff;
+        width: 15%;
+        margin-bottom: 30px;
+    }
+
+    footer .mentions .mention {
+        margin-top: -5px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        footer .mentions .mention p {
+            margin-right: 30px;
+        }
+
+    footer #contact {
+        color: rgb(181, 181, 181);
+    }
+
+    footer .mention {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+}
+
+.icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+    .icon i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+    .icon img {
+        width: 50px;
+        height: 50px;
+    }
+
+/* Mettre une virgule pour donner les attributs*/
+/* Regarder les points , et [] pour les attributs css*/
+/* CSS class order/organization */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: black;
+}
+
+.login-container {
+    background-color: black;
+    width: 400px;
+    padding: 20px;
+    margin: 100px auto;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+    .login-logo img {
+        width: 200px;
+    }
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color:aliceblue
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+    .login-form label {
+        margin-bottom: 5px;
+    }
+
+    .login-form input {
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #d9d9d9;
+        
+    }
+
+    .login-form button {
+        padding: 10px;
+        background-color: #c013a4;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+
+        .login-form button:hover {
+            background-color: #c013a4;
+        }
+
+p {
+    text-align: center;
+}
+
+.email {
+    position: relative;
+}
+
+    .email label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width:100%;
+        font-size: 16px;
+        color: #ccc;
+        transition: 0.3s;
+        pointer-events: none; /* Permet de cliquer  travers le label */
+    }
+.mdp {
+    position: relative;
+}
+
+    .mdp label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 16px;
+        color: #ccc;
+        transition: 0.3s;
+        pointer-events: none; /* Permet de cliquer  travers le label */
+    }
+
+.login-form input[type="email"] {
+    margin-bottom: 30px; /* Vous pouvez ajuster cette valeur selon vos prfrences */
+    border: none;
+    background: black;
+    outline: none;
+    border-bottom: 1px solid #ccc;
+    width:100%
+    
+}
+
+.login-form input[type="password"] {
+    border: none;
+    background: black;
+    outline: none;
+    border-bottom: 1px solid #ccc;
+    width: 100%
+}
+.email input[type="email"]::placeholder {
+    color: transparent;
+}
+.mdp input[type="password"]::placeholder {
+    color: transparent;
+}
+
+.email input[type="email"]:focus,
+.email input[type="email"]:not(:placeholder-shown) {
+    border-color: blanchedalmond;
+}
+
+    .email input[type="email"]:focus + label,
+    .email input[type="email"]:not(:placeholder-shown) + label {
+        top: -12px;
+        font-size: 12px;
+        color: blanchedalmond;
+    }
+.mdp input[type="password"]:focus,
+.mdp input[type="password"]:not(:placeholder-shown) {
+    border-color: blanchedalmond;
+}
+
+.mdp input[type="password"]:focus + label,
+.mdp input[type="password"]:not(:placeholder-shown) + label {
+    top: -12px;
+    font-size: 12px;
+    color:blanchedalmond;
+}
+
+
+
+
+
+    .login-form input[type="email"]:focus,
+    .login-form input[type="password"]:focus,
+    .login-form input[type="email"]:hover,
+    .login-form input[type="password"]:hover {
+        border-bottom: 2px solid #c013a4; /* Couleur de la ligne lorsque le champ est en focus */
+        outline: none
+    }
+
+a {
+    color: white;
+    text-decoration: none;
+    font-size:15px;
+
+}
+.widget-title {
+    font-family: inherit; /* Utilise la mme police que celle hrite de la classe parente */
+    text-decoration: underline; /* Souligne le texte */
+}
