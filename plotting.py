@@ -1,6 +1,4 @@
 from config import *
-from portfolio_analysis import *
-
 
 def plot_assets_and_cal(data_dict, rf_daily):
     # Loop over the dictionary to plot for each asset type
@@ -51,6 +49,3 @@ def plot_assets_and_cal_plotly(data_dict, rf_daily):
         fig.update_layout(title=data["title"], xaxis_title='Volatilité (Écart type du rendement)',
                           yaxis_title='Rendement attendu')
         fig.show()
-
-
-

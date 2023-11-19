@@ -1,69 +1,74 @@
-# Création du questionnaire pour évaluer l'aversion au risque d'un investisseur
+questions = [
+    "1. What is your age?\n   a) Under 30\n   b) 30-50 years\n   c) Over 50 years",
+    "2. What is your investment experience?\n   a) Beginner\n   b) Intermediate\n   c) Experienced",
+    "3. What is your investment horizon?\n   a) Short term (less than 5 years)\n   b) Medium term (5-10 years)\n   c) Long term (more than 10 years)",
+    "4. What percentage of your investment are you willing to lose to obtain better returns?\n   a) Less than 10%\n   b) 10-30%\n   c) More than 30%",
+    "5. How would you react if your investments lost 10% of their value in a short period of time?\n   a) Buy more\n   b) Make no changes\n   c) Sell all investments",
+    "6. Are you considering alternative investments (like cryptocurrencies, real estate, commodities, etc.)?\n   a) No, I prefer traditional investments\n   b) Yes, but only a small portion of my portfolio\n   c) Yes, I am open to a significant proportion in alternative investments.",
+    "7. If an investment does not perform as expected after one year, what would be your action?\n   a) Sell immediately to limit losses\n   b) Reevaluate the situation, but probably maintain the investment\n   c) Keep the investment because I believe in long-term benefits",
+    "8. Which of the following statements best describes your knowledge of investing?\n   a) My knowledge of investments and financial markets is limited. Informing yourself about financial matters is not one of your priorities. For example, you could not explain the difference between stocks, bonds, and mutual funds.\n   b) I have some knowledge of investments and financial markets. You could explain the difference between the investments listed above.\n   c) I have solid knowledge of investments. In addition to being able to differentiate the investments listed above, you know the stock markets, investment fees, and principles of diversification. You are very familiar with the risks of different investments.",
+    "9. What is your main objective in investing?\n   a) Preserve capital and maintain stable growth\n   b) Balance growth and security, with a moderate approach\n   c) Seek high growth, even if it means greater risk.",
+    "10. Faced with a very popular new investment trend, like a speculative bubble, what would be your approach?\n   a) Avoid completely, too risky for my taste\n   b) Invest a small amount not to miss a potential opportunity\n   c) Invest significantly, hoping to make a big profit.",
+    "11. Do you wish to include cryptocurrencies in your portfolio?\n   a) Yes\n   b) No"
+]
+
+scores = {
+    'a': 1,
+    'b': 2,
+    'c': 3
+}
+
+weights = {
+    1: 0.5,
+    2: 1,
+    3: 1,
+    4: 1.5,
+    5: 2,
+    6: 2,
+    7: 1,
+    8: 2,
+    9: 1,
+    10: 1,
+    11: 0  # No weight for question 11, as it sets score to 0 if answered 'b'
+}
 
 def evaluate_risk_aversion():
-    questions = [
-        "1. Quel est votre âge ?\n   a) Moins de 30 ans\n   b) 30-50 ans\n   c) Plus de 50 ans",
-        "2. Quelle est votre expérience en matière d'investissement ?\n   a) Débutant\n   b) Intermédiaire\n   c) Expérimenté",
-        "3. Quel est votre horizon d'investissement ?\n   a) Court terme (moins de 5 ans)\n   b) Moyen terme (5-10 ans)\n   c) Long terme (plus de 10 ans)",
-        "4. Quel pourcentage de votre investissement êtes-vous prêt à perdre pour obtenir de meilleurs rendements ?\n   a) Moins de 10%\n   b) 10-30%\n   c) Plus de 30%",
-        "5. Comment réagiriez-vous si vos investissements perdaient 10% de leur valeur en un court laps de temps ?\n   a) Acheter plus\n   b) Ne rien changer\n   c) Vendre tous les investissements"
-        "6. Envisagez-vous des investissements alternatifs (comme les cryptomonnaies, l'immobilier, les matières premières, etc.) ?\n a) Non, je préfère les investissements traditionnels\n b) Oui, mais seulement une petite partie de mon portefeuille\n c) Oui, je suis ouvert à une proportion significative dans des investissements alternatifs."
-        "7. Si un investissement ne performe pas comme prévu après un an, quelle serait votre action ?\n a) Vendre immédiatement pour limiter les pertes.\n b) Réévaluer la situation, mais probablement maintenir l'investissement.\n c) Garder l'investissement car je crois aux bénéfices à long terme."
-        "8. Lequel des énoncés suivants décrit le mieux vos connaissances en matière de placement?\n a) Mes connaissances des placements et des marchés financiers sont limitées. Vous informer sur les questions financières ne fait pas partie de vos priorités. Par exemple, vous ne pourriez pas expliquer la différence entre des actions, des obligations et des fonds communs de placement.\n b)Je possède certaines connaissances des placements et des marchés financiers. Vous pourriez expliquer la différence entre les placements énumérés plus haut.\n Je possède de solides connaissances des placements.\n En plus de pouvoir différencier les placements émunérés plus haut, vous connaissez les marchés boursiers, les frais des placements et les principes de diversification. Vous connaissez très bien les risques des différents placements."
-        "9. Quel est votre objectif principal en investissant ?\n a) Préserver le capital et maintenir une croissance stable.\nb) Équilibrer la croissance et la sécurité, avec une approche modérée.\nc) Chercher une croissance élevée, même si cela signifie un risque plus grand."
-        "10.Face à une nouvelle tendance d'investissement très populaire, comme une bulle spéculative, quelle serait votre approche ?\na) Éviter complètement, trop risqué à mon goût.\nb) Investir une petite somme pour ne pas rater une opportunité potentielle.\nc) Investir de manière significative, en espérant réaliser un gros profit."
-    ]
-
-    scores = {
-        'a': 1,
-        'b': 2,
-        'c': 3
-    }
-
     total_score = 0
 
-    # Poids pour chaque question
-    weights = {
-        1: 0.5,  # Poids pour la question 1
-        2: 1,  # Poids pour la question 2
-        3: 1,  # Poids pour la question 3
-        4: 1.5,  # Poids pour la question 4
-        5: 2,  # Poids pour la question 5
-        6: 2,
-        7: 1,
-        8: 2,
-        9: 1,
-        10: 1,
-
-    }
-
-    total_score = 0
-    last_answer_critical = False  # Indicateur si la dernière réponse est critique
-
-    for index, question in enumerate(questions,
-                                     start=1):  # Commence à 1 pour correspondre aux clés du dictionnaire des poids
+    for index, question in enumerate(questions, start=1):
         print(question)
-        answer = input("Votre choix (a, b, ou c): ").lower()
-        if index == 5 and answer == 'c':  # Si la réponse à la dernière question est 'c'
-            last_answer_critical = True  # Active l'indicateur
-            break  # Sort de la boucle car les autres réponses ne comptent plus
-        total_score += scores.get(answer, 0) * weights[index]  # Accumule le score pondéré
+        if index ==11:
+            answer = input("Your choice (a, or b): ").lower()
+        else:
+            answer = input("Your choice (a, b, or c): ").lower()
 
-    if last_answer_critical:
-        return 0  # Retourne 0 si la dernière réponse est 'c'
-    else:
-        print(total_score)
-        return total_score  # Retourne le score total sinon
+        if index == 11 and answer == 'b':  # For question 11, if the answer is 'b', set score to 0
+            return 50
+
+        if index == 5 and answer == 'c':  # If the answer to question 5 is 'c'
+            return 1  # Return 1 (considered critical)
+
+        total_score += scores.get(answer, 0) * weights[index]
+
+    return total_score
 
 
 def suggest_portfolio(score):
-    if score <5:
-        return "Très prudent"
-    elif 5 <= score < 10:
-        return "Prudent"
-    elif 10 <= score < 15:
-        return "Equilibré"
-    elif 15 <= score < 20:
-        return "Croissance"
-    elif score >= 20:
-        return "Très dynamique"
+    # Score maximum possible
+    max_score = sum(3 * weight for weight in weights.values())
+
+    # Définir les catégories en fonction des pourcentages du score maximum
+    if score == 50:
+        return "No Crypto"
+    elif score == 1:
+        return "Beginner"
+    elif score <= max_score * 0.2:
+        return "Very Conservative"
+    elif score <= max_score * 0.4:
+        return "Balanced"
+    elif score <= max_score * 0.6:
+        return "Growth"
+    elif score <= max_score * 0.8:
+        return "Growth"
+    else:
+        return "Very Dynamic"

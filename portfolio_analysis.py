@@ -1,10 +1,4 @@
-from data_retrieval import *
-import numpy as np
-import matplotlib.pyplot as plt
-
-
-def portfolio_volatility(weights, avg_returns, cov_matrix):
-    return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+from config import *
 
 
 def calculate_returns(data):
@@ -57,6 +51,10 @@ def efficient_frontier(returns, target_return_, min_diversification=0):
     return results
 
 
+def portfolio_volatility(weights, avg_returns, cov_matrix):
+    return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+
+
 # Function to perform Monte Carlo simulation for stock selection
 def monte_carlo_selection(stocks_data, crypto_data, nb_simulations, nb_stocks, crypto_limit):
     nb_crypto_ok = int(nb_stocks * crypto_limit)
@@ -64,14 +62,18 @@ def monte_carlo_selection(stocks_data, crypto_data, nb_simulations, nb_stocks, c
 
     # Séparation des données en actions et cryptomonnaies
     stocks_only_data = stocks_data
-    crypto_only_data = crypto_data
 
     # Sélection des actions
     selected_stocks = run_monte_carlo(stocks_only_data, nb_simulations, nb_stocks_ok)
+    if nb_crypto_ok == 0:
+        selected_cryptos=[]
+        combined_selected_data = stocks_data[selected_stocks]
     # Sélection des cryptomonnaies
-    selected_cryptos = run_monte_carlo(crypto_only_data, nb_simulations, nb_crypto_ok)
-    # Combiner les actions et cryptomonnaies sélectionnées pour une analyse complète
-    combined_selected_data = pd.concat([stocks_only_data[selected_stocks], crypto_only_data[selected_cryptos]], axis=1)
+    else:
+        crypto_only_data = crypto_data
+        selected_cryptos = run_monte_carlo(crypto_only_data, nb_simulations, nb_crypto_ok)
+        # Combiner les actions et cryptomonnaies sélectionnées pour une analyse complète
+        combined_selected_data = pd.concat([stocks_only_data[selected_stocks], crypto_only_data[selected_cryptos]], axis=1)
     ret_arr, vol_arr, sharpe_arr = run_full_monte_carlo(combined_selected_data, nb_simulations)
 
     return selected_stocks, selected_cryptos, ret_arr, vol_arr, sharpe_arr
@@ -163,12 +165,10 @@ def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_c
     return best_weights, ret_arr, vol_arr, sharpe_arr
 
 
-
-
-def recommend_portfolio(nb_stocks, list_stock, list_crypto, data_stock, data_crypto, capital,
-                        total_score,
+def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
+                        portfolio_suggestion,
                         investment_horizon):
-    crypto_weight_limit = get_crypto_weight_limit(total_score, investment_horizon)
+    crypto_weight_limit = get_crypto_weight_limit(portfolio_suggestion, investment_horizon)
 
     # Drop any NaN values to clean the data
     stocks_data = data_stock.dropna()
@@ -179,7 +179,6 @@ def recommend_portfolio(nb_stocks, list_stock, list_crypto, data_stock, data_cry
         stocks_data, crypto_data,
         10000,
         nb_stocks, crypto_weight_limit)
-
 
     # Run the second Monte Carlo simulation for weight allocation
     best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation = monte_carlo_allocation(stocks_data,
@@ -194,14 +193,10 @@ def recommend_portfolio(nb_stocks, list_stock, list_crypto, data_stock, data_cry
     combined_selected_assets = selected_stocks.append(selected_cryptos)
 
     # Print the monetary allocation for the selected stocks and cryptos
-    print("Monetary allocation for the Best Portfolio:")
-    for asset, allocation in zip(combined_selected_assets, monetary_allocation):
-        print(f"{asset}: ${allocation:,.2f}")
+    print("Monetary allocation and Weights for the Best Portfolio:")
+    for asset, (allocation, weight) in zip(combined_selected_assets, zip(monetary_allocation, best_weights)):
+        print(f"{asset}: ${allocation:,.2f} ({weight:.2%})")
 
-    # Afficher les poids pour chaque actif sélectionné
-    print("Portfolio Weights:")
-    for asset, weight in zip(combined_selected_assets, best_weights):
-        print(f"{asset}: {weight:.2%}")
     # Plot the results of the first Monte Carlo simulation
     plt.figure(figsize=(12, 8))
     plt.scatter(vol_arr_selection, ret_arr_selection, c=sharpe_arr_selection, cmap='plasma')
@@ -229,40 +224,34 @@ def recommend_portfolio(nb_stocks, list_stock, list_crypto, data_stock, data_cry
     plt.show()
 
 
-def get_crypto_weight_limit(total_score, investment_horizon):
+def get_crypto_weight_limit(portfolio_suggestion, investment_horizon):
     """
-    Détermine le poids limite des cryptomonnaies dans le portefeuille en fonction du score de risque et de l'horizon d'investissement.
+    Détermine le poids limite des cryptomonnaies dans le portefeuille en fonction de la suggestion de portefeuille et de l'horizon d'investissement.
 
-    :param total_score: Score de risque de l'investisseur.
+    :param portfolio_suggestion: Suggestion de portefeuille (basée sur le score de risque).
     :param investment_horizon: Horizon d'investissement en années.
     :return: Le poids limite des cryptomonnaies dans le portefeuille.
     """
 
-    # Poids de base pour les cryptomonnaies en fonction du score de risque
-    if total_score <= 6:
-        base_crypto_weight = 0.10  # Faible tolérance au risque
-    elif total_score < 7:
-        base_crypto_weight = 0.20  # Tolérance au risque moyenne
-    else:
-        base_crypto_weight = 0.30  # Haute tolérance au risque
+    # Poids de base pour les cryptomonnaies en fonction de la suggestion de portefeuille
+    base_crypto_weight = {
+        "No Crypto": 0,
+        "Beginner":0.025,
+        "Very Conservative": 0.05,  # Très faible exposition aux cryptomonnaies
+        "Conservative": 0.10,  # Faible exposition
+        "Balanced": 0.15,  # Exposition modérée
+        "Growth": 0.20,  # Exposition relativement plus élevée
+        "Very Dynamic": 0.25  # Exposition agressive
+    }.get(portfolio_suggestion, 0.10)  # Valeur par défaut si non spécifié
 
     # Ajustement en fonction de l'horizon d'investissement
-    if investment_horizon >= 10:
-        # Horizon long: capacité à tolérer plus de volatilité
-        adjustment_factor = 1.2
-    elif investment_horizon >= 5:
-        # Horizon moyen
-        adjustment_factor = 1.0
-    else:
-        # Horizon court: réduire l'exposition à la volatilité
-        adjustment_factor = 0.8
+    adjustment_factor = 1.0 + (0.1 * (investment_horizon // 5))  # Augmente de 10% tous les 5 ans
 
     # Calcul du poids limite ajusté
     adjusted_crypto_weight = base_crypto_weight * adjustment_factor
 
-    # Assurer que le poids ne dépasse pas une certaine limite (par exemple, 50%)
-    max_crypto_weight = 0.50
-    print(min(adjusted_crypto_weight, max_crypto_weight))
+    # Assurer que le poids ne dépasse pas une certaine limite (par exemple, 40%)
+    max_crypto_weight = 0.40
     return min(adjusted_crypto_weight, max_crypto_weight)
 
 # def recommend_portfolio(score, capital, investment_horizon, stocks_avg_daily_returns, stocks_volatility,
