@@ -1,0 +1,431 @@
+<style>
+    .modal-content {
+        background-color: #212121;
+        color: white;
+    }
+    button.multiselect.dropdown-toggle {
+        background-color: white;
+        color: black;
+    }
+    .close {
+        background: transparent;
+        border: none;
+        opacity: 1;
+    }
+
+</style>
+
+<div class="modal fade" id="querry_details_Modal-{{ execution.Id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ execution.Name }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="reloadPage()" style="color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name_schedule_{{ execution.Id }}">Name</label>
+                    <input type="text" class="form-control" id="name_schedule_{{ execution.Id }}"
+                           value="{{ execution.Name }}">
+                </div>
+
+                <!-- Environment Checkboxes -->
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input envmt-checkbox" type="checkbox"
+                        id="envmt_Test_Modal_{{ execution.Id }}" name="envmt_group_{{ execution.Id }}"
+                        {{ 'checked' if execution.envmt_Test }}>
+                    <label class="form-check-label" for="envmt_Test_{{ execution.Id }}">Test</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input envmt-checkbox" type="checkbox"
+                        id="envmt_Prod_lu_Modal_{{ execution.Id }}" name="envmt_group_{{ execution.Id }}"
+                        {{ 'checked' if execution.envmt_Prod_lu }}>
+                    <label class="form-check-label" for="envmt_Prod_lu_{{ execution.Id }}">Prod LU</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input envmt-checkbox" type="checkbox"
+                        id="envmt_Prod_ch_Modal_{{ execution.Id }}" name="envmt_group_{{ execution.Id }}"
+                        {{ 'checked' if execution.envmt_Prod_ch }}>
+                    <label class="form-check-label" for="envmt_Prod_ch_{{ execution.Id }}">Prod CH</label>
+                </div>
+                <br>
+                <br>
+                <!-- Frequency -->
+                <div class="form-group">
+                    <label for="frequency_modal{{ execution.Id }}">Frequency</label>
+                    <select class="form-control" id="frequency_modal{{ execution.Id }}"
+                            onchange="function toggleWeeklyElementsModal(executionId) {
+                                        const frequencyInput = document.getElementById('frequency_modal' + executionId);
+                                        const weeklyDiv = document.getElementById('weekly_modal_day' + executionId);
+                                        const dailyDiv = document.getElementById('days_daily'+ executionId);
+
+                                        if (frequencyInput.value === 'weekly') {
+                                            weeklyDiv.style.display = 'block';
+                                            dailyDiv.style.display = 'none';
+                                        } else {
+                                            weeklyDiv.style.display = 'none';
+                                            dailyDiv.style.display = 'block';
+                                        }
+                                    }
+                                    toggleWeeklyElementsModal('{{ execution.Id }}')">
+                        <option value="daily" {% if execution.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                        <option value="weekly" {% if execution.frequency == 'weekly' %}selected{% endif %}>Weekly
+                        </option>
+                    </select>
+                </div>
+
+                <div id="weekly_modal_day{{ execution.Id }}" class="align-items-center mt-2"
+                     style="margin-top: 20px;margin-bottom: 20px">
+                    <label class="form-check-label mr-2" for="Not_Intraday_Schedule_modal_{{ execution.Id }}"
+                           style="color: white;">
+                        Day of the week
+                    </label>
+                    <select multiple="multiple" id="weekly_days_modal{{ execution.Id }}" style="color: #FFFFFF; width: auto;">
+                        {% if execution.weekly_day is none %}
+                            {% set days_list = [] %}
+                        {% endif %}
+                        {% if execution.weekly_day is not none %}
+                            {% set days_list = execution.weekly_day.split(',') %}
+                        {% endif %}
+                        <option value="monday" {% if 'monday' in days_list %}selected{% endif %}>
+                            Monday
+                        </option>
+                        <option value="tuesday" {% if 'tuesday' in days_list %}selected{% endif %}>
+                            Tuesday
+                        </option>
+                        <option value="wednesday" {% if 'wednesday' in days_list %}selected{% endif %}>
+                            Wednesday
+                        </option>
+                        <option value="thursday" {% if 'thursday' in days_list %}selected{% endif %}>
+                            Thursday
+                        </option>
+                        <option value="friday" {% if 'friday' in days_list %}selected{% endif %}>
+                            Friday
+                        </option>
+                        <option value="saturday" {% if 'saturday' in days_list %}selected{% endif %}>
+                            Saturday
+                        </option>
+                        <option value="sunday" {% if 'sunday' in days_list %}selected{% endif %}>
+                            Sunday
+                        </option>
+                    </select>
+
+                </div>
+                <div class="form-group row" id="days_daily{{ execution.Id }}">
+                    <div class="col">
+                        <label for="schedule_date_begin_{{ execution.Id }}">Beginning</label>
+                        <select class="form-control" id="schedule_date_begin_{{ execution.Id }}">
+                            <option value="monday" {% if execution.start_date == 'monday' %}selected{% endif %}>
+                                Monday
+                            </option>
+                            <option value="tuesday"
+                                    {% if execution.start_date == 'tuesday' %}selected{% endif %}>Tuesday
+                            </option>
+                            <option value="wednesday"
+                                    {% if execution.start_date == 'wednesday' %}selected{% endif %}>Wednesday
+                            </option>
+                            <option value="thursday"
+                                    {% if execution.start_date == 'thursday' %}selected{% endif %}>Thursday
+                            </option>
+                            <option value="friday" {% if execution.start_date == 'friday' %}selected{% endif %}>
+                                Friday
+                            </option>
+                            <option value="saturday"
+                                    {% if execution.start_date == 'saturday' %}selected{% endif %}>Saturday
+                            </option>
+                            <option value="sunday" {% if execution.start_date == 'sunday' %}selected{% endif %}>
+                                Sunday
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="schedule_date_end_{{ execution.Id }}">End</label>
+                        <select class="form-control" id="schedule_date_end_{{ execution.Id }}">
+                            <option value="monday" {% if execution.end_date == 'monday' %}selected{% endif %}>
+                                Monday
+                            </option>
+                            <option value="tuesday" {% if execution.end_date == 'tuesday' %}selected{% endif %}>
+                                Tuesday
+                            </option>
+                            <option value="wednesday"
+                                    {% if execution.end_date == 'wednesday' %}selected{% endif %}>Wednesday
+                            </option>
+                            <option value="thursday"
+                                    {% if execution.end_date == 'thursday' %}selected{% endif %}>Thursday
+                            </option>
+                            <option value="friday" {% if execution.end_date == 'friday' %}selected{% endif %}>
+                                Friday
+                            </option>
+                            <option value="saturday"
+                                    {% if execution.end_date == 'saturday' %}selected{% endif %}>Saturday
+                            </option>
+                            <option value="sunday" {% if execution.end_date == 'sunday' %}selected{% endif %}>
+                                Sunday
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-around mt-2">
+                    <div class="d-flex align-items-center mr-5">
+                        <label class="form-check-label mr-2" for="Intraday_Schedule_home_{{ execution.Id }}"
+                            style="color: white; order: 1;">
+                            Intraday
+                        </label>
+                        <input class="form-check-input intraday-checkbox" type="checkbox"
+                            id="Intraday_Schedule_modal_{{ execution.Id }}" name="intraday_group_{{ execution.Id }}"
+                            {{ 'checked' if execution.Intraday_Schedule }} style="order: 2;">
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <label class="form-check-label mr-2" for="Is_not_Intraday_home_{{ execution.Id }}"
+                            style="color: white; order: 1;">
+                            Not Intraday
+                        </label>
+                        <input class="form-check-input intraday-checkbox" type="checkbox"
+                            id="Is_not_Intraday_modal_{{ execution.Id }}" name="intraday_group_{{ execution.Id }}"
+                            {{ 'checked' if execution.Is_not_Intraday }} style="order: 2;">
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <label class="form-check-label mr-2" for="Multi_Intraday_home_{{ execution.Id }}"
+                            style="color: white; order: 1;">
+                            Multi-Intraday
+                        </label>
+                        <input class="form-check-input multi-intraday-checkbox" type="checkbox"
+                            id="Multi_Intraday_modal_{{ execution.Id }}" name="intraday_group_{{ execution.Id }}"
+                            {{ 'checked' if execution.Multi_Intraday }} style="order: 2;">
+                    </div>
+                </div>
+                <br>
+                <div id="executionDetailsNotIntradayModal_{{ execution.Id }}" style="display: none">
+                    <br>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <label class="mx-1 mr-1" style="color: white">
+                                Time of execution
+                            </label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="time" class="form-control form-control-plaintext inputField"
+                                   id="Time_Execution_modal_{{ execution.Id }}"
+                                   value="{{ execution.Time_Execution if execution.Time_Execution else '' }}"
+                                   style=" width: 110px;background-color: white">
+                        </div>
+                    </div>
+                </div>
+                <div id="executionDetailsMultiIntradayModal_{{ execution.Id }}" style="display: none">
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="multiIntradayDropdown_{{ execution.Id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Multi-Intraday Schedules
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="multiIntradayDropdown_{{ execution.Id }}">
+                            <h6 class="dropdown-header">Start Time -- End Time -- Frequency</h6>
+                            {% for schedule in multi_intraday %}
+                                <div class="dropdown-item d-flex justify-content-between align-items-center">
+                                    <span onclick="fillInputs({{ execution.Id }}, '{{ schedule[0] }}', '{{ schedule[1] }}', '{{ schedule[2] }}')">{{ schedule[0] }} -- {{ schedule[1] }} -- {{ schedule[2] }}</span>
+                                    <button class="btn btn-sm btn-danger" onclick="removeSchedule(this)">Remove</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <input type="time" class="form-control form-control-plaintext inputField" id="multiIntraday_startTime_{{ execution.Id }}" style=" background-color: white; width: 80px;">
+                        <label class="mx-2" style="color: white;">To</label>
+                        <input type="time" class="form-control form-control-plaintext inputField" id="multiIntraday_endTime_{{ execution.Id }}" style="background-color: white; width: 80px;">
+                    </div>
+                    <br>
+                    <div class="d-flex justify-content-center mt-2">
+                        <label style="color: white; margin-right: 5px;">Frequency</label>
+                        <input type="text" class="form-control form-control-plaintext inputField" id="multiIntraday_frequency_{{ execution.Id }}" style="background-color: white; width: 80px;">
+                    </div>
+                    <br>
+                    <div class="d-flex justify-content-center mt-2">
+                        <button type="button" class="btn btn-outline btn-danger mr-1" onclick="addMultiIntradaySchedule({{ execution.Id }})" style="margin-left: 10px;">Add</button>
+                        <button type="button" class="btn btn-outline btn-info mr-1" onclick="updateMultiIntradaySchedule({{ execution.Id }})" style="margin-left: 10px;">Update</button>
+                    </div>
+                </div>
+                <div id="executionDetailsIntradayModal_{{ execution.Id }}" style="display: none">
+                    <div class="text-center"> <!-- Add the 'text-center' class here -->
+                        <label class="mt-2" style="color: white;">
+                            Intraday Schedule
+                        </label>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <input type="time" class="form-control form-control-plaintext inputField"
+                            id="Intraday_schedule_Begin_home_{{ execution.Id }}"
+                            value="{{ execution.Intraday_schedule_Begin.strftime('%H:%M') if execution.Intraday_schedule_Begin else '' }}" style=" background-color: white;width: 80px;">
+                        <label class="mx-2" style="color: white;">
+                            To
+                        </label>
+                        <input type="time" class="form-control form-control-plaintext inputField"
+                            id="Intraday_schedule_End_home_{{ execution.Id }}"
+                            value="{{ execution.Intraday_schedule_End.strftime('%H:%M') if execution.Intraday_schedule_End else '' }}" style="background-color: white; width: 80px;">
+                    </div>
+                    <br>
+                    <div class="d-flex justify-content-center mt-2">
+                        <label style="color: white; margin-right: 5px;">
+                            Intraday Frequency
+                        </label>
+                        <input type="text" class="form-control form-control-plaintext inputField"
+                            id="Intraday_schedule_Frequency_home_{{ execution.Id }}"
+                            value="{{ execution.Intraday_schedule_Frequency }}"
+                            style="background-color: white; width: 80px;">
+                    </div>
+                </div>
+                <br>
+                <div class="form-check ">
+                    <label class="form-check-label" for="have_parameters_{{ execution.Id }}">Does the query have parameters</label>
+                    <input class="form-check-input" type="checkbox" style="margin-left: 10px"
+                           id="have_parameters_{{ execution.Id }}" {{ 'checked' if execution.have_parameters }}>
+                </div>
+                <br>
+                <div id="parameters_fields_{{ execution.Id }}" style="display: {{ 'block' if execution.have_parameters else 'none' }}">
+                    <div class="form-group">
+                        <label for="customers_select_{{ execution.Id }}">Customers</label>
+                        <select multiple="multiple" id="customers_select_{{ execution.Id }}"
+                                style="color: #FFFFFF; width: auto;">
+                            <option value="None" {% if execution.Customer_Id == None %}selected{% endif %}>
+                                None
+                            </option>
+                            {% for name in customerLu %}
+                                <option {% if execution.Customer_Id and (name in execution.Customer_Id.split(', ')) %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                            {% for name in customerCh %}
+                                <option {% if execution.Customer_Id and (name in execution.Customer_Id.split(', ')) %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                    <!-- Margin -->
+                    <div class="form-group">
+                        <label for="margin_{{ execution.Id }}">Margin</label>
+                        <input type="number" class="form-control" id="margin_{{ execution.Id }}"
+                               value="{{ execution.Margin }}">
+                    </div>
+
+                    <!-- Date Begin and Date End -->
+                    <div class="form-group">
+                        <label for="querry_begin_date_{{ execution.Id }}">Start Date</label>
+                        <select class="form-control" id="querry_begin_date_{{ execution.Id }}">
+                            <option value="None" {% if execution.DateBegin == None %}selected{% endif %}>
+                                None
+                            </option>
+                            <option value="CURRENT_DATE-1" {% if execution.DateBegin == 'CURRENT_DATE-1' %}selected{% endif %}>
+                                current day -1
+                            </option>
+                            <option value="CURRENT_DATE-2" {% if execution.DateBegin == 'CURRENT_DATE-2' %}selected{% endif %}>
+                                current day -2
+                            </option>
+                            <option value="CURRENT_DATE-3" {% if execution.DateBegin == 'CURRENT_DATE-3' %}selected{% endif %}>
+                                current day -3
+                            </option>
+                            <option value="CURRENT_DATE-4" {% if execution.DateBegin == 'CURRENT_DATE-4' %}selected{% endif %}>
+                                current day -4
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="querry_end_date_{{ execution.Id }}">End Date</label>
+                        <select class="form-control" id="querry_end_date_{{ execution.Id }}">
+                                <option value="None" {% if execution.DateEnd == None %}selected{% endif %}>
+                                None
+                                </option>
+                                <option value="CURRENT_DATE" {% if execution.DateEnd == 'CURRENT_DATE' %}selected{% endif %}>
+                                    Current day
+                                </option>
+                                <option value="CURRENT_DATE-1" {% if execution.DateEnd == 'CURRENT_DATE-1' %}selected{% endif %}>
+                                    current day -1
+                                </option>
+                                <option value="CURRENT_DATE-2" {% if execution.DateEnd == 'CURRENT_DATE-2' %}selected{% endif %}>
+                                    current day -2
+                                </option>
+                                <option value="CURRENT_DATE-3" {% if execution.DateEnd == 'CURRENT_DATE-3' %}selected{% endif %}>
+                                    current day -3
+                                </option>
+                                <option value="CURRENT_DATE-4" {% if execution.DateEnd == 'CURRENT_DATE-4' %}selected{% endif %}>
+                                    current day -4
+                                </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-around mt-2">
+                    <div class="d-flex align-items-center mr-5">
+                        <label class="form-check-label mr-2" for="send_mail_home_{{ execution.Id }}"
+                            style="color: white; order: 1;">
+                            Send email
+                        </label>
+                        <input class="form-check-input intraday-checkbox" type="checkbox"
+                            id="send_mail_modal_{{ execution.Id }}"
+                            {{ 'checked' if execution.send_mail }} style="order: 2;">
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <label class="form-check-label mr-2" for="send_slack_home_{{ execution.Id }}"
+                            style="color: white; order: 1;">
+                            Send slack
+                        </label>
+                        <input class="form-check-input intraday-checkbox" type="checkbox"
+                            id="send_slack_modal_{{ execution.Id }}"
+                            {{ 'checked' if execution.send_to_slack }} style="order: 2;">
+                    </div>
+
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="list_mail_{{ execution.Id }}">List email</label>
+                    <textarea class="form-control" id="list_mail_{{ execution.Id }}" rows="3">{{ execution.list_email }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="list_mail_cc_{{ execution.Id }}">List of emails to cc</label>
+                    <textarea class="form-control" id="list_mail_cc_{{ execution.Id }}" rows="3">{{ execution.list_cc_email }}</textarea>
+                </div>
+                <br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input sendmail-checkbox" type="checkbox"
+                        id="send_report_slack_Modal_{{ execution.Id }}"
+                        {{ 'checked' if execution.Send_slack_empty }}>
+                    <label class="form-check-label" for="envmt_Test_{{ execution.Id }}">Sent the report to Slack when no row returned?</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input envmt-checkbox" type="checkbox"
+                        id="send_report_mail_Modal_{{ execution.Id }}"
+                        {{ 'checked' if execution.Send_mail_empty }}>
+                    <label class="form-check-label" for="send_report_mail_Modal_{{ execution.Id }}">Sent the report by mail when no row returned?</label>
+                </div>
+                <br>
+                <br>
+                <div class="form-group">
+                    <label for="file_extension_modal_{{ execution.Id }}">File extension</label>
+                    <select class="form-control" id="file_extension_modal_{{ execution.Id }}" multiple>
+                        {% if execution.file_extension is none %}
+                            {% set selected_extensions = [] %}
+                        {% endif %}
+                        {% if execution.file_extension is not none %}
+                            {% set selected_extensions = execution.file_extension.split(',') %}
+                        {% endif %}
+                        <option value="xlsx" {% if 'xlsx' in selected_extensions %}selected{% endif %}>
+                            Xlsx
+                        </option>
+                        <option value="csv" {% if 'csv' in selected_extensions %}selected{% endif %}>
+                            Csv
+                        </option>
+                    </select>
+                </div>
+                <br>
+                <br>
+                <!-- Status -->
+                <div class="form-check ">
+                    <input class="form-check-input" type="checkbox"
+                           id="Status_{{ execution.Id }}" {{ 'checked' if execution.Status }}>
+                    <label class="form-check-label" for="Status_{{ execution.Id }}">Status</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="reloadPage()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveExecution({{ execution.Id }})">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+

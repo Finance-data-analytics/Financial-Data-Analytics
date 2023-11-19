@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    AddQuery
+{% endblock %}
+
+{% block style %}
+    .close-icon {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: red;
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 14px;
+        line-height: 16px;
+        cursor: pointer;
+        box-sizing: border-box;
+        padding: 1px 0 0 1px;  // Fine-tune padding values for visual centering
+    }
+
+    .sql-field-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    .groupNameContainer {
+        display: none;
+    }
+
+
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <form method="POST" class="form-register" style="color:white">
+            {{ form.hidden_tag() }}
+            <br>
+            <br>
+            {{ form.Name.label() }}
+            {{ form.Name(class="form-control",placeholder="Name Query") }}
+
+            <div id="groupNameContainer" style="display: none;">
+                <br>
+                <br>
+                {{ form.group_name.label() }}
+                {{ form.group_name(class="form-control", id="groupNameField") }}
+            </div>
+            <br>
+            <br>
+            <button type="button" id="addSqlFieldBtn" class="btn btn-secondary">Add SQL Field</button>
+            <br>
+            <br>
+            <div id="sqlFieldsContainer">
+                <label for="Querry-0">SQL Code Of The Query</label>
+                <br>
+                <br>
+                <textarea id="Querry-0" name="Querry-0" rows="10" class="form-control" required placeholder="SQL Code"></textarea>
+            </div>
+            <br>
+            <br>
+            {{ form.Description.label() }}
+            {{ form.Description(rows=8, class="form-control", placeholder="Description Query") }}
+            <br>
+            <br>
+            {{ form.Github_link.label() }}
+            {{ form.Github_link(class="form-control", placeholder="Link Github issue") }}
+            <br>
+            <br>
+            {{ form.submit() }}
+            <br>
+            <br>
+        </form>
+    </div>
+</body>
+{% endblock %}
+
+{% block JS %}
+    function checkNumberOfTextAreas() {
+        if (document.querySelectorAll('#sqlFieldsContainer textarea').length > 1) {
+            document.getElementById('groupNameContainer').style.display = 'block';
+        } else {
+            document.getElementById('groupNameContainer').style.display = 'none';
+        }
+    }
+    let textareaCount = 1;  // Start with 1 because Querry-0 already exists
+    document.getElementById('addSqlFieldBtn').addEventListener('click', function() {
+        var newField = document.createElement('textarea');
+        newField.name = 'Querry-' + textareaCount;
+        textareaCount++;
+        newField.rows = 10;
+        newField.classList.add('form-control');
+        newField.placeholder = 'SQL Code';
+
+
+        // Create the close icon
+        var closeIcon = document.createElement('span');
+        closeIcon.classList.add('close-icon');
+        closeIcon.textContent = '×';  // Using a multiplication sign as a cross
+        closeIcon.addEventListener('click', function() {
+            // Remove the entire parent div which contains the br, textarea and close icon
+            container.removeChild(parentDiv);
+            checkNumberOfTextAreas();
+        });
+
+        var wrapper = document.createElement('div');
+        wrapper.classList.add('sql-field-wrapper');
+        wrapper.appendChild(closeIcon);
+        wrapper.appendChild(newField);
+
+        var parentDiv = document.createElement('div');
+        parentDiv.appendChild(document.createElement('br'));
+        parentDiv.appendChild(wrapper);
+
+        var container = document.getElementById('sqlFieldsContainer');
+        container.appendChild(parentDiv);
+        checkNumberOfTextAreas();
+    });
+
+
+    window.onload = function() {
+        var tx = document.getElementById('Query');
+        tx.setAttribute('style', 'height:' + (tx.scrollHeight+15) + 'px;overflow-y:hidden;');
+        tx.addEventListener("input", function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        }, false);
+    };
+{% endblock %}

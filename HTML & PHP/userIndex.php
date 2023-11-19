@@ -70,7 +70,9 @@
                     </button>
                     <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
                         <a href="login.php" class="animated-link">
-                            <span> Login </span>
+                            <span>
+                                <img src="../pictures/account.svg" alt="Description de l'image">
+                            </span>
                         </a>
                         <a href="" class="animated-link">
                             <span> Our Team </span>

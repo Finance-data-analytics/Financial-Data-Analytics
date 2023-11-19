@@ -1,0 +1,1042 @@
+{% extends 'base.html' %}
+{% block style %}
+    .dropdown-menu {
+        display: none;           /* By default, it should not be displayed */
+        position: relative;     /* Use relative positioning */
+        float: none;            /* Don't float */
+        margin-top: 0;          /* Reset any margin */
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+    }
+    .dropdown-menu.show {
+        display: contents;
+    }
+
+    .form-group {
+        position: relative;  /* Ensure the parent has a relative position */
+    }
+
+    .close-icon {
+        display: none;
+        position: absolute;
+        top: 20px;  /* Adjust according to your design */
+        right: -10px;  /* Adjust according to your design */
+        background-color: red;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 22px;
+        line-height: 25px;  /* Match height for vertical alignment */
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+
+    .sql-field-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+{% endblock %}
+{% block content %}
+    <h1 class="text-center">Info about : {{ group.group_name }} </h1>
+    <hr class="separator-line" style="border-top: 2px solid #fff">
+    <div>
+        <br>
+        <h2 class="text-center">Executions</h2>
+        <form class="text-center" action="{{ url_for('main.add_schedule_querry', id=group.id) }}" method="GET">
+            <button class="btn btn-outline btn-info btn-block" type="submit">Add a new schedule
+                for {{ group.group_name }}</button>
+        </form>
+        <br>
+        <div style="overflow-x: auto;">
+            <table class="table table-hover table-dark" id="executionTable">
+                <thead>
+                <tr class="text-center">
+                    <th scope="col">Environment</th>
+                    <th scope="col" style="width: 18%">Frequency</th>
+                    <th scope="col">Schedule Date</th>
+                    <th scope="col">Have Parameters</th>
+                    <th scope="col">Query Parameters</th>
+                    <th scope="col">Send file when empty</th>
+                    <th scope="col">Mail</th>
+                    <th scope="col">Send to slack</th>
+                    <th scope="col">File extension</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Options</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for execution in executions %}
+                    {% with execution_data=execution %}
+                        {% include 'includes/querry_details_modals.html' %}
+                    {% endwith %}
+                    <tr class="text-center">
+                        <td colspan="12" style="background-color: #444;"> <!-- Adjust the colspan to the total number of columns -->
+                            <strong>{{ execution.Name }}</strong>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input inputField mx-auto d-block"
+                                       id="envmt_Test_home_{{ execution.Id }}" {{ 'checked' if execution.envmt_Test }}
+                                       disabled>
+                                <label class="form-check-label" for="envmt_Test_{{ execution.Id }}">Test</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input inputField mx-auto d-block"
+                                       id="envmt_Prod_lu_home_{{ execution.Id }}" {{ 'checked' if execution.envmt_Prod_lu }}
+                                       disabled>
+                                <label class="form-check-label" for="envmt_Prod_lu_home_{{ execution.Id }}"
+                                       style="margin-left: 20px">Prod LU</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input inputField mx-auto d-block"
+                                       id="envmt_Prod_ch_home_{{ execution.Id }}" {{ 'checked' if execution.envmt_Prod_ch }}
+                                       disabled>
+                                <label class="form-check-label" for="envmt_Prod_ch_home_{{ execution.Id }}"
+                                       style="margin-left: 18px">Prod CH</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="col-auto">
+                                <div class="d-flex flex-column align-items-center">
+                                    <input type="text" class="form-control form-control-plaintext inputField"
+                                           id="frequency_home_{{ execution.Id }}" value="{{ execution.frequency }}"
+                                           readonly
+                                           style="color: #FFFFFF; background-color: #212121; width: auto;">
+                                    <div class="d-flex justify-content-around mt-2" style="padding-left: 30px">
+                                        <!-- Intraday Checkbox -->
+                                        <div class="col-4 d-flex align-items-center">
+                                            <label class="form-check-label mr-2"
+                                                   for="Intraday_Schedule_home_{{ execution.Id }}"
+                                                   style="color: white; order: 1;">
+                                                Intraday
+                                            </label>
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="Intraday_Schedule_home_{{ execution.Id }}" {{ 'checked' if execution.Intraday_Schedule }}
+                                                   disabled style="order: 2;">
+                                        </div>
+
+                                        <!-- Not Intraday Checkbox -->
+                                        <div class="col-4 d-flex align-items-center">
+                                            <label class="form-check-label mr-2"
+                                                   for="Is_not_Intraday_home_{{ execution.Id }}"
+                                                   style="color: white; order: 1;">
+                                                Not Intraday
+                                            </label>
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="Is_not_Intraday_home_{{ execution.Id }}" {{ 'checked' if execution.Is_not_Intraday }}
+                                                   disabled style="order: 2;">
+                                        </div>
+
+                                        <!-- Multi-Intraday Checkbox -->
+                                        <div class="col-4 d-flex align-items-center">
+                                            <label class="form-check-label mr-2"
+                                                   for="Multi-Intraday_home_{{ execution.Id }}"
+                                                   style="color: white; order: 1;">
+                                                Multi-Intraday
+                                            </label>
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="Multi-Intraday_home_{{ execution.Id }}" {{ 'checked' if execution.Multi_Intraday }}
+                                                   disabled style="order: 2;">
+                                        </div>
+                                    </div>
+                                    <div id="executionDetailsNotIntraday_{{ execution.Id }}" style="display: none">
+                                        <br>
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <label class="mx-1 mr-1" style="color: white">
+                                                    Time of execution
+                                                </label>
+                                            </div>
+                                            <div class="col-auto">
+                                                <input type="time"
+                                                       class="form-control form-control-plaintext inputField"
+                                                       id="Time_Execution_home_{{ execution.Id }}"
+                                                       value="{{ execution.Time_Execution if execution.Time_Execution else '' }}"
+                                                       readonly
+                                                       style="color: #FFFFFF; background-color: #212121; width: 110px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="executionDetailsIntraday_{{ execution.Id }}" style="display: none">
+                                        <label class="mt-2" style="color: white">
+                                            Intraday Schedule
+                                        </label>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <input type="time" class="form-control form-control-plaintext inputField"
+                                                   id="Intraday_schedule_Begin_home_{{ execution.Id }}"
+                                                   value="{{ execution.Intraday_schedule_Begin.strftime('%H:%M') if execution.Intraday_schedule_Begin else '' }}"
+                                                   readonly
+                                                   style="color: #FFFFFF; background-color: #212121; width: 80px;">
+                                            <label class="mx-2" style="color: white">
+                                                To
+                                            </label>
+                                            <input type="time" class="form-control form-control-plaintext inputField"
+                                                   id="Intraday_schedule_End_home_{{ execution.Id }}"
+                                                   value="{{ execution.Intraday_schedule_End.strftime('%H:%M') if execution.Intraday_schedule_End else '' }}"
+                                                   readonly
+                                                   style="color: #FFFFFF; background-color: #212121; width: 80px;">
+                                        </div>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <label style="color: white; margin-right: 5px;">
+                                                Intraday Frequency
+                                            </label>
+                                            <input type="text" class="form-control form-control-plaintext inputField"
+                                                   id="Intraday_schedule_Frequency_home_{{ execution.Id }}"
+                                                   value="{{ execution.Intraday_schedule_Frequency }}" readonly
+                                                   style="color: #FFFFFF; background-color: #212121; width: 60px;">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div id="executionDetails_Multi_Intraday_{{ execution.Id }}" style="display: none">
+                                        <label class="mt-2" style="color: white">
+                                            Multi-Intraday Schedule
+                                        </label>
+
+                                        <!-- Multi-Intraday Table -->
+                                        <table class="table table-dark mt-2">
+                                            <thead>
+                                                <tr>
+                                                    <th>Start Time</th>
+                                                    <th>End Time</th>
+                                                    <th>Frequency (in hours)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for schedule in multi_intraday %}
+                                                    <tr>
+                                                        <td>{{ schedule[0] }}</td>
+                                                        <td>{{ schedule[1] }}</td>
+                                                        <td>{{ schedule[2] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        {% if execution.frequency == 'daily' %}
+                            <td>
+                                <div class="col-auto">
+{#                                    <label class="form-check-label" for="start_date_home_{{ execution.Id }}">Beginning#}
+{#                                        :</label>#}
+                                    <input type="text"
+                                           class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                           id="start_date_home_{{ execution.Id }}" value="{{ execution.start_date }}"
+                                           readonly
+                                           style="color: #FFFFFF; background-color: #212121;width: 110px;">
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check-label" for="end_date_home_{{ execution.Id }}" style="margin-block: 10px">To</label>
+                                    <input type="text"
+                                           class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                           id="end_date_home_{{ execution.Id }}" value="{{ execution.end_date }}" readonly
+                                           style="color: #FFFFFF; background-color: #212121; width: 110px;">
+                                </div>
+                            </td>
+                        {% elif execution.frequency == 'weekly' %}
+                            <td>
+                               <div id="weekly_day{{ execution.Id }}" class="align-items-center mt-2"
+                                             style="margin-top: 20px;margin-bottom: 20px">
+                                    <label class="form-check-label mr-2"
+                                           for="Intraday_Schedule_home_{{ execution.Id }}"
+                                           style="color: white;">
+                                        Day(s) of the week
+                                    </label>
+                                    <br>
+                                    <br>
+                                    <ul style="background-color: rgb(33, 33, 33);padding-right: 20px;border-radius: 10px;padding-block: 10px;">
+                                        {% set days = execution.weekly_day.split(',') %}
+                                        {% for day in days %}
+                                            <li>{{ day.strip() }}</li>
+                                        {% endfor %}
+                                    </ul>
+                               </div>
+                            </td>
+                        {% endif %}
+                        <td>
+                            <div class="col-auto"><input type="checkbox"
+                                                         class="form-check-input form-control-plaintext inputField mx-auto d-block"
+                                                         id="have_parameters_home_{{ execution.Id }}" {{ 'checked' if execution.have_parameters }}
+                                                         disabled></div>
+                        </td>
+                        <td id="have_parameters_td" style="display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label class="form-check-label" for="querry_begin_date_home_{{ execution.Id }}" style="width: 130px; margin-right: 20px;text-align: left;">Begin Day</label>
+                                <input type="text"
+                                       class="form-control form-control-plaintext inputField"
+                                       id="querry_begin_date_home_{{ execution.Id }}" value="{{ execution.DateBegin }}"
+                                       readonly
+                                       style="color: #FFFFFF; background-color: #212121;">
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label class="form-check-label" for="querry_end_date_home_{{ execution.Id }}" style="width: 130px; margin-right: 20px;text-align: left;">End Day</label>
+                                <input type="text"
+                                       class="form-control form-control-plaintext inputField"
+                                       id="querry_end_date_home_{{ execution.Id }}" value="{{ execution.DateEnd }}"
+                                       readonly
+                                       style="color: #FFFFFF; background-color: #212121;">
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label class="form-check-label" for="margin_home_{{ execution.Id }}" style="width: 130px; margin-right: 20px;text-align: left;">Margin</label>
+                                <input type="text"
+                                   class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                   id="margin_home_{{ execution.Id }}" value="{{ execution.Margin }}" readonly
+                                   style="color: #FFFFFF; background-color: #212121; margin-bottom: 10px;">
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label class="form-check-label" for="customers_home_{{ execution.Id }}" style="width: 130px;margin-right: 20px;text-align: left;">Customers</label>
+                                <textarea class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                      id="customers_home_{{ execution.Id }}" readonly
+                                      style="color: #FFFFFF; background-color: #212121; width: auto;"
+                                      rows="3">{{ execution.Customer_Id }}</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-check form-check-inline" style="margin-right: 60px">
+                                <input class="form-check-input" type="checkbox" id="send_report_mail_home_{{ execution.Id }}" {{ 'checked' if execution.Send_mail_empty }}
+                                       disabled>
+                                <label class="form-check-label" for="send_report_mail_home_{{ execution.Id }}">Mail</label>
+                            </div>
+
+                            <div class="form-check form-check-inline" style="margin-right: 50px">
+                                <input class="form-check-input" type="checkbox" id="send_report_slack_home_{{ execution.Id }}"
+                                       {{ 'checked' if execution.Send_slack_empty }} disabled>
+                                <label class="form-check-label" for="send_report_slack_home_{{ execution.Id }}">Slack</label>
+                            </div>
+
+                        </td>
+                        <td>
+                            <div class="form-check form-check-inline" style="margin-right: 6em">
+                                <label class="form-check-label" for="boolean_email_home_{{ execution.Id }}">Send mail ?</label>
+                                <input class="form-check-input" type="checkbox" id="boolean_email_home_{{ execution.Id }}" {{ 'checked' if execution.send_mail }}
+                                       disabled>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="row">
+                                <label class="form-check-label" for="list_email_home_{{ execution.Id }}">List of emails to send</label>
+                                <textarea class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                      id="list_email_home_{{ execution.Id }}" readonly
+                                      style="color: #FFFFFF; background-color: #212121; width: auto;">{{ execution.list_email }}</textarea>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <label class="form-check-label" for="list_email_cc_home_{{ execution.Id }}">List of emails to cc </label>
+                                <textarea class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                      id="list_email_cc_home_{{ execution.Id }}" readonly
+                                      style="color: #FFFFFF; background-color: #212121; width: auto;">{{ execution.list_cc_email }}</textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="col-auto"><input type="checkbox"
+                                                         class="form-check-input form-control-plaintext inputField mx-auto d-block"
+                                                         id="send_slack_home_{{ execution.Id }}" {{ 'checked' if execution.send_to_slack }}
+                                                         disabled></div>
+                        </td>
+                        <td>
+                            <div class="col-auto">
+                                <input type="text"
+                                   class="form-control form-control-plaintext inputFieldSmall mx-auto d-block"
+                                   id="file_extension_home_{{ execution.Id }}" value="{{ execution.file_extension }}" readonly
+                                   style="color: #FFFFFF; background-color: #212121; margin-bottom: 10px;width: 90px">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="col-auto">
+                                <input type="checkbox" class="form-check-input form-control-plaintext inputField mx-auto d-block"
+                                                         id="Status_home_{{ execution.Id }}" {{ 'checked' if execution.Status }}
+                                                         disabled>
+                            </div>
+                        </td>
+                        <td>
+                            <div id="executionButtons_{{ execution.Id }}" class="btn-group" role="group">
+                                <form id="deleteExecutionForm_{{ execution.Id }}"
+                                      action="{{ url_for('main.delete_execution', id=execution.Id) }}" method="POST">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button class="btn btn-outline btn-danger mr-1" type="submit">Delete</button>
+                                </form>
+                                <button class="btn btn-primary btn-warning btn-block" data-toggle="modal"
+                                        data-target="#querry_details_Modal-{{ execution.Id }}" style="border-radius: 4px"> Edit
+                                </button>
+                            </div>
+                            <div>
+                                <form id="executeExecutionForm_{{ execution.Id }}"
+                                      action="{{ url_for('main.execute_schedule', id=execution.Id) }}" method="POST">
+                                    <input type="hidden" name="_method" value="EXECUTE">
+                                    <button class="btn btn-outline btn-success btn-block" type="submit" style="margin-top: 3px">Execute</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br>
+    <button class="btn btn-outline btn-warning btn-block" id="editButton" type="button" onclick="toggleEdit()">Edit
+    </button>
+    <div id="editButtons" style="display: none;">
+        <button id="saveButton" class="btn btn-primary btn-info btn-block" type="button" onclick="saveGroup()">Save
+        </button>
+        <button id="cancelButton" class="btn btn-secondary btn-danger btn-block" type="button" onclick="cancelEdit()">
+            Cancel
+        </button>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <br>
+            <div class="form-group">
+                <label>
+                    group name
+                </label>
+                <textarea class="form-control bg-dark text-light" id="queryInput1" readonly>{{ group.group_name }}</textarea>
+            </div>
+            <br>
+            <div class="form-group">
+                <label>
+                    Description Query
+                </label>
+                <textarea class="form-control bg-dark text-light" id="queryInput2"
+                          readonly>{{ group.Description }}</textarea>
+            </div>
+            <br>
+            <div class="form-group">
+                <label>
+                    Link to Github issue
+                </label>
+                <input type="url" class="form-control bg-dark text-light" id="queryInput3" value="{{ group.Github_link }}" readonly>
+                <a href="#" onclick="function openLink() {
+                    let url = document.getElementById('queryInput3').value;
+                    if (url === 'None') {
+                        alert('Invalid URL!');
+                    } else {
+                        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                            url = 'http://' + url;
+                        }
+                        window.open(url, '_blank');
+                    }
+                }
+                openLink()" class="btn btn-primary mx-auto d-block" style="margin-top: 20px">Open Link</a>
+            </div>
+        </div>
+        <div class="col-8 flex-fill">
+            <div class="h-100" id="sqlFieldsContainer" style="width: 99%"><!-- Loop for related queries -->
+                <br>
+                <button class="btn btn-outline btn-warning btn-block" id="addSqlFieldBtn" style="display: none" type="button">Add New SQL Field</button>
+                {% for related_query in group_query %}
+                    <br>
+                    <div class="form-group">
+                        <!-- Flexbox container for Info button and dropdown button -->
+                        <div class="d-flex justify-content-between">
+                            <!-- Info button -->
+                            <form action="{{ url_for('main.querry_details', id=related_query.Id) }}" method="GET" class="mr-2">
+                                <button class="btn btn-outline btn-success" type="submit">Info</button>
+                            </form>
+                            <form action="{{ url_for('main.delete_querry', id=related_query.Id) }}" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="btn btn-outline btn-danger mr-1" type="submit">Delete</button>
+                            </form>
+
+                            <!-- Dropdown wrapper -->
+                            <div class="dropdown flex-grow-1">
+                                <!-- Trigger button -->
+                                <button class="btn btn-outline btn-info dropdown-toggle btn-block" type="button" id="dropdownMenuButton_{{ related_query.Id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ related_query.Name }}
+                                </button>
+
+                                <!-- Dropdown menu -->
+                                <div class="dropdown-menu bg-dark text-light w-100" aria-labelledby="dropdownMenuButton_{{ related_query.Id }}">
+                                    <textarea class="form-control bg-dark text-light queryTextarea w-100" id="queryInput_{{ related_query.Id }}" readonly>{{ related_query.Querry }} </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block JS %}
+    function adjustTextareaHeight(textarea) {
+        // Log initial height
+
+        // Store the current scroll position
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Reset the textarea height to auto to shrink it
+        textarea.style.height = 'auto';
+
+        // Log the scrollHeight
+
+        // Set it to its scrollHeight
+        textarea.style.height = textarea.scrollHeight + 'px';
+
+        // Log final height
+
+        // Restore the scroll position after adjusting the textarea's height
+        window.scrollTo(0, scrollTop);
+    }
+
+
+
+    function isValidEmailList(emails) {
+        if (!emails) {
+            return true;  // Allow empty strings
+        }
+
+        let emailArray = emails.split(/[;,]+/)
+                               .map(email => email.trim())
+                               .filter(email => email.length > 0);  // Filter out empty strings
+
+        let emailRegex = /.+@.+\..+/;  // Simplified regex just to test
+
+        for (let email of emailArray) {
+            if (!emailRegex.test(email)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function validateEmailFields(executionId) {
+        let emailList = document.getElementById('list_mail_' + executionId).value;
+        let ccEmailList = document.getElementById('list_mail_cc_' + executionId).value;
+
+        if (!isValidEmailList(emailList) || !isValidEmailList(ccEmailList)) {
+            alert('Please enter a valid list of emails separated by , or ;');
+            return false;
+        }
+
+        return true;
+    }
+    function removeSchedule(buttonElement) {
+        let parentItem = buttonElement.parentElement;
+        parentItem.parentElement.removeChild(parentItem);
+    }
+
+    function retrieveMultiIntradayList(executionId) {
+        let dropdownMenu = document.querySelector(`div[aria-labelledby="multiIntradayDropdown_${executionId}"]`);
+        let items = dropdownMenu.querySelectorAll('.dropdown-item');
+
+        let schedules = [];
+
+        items.forEach(item => {
+            let cells = item.textContent.trim().split('--');
+            if (cells.length === 3) {
+                let startTime = cells[0].trim();
+                let endTime = cells[1].trim();
+                let frequency = cells[2].trim().replace("Remove", "").trim();
+                schedules.push(`["${startTime}", "${endTime}", "${frequency}"]`);
+            }
+        });
+
+        return `[${schedules.join(",")}]`;
+    }
+
+    function fillInputs(executionId, startTime, endTime, frequency) {
+        document.getElementById('multiIntraday_startTime_' + executionId).value = startTime;
+        document.getElementById('multiIntraday_endTime_' + executionId).value = endTime;
+        document.getElementById('multiIntraday_frequency_' + executionId).value = frequency;
+        selectedDropdownItem = event.target; // Set the selected dropdown item
+    }
+
+    function addMultiIntradaySchedule(executionId) {
+        let startTime = document.getElementById('multiIntraday_startTime_' + executionId).value;
+        let endTime = document.getElementById('multiIntraday_endTime_' + executionId).value;
+        let frequency = document.getElementById('multiIntraday_frequency_' + executionId).value;
+
+        // Validate the input values
+        if (!startTime || !endTime || !frequency) {
+            alert('All fields must be filled before adding a schedule.');
+            return;
+        }
+        // Create a new dropdown item
+        let newSchedule = createDropdownItem(executionId);
+
+        // Append the new item to the dropdown menu
+        document.querySelector(`#multiIntradayDropdown_${executionId} + .dropdown-menu`).appendChild(newSchedule);
+
+        // Clear the input fields
+        clearInputs(executionId);
+    }
+
+    function updateMultiIntradaySchedule(executionId) {
+        if (selectedDropdownItem) {
+            // Update the selected dropdown item
+            let startTime = document.getElementById('multiIntraday_startTime_' + executionId).value;
+            let endTime = document.getElementById('multiIntraday_endTime_' + executionId).value;
+            let frequency = document.getElementById('multiIntraday_frequency_' + executionId).value;
+            selectedDropdownItem.innerText = `${startTime} -- ${endTime} -- ${frequency}`;
+            selectedDropdownItem.onclick = function() { fillInputs(executionId, startTime, endTime, frequency) };
+
+            // Clear the input fields
+            clearInputs(executionId);
+
+            // Reset the reference to the selected dropdown item
+            selectedDropdownItem = null;
+        }
+    }
+    function createDropdownItem(executionId) {
+        let startTime = document.getElementById('multiIntraday_startTime_' + executionId).value;
+        let endTime = document.getElementById('multiIntraday_endTime_' + executionId).value;
+        let frequency = document.getElementById('multiIntraday_frequency_' + executionId).value;
+
+        let newSchedule = document.createElement('div');
+        newSchedule.className = "dropdown-item d-flex justify-content-between align-items-center";
+
+        let scheduleText = document.createElement('span');
+        scheduleText.innerText = `${startTime} -- ${endTime} -- ${frequency}`;
+        scheduleText.onclick = function() {
+            fillInputs(executionId, startTime, endTime, frequency);
+            selectedDropdownItem = newSchedule; // Set the selected dropdown item
+        };
+
+        let removeButton = document.createElement('button');
+        removeButton.className = "btn btn-sm btn-danger";
+        removeButton.innerText = "Remove";
+        removeButton.onclick = function() {
+            removeSchedule(removeButton);
+        };
+
+        newSchedule.appendChild(scheduleText);
+        newSchedule.appendChild(removeButton);
+
+        return newSchedule;
+    }
+
+
+    function clearInputs(executionId) {
+        document.getElementById('multiIntraday_startTime_' + executionId).value = '';
+        document.getElementById('multiIntraday_endTime_' + executionId).value = '';
+        document.getElementById('multiIntraday_frequency_' + executionId).value = '';
+    }
+
+    function reloadPage() {
+    window.location.reload(true);
+    }
+    document.addEventListener('DOMContentLoaded', (event) => {
+    let dropdownButtons = document.querySelectorAll('.dropdown-toggle');
+    dropdownButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            let relatedTextareaId = this.id.replace("dropdownMenuButton_", "queryInput_");
+
+            let textarea = document.getElementById(relatedTextareaId);
+            if (textarea) {
+                setTimeout(() => adjustTextareaHeight(textarea), 1);
+
+            }
+        });
+    });
+    function toggleEdit() {
+        // Toggle the other textareas by their IDs
+        toggleInput('queryInput1');
+        toggleInput('queryInput2');
+        toggleInput('queryInput3');
+    }
+
+    function toggleInput(inputId) {
+        let input = document.getElementById(inputId);
+        toggleInputByElement(input);
+    }
+
+
+    function addNewTextarea() {
+        var newField = document.createElement('textarea');
+        newField.name = 'Querry';
+        newField.rows = 5;
+        newField.classList.add('form-control', 'queryTextarea', 'newlyAdded');  // added 'newlyAdded' class
+        newField.placeholder = 'SQL Code';
+
+        var closeIcon = document.createElement('span');
+        closeIcon.classList.add('close-icon');
+        closeIcon.textContent = '×';
+        closeIcon.style.display = 'inline-block'; // Ensure the close icon is displayed
+        closeIcon.style.top = '-10px';  // Set the top position of the close icon
+        closeIcon.addEventListener('click', function() {
+            var container = document.getElementById('sqlFieldsContainer');
+            container.removeChild(parentDiv);
+        });
+
+        var wrapper = document.createElement('div');
+        wrapper.classList.add('sql-field-wrapper');
+        wrapper.appendChild(closeIcon);
+        wrapper.appendChild(newField);
+
+        var parentDiv = document.createElement('div');
+        parentDiv.appendChild(document.createElement('br'));
+
+        // Add label above textarea
+        var label = document.createElement('label');
+        label.textContent = 'Query';
+        parentDiv.appendChild(label);
+
+        parentDiv.appendChild(wrapper);
+
+        var container = document.getElementById('sqlFieldsContainer');
+        container.appendChild(parentDiv);
+    }
+
+    function toggleInputByElement(input) {
+        let editButtons = document.getElementById('editButtons');
+        let editButton = document.getElementById('editButton');
+        let addSQLfields = document.getElementById('addSqlFieldBtn');
+
+        if (input.hasAttribute('readonly')) {
+            // Make the input editable
+            input.setAttribute('data-initial-content', input.value); // Store the initial content
+            input.removeAttribute('readonly');
+            input.classList.remove('bg-dark', 'text-light');
+            editButtons.style.display = 'block';
+            addSQLfields.style.display = 'block';
+            editButton.style.display = 'none';
+
+        } else {
+            // Make the input readonly again
+            input.setAttribute('readonly', true);
+            input.classList.add('bg-dark', 'text-light');
+            editButtons.style.display = 'none';
+            editButton.style.display = 'block';
+        }
+    }
+
+
+    document.getElementById('editButton').addEventListener('click', toggleEdit);
+    document.getElementById('saveButton').addEventListener('click', saveGroup);
+    document.getElementById('cancelButton').addEventListener('click', cancelEdit);
+    document.getElementById('addSqlFieldBtn').addEventListener('click', addNewTextarea);
+
+
+    function adjustAllQueryTextareaHeights() {
+        // Select all textareas with the class 'queryTextarea'
+        var queryTextareas = document.querySelectorAll('.queryTextarea');
+        queryTextareas.forEach(function(textarea) {
+            adjustTextareaHeight(textarea);
+            textarea.addEventListener("input", function() {
+                adjustTextareaHeight(this);
+            });
+        });
+    }
+
+    adjustAllQueryTextareaHeights();
+
+    // Auto-adjust textarea height for each customer input in the loop
+    var customerTextareas = document.querySelectorAll('[id^="customers_home_"]');
+    customerTextareas.forEach(function(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight + 10) + 'px';
+    textarea.addEventListener("input", function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight + 10) + 'px';
+    }, false);
+    });
+
+    function saveGroup() {
+        let groupId = {{ group.id }};
+        let newName = document.getElementById('queryInput1').value.trim();
+        let newDescritpion = document.getElementById('queryInput2').value;
+        let newGithub_link = document.getElementById('queryInput3').value;
+
+        if (!newName) {
+            alert("Name cannot be empty!");
+            return;  // Exit the function
+        }
+
+        let invalidQueryFound = false;
+
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/update_group';
+
+        let queryTextareas = document.querySelectorAll('.queryTextarea');
+        queryTextareas.forEach(function(textarea) {
+            let query = textarea.value.trim();
+
+            // Check if the query is valid
+            if (!query.startsWith('SELECT') && !query.startsWith('DELETE') && !query.startsWith('UPDATE')) {
+                alert("Invalid query format: " + query + ".\nAll queries must start with either SELECT, DELETE, or UPDATE in capital letters!");
+                invalidQueryFound = true;
+                return;
+
+            }
+
+            let inputQueryName;
+            if (textarea.id.startsWith('queryInput_')) {
+                inputQueryName = 'new_query_' + textarea.id.split('_')[1];
+            } else {
+                // If it's a newly added textarea without a specific ID format
+                inputQueryName = 'new_query_added';
+            }
+
+            // Create input elements for each query
+            let inputQuery = document.createElement('input');
+            inputQuery.type = 'hidden';
+            inputQuery.name = inputQueryName;
+            inputQuery.value = query;
+            form.appendChild(inputQuery);
+        });
+
+
+
+        if (invalidQueryFound) {
+            return;  // Exit the function if any invalid query was found
+        }
+
+        // Add hidden input fields for query ID, new name value, and other details
+        let inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'group_id';
+        inputId.value = groupId;
+        form.appendChild(inputId);
+
+        let inputName = document.createElement('input');
+        inputName.type = 'hidden';
+        inputName.name = 'new_name';
+        inputName.value = newName;
+        form.appendChild(inputName);
+
+        let inputDescription = document.createElement('input');
+        inputDescription.type = 'hidden';
+        inputDescription.name = 'new_Descritpion';
+        inputDescription.value = newDescritpion;
+        form.appendChild(inputDescription);
+
+        let inputGithub_link = document.createElement('input');
+        inputGithub_link.type = 'hidden';
+        inputGithub_link.name = 'new_Github_link';
+        inputGithub_link.value = newGithub_link;
+        form.appendChild(inputGithub_link);
+
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+
+    function cancelEdit() {
+        // Remember the current scroll position
+        const scrollPosition = window.scrollY;
+
+        // Reset the other textareas by their IDs
+        resetInput('queryInput1');
+        resetInput('queryInput2');
+        resetInput('queryInput3');
+
+        // Restore the scroll position
+        window.scrollTo(0, scrollPosition);
+        let newlyAddedTextareas = document.querySelectorAll('.newlyAdded');
+        newlyAddedTextareas.forEach(textarea => {
+            textarea.parentElement.parentElement.remove();  // remove the parent div containing the textarea
+        });
+        hideCrossButtons();
+        reloadPage()
+    }
+
+    function resetInput(inputId) {
+        let input = document.getElementById(inputId);
+        resetInputByElement(input);
+    }
+
+    function resetInputByElement(input) {
+        let editButtons = document.getElementById('editButtons');
+        let editButton = document.getElementById('editButton');
+        let addSQLfields = document.getElementById('addSqlFieldBtn');
+
+        // Set the value of the input back to the initial content
+        input.value = input.getAttribute('data-initial-content');
+
+        // Make the input readonly again
+        input.setAttribute('readonly', true);
+        input.classList.add('bg-dark', 'text-light');
+        editButtons.style.display = 'none';
+        addSQLfields.style.display = 'none';
+        editButton.style.display = 'block';
+    }
+    });
+
+    $(document).ready(function() {
+        {% for execution in executions %}
+            function toggleEmailFieldsBasedOnCheckboxState(executionId) {
+                if ($('#send_mail_modal_' + executionId).is(":checked")) {
+                    $('#list_mail_' + executionId).closest('.form-group').show();
+                    $('#list_mail_cc_' + executionId).closest('.form-group').show();
+                } else {
+                    $('#list_mail_' + executionId).closest('.form-group').hide();
+                    $('#list_mail_cc_' + executionId).closest('.form-group').hide();
+                }
+            }
+            toggleEmailFieldsBasedOnCheckboxState("{{ execution.Id }}");
+
+            $('#send_mail_modal_{{ execution.Id }}').change(function() {
+                toggleEmailFieldsBasedOnCheckboxState("{{ execution.Id }}");
+            });
+
+            $('#have_parameters_{{ execution.Id }}').change(function() {
+                if($(this).is(":checked")) {
+                    $('#parameters_fields_{{ execution.Id }}').show();
+                } else {
+                    $('#parameters_fields_{{ execution.Id }}').hide();
+                }
+            });
+        {% endfor %}
+        // Initialize the dropdowns
+        var dropdowns = $('select[id^="customers_select_"], select[id^="weekly_days_modal"],select[id^="file_extension_modal_"]');
+
+        dropdowns.multiselect({
+        nonSelectedText: 'Please Select',
+        selectAllText: 'All',
+        enableClickableOptGroups: true,
+        enableCollapsibleOptGroups: true,
+        collapseOptGroupsByDefault: true,
+        buttonClass: 'btn btn-white', // Set the button's class to 'btn btn-white'
+        buttonWidth: '100%',
+        dropRight: true
+        });
+
+
+        $(document).on('change', '.intraday-checkbox', function() {
+        const groupName = $(this).attr('name'); // Get the checkbox group name
+
+        // Uncheck other checkboxes in the same group
+        $(`.intraday-checkbox[name="${groupName}"]`).not(this).prop('checked', false);
+        });
+        });
+
+
+        function saveExecution(executionId) {
+            let querryId = {{ group.id }};
+            let nameExecution = document.getElementById('name_schedule_' + executionId).value;
+            let newEnvmtTest = document.getElementById('envmt_Test_Modal_' + executionId).checked;
+            let newEnvmtProdLu = document.getElementById('envmt_Prod_lu_Modal_' + executionId).checked;
+            let newEnvmtProdCh = document.getElementById('envmt_Prod_ch_Modal_' + executionId).checked;
+            let newStartDate = document.getElementById('schedule_date_begin_' + executionId).value;
+            let newEndDate = document.getElementById('schedule_date_end_' + executionId).value;
+            let newFrequency = document.getElementById('frequency_modal' + executionId).value;
+            let newStatus = document.getElementById('Status_' + executionId).checked;
+            let newMargin = document.getElementById('margin_' + executionId).value;
+            if (newMargin == "") {
+            newMargin = "0.0";  // Or any default float value.
+            }
+            let newCustomers = $('#customers_select_' + executionId).val().join(', ');
+            let newquerry_begin_date = document.getElementById('querry_begin_date_' + executionId).value;
+            let newquerry_end_date = document.getElementById('querry_end_date_' + executionId).value;
+
+            let newhave_parameters = document.getElementById('have_parameters_' + executionId).checked;
+            let newTimeExecution = document.getElementById('Time_Execution_modal_' + executionId).value;
+            let newIntradaySchedule = document.getElementById('Intraday_Schedule_modal_' + executionId).checked;
+            let newIsNotIntradaySchedule = document.getElementById('Is_not_Intraday_modal_' + executionId).checked;
+            let newIntradayBegin = document.getElementById('Intraday_schedule_Begin_home_' + executionId).value;
+            let newIntradayEnd = document.getElementById('Intraday_schedule_End_home_' + executionId).value;
+            let newIntradayFrequency = document.getElementById('Intraday_schedule_Frequency_home_' + executionId).value;
+            let newIntradayWeekday = $('#weekly_days_modal' + executionId).val().join(', ');
+
+            let newListEmail = document.getElementById('list_mail_' + executionId).value;
+            let newSendSlackEmpty = document.getElementById('send_report_slack_Modal_' + executionId).checked;
+            let newSendMailEmpty = document.getElementById('send_report_mail_Modal_' + executionId).checked;
+            let newListEmailCC = document.getElementById('list_mail_cc_' + executionId).value;
+            let newMultiIntraday = document.getElementById('Multi_Intraday_modal_' + executionId).checked;
+            let intradayListForExecution = retrieveMultiIntradayList(executionId);
+            let fileExtension =  $('#file_extension_modal_' + executionId).val().join(', ');
+
+            if (newMultiIntraday && intradayListForExecution.length === 2) {
+                alert('The multiintraday list is empty');
+                return;
+            }
+            let newsendmail = document.getElementById('send_mail_modal_' + executionId).checked;
+            let newsendslack = document.getElementById('send_slack_modal_' + executionId).checked;
+            if (newsendmail) {
+                if (!isValidEmailList(newListEmail) || !isValidEmailList(newListEmailCC)) {
+                    alert('Please enter a valid list of emails separated by , or ;');
+                    return;  // Exit the function and don't continue with the save operation
+                }
+            }
+            if (newIsNotIntradaySchedule && !newTimeExecution) {
+                alert('Time Execution cannot be empty when "Not Intraday" is selected.');
+                return;
+            }
+            if (newIntradaySchedule && (!newIntradayBegin || !newIntradayEnd || newIntradayFrequency=="None")) {
+                alert('Intraday Begin, End and Frequency cannot be empty when "Intraday Schedule" is selected.');
+                return;
+            }
+            if (newsendmail && newListEmail=="None") {
+                alert('Email List cannot be empty when "Send Mail" is selected.');
+                return;
+            }
+            if (newFrequency=="daily" && newStartDate==newEndDate) {
+                alert('The begin day and End day cannot be the same.change the days or choose weekly to choose one day ');
+                return;
+            }
+            if (newFrequency=="weekly" && !newIntradayWeekday) {
+                alert('Please choose at least one day for the frequency weekly');
+                return;
+            }
+            if ((newsendmail || newsendslack) && !fileExtension) {
+                alert('Please choose at least one extension file for your output file');
+                return;
+            }
+
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/update_execution';  // replace with your actual route
+
+            // Add hidden input fields for execution ID and new values
+            let inputs = [
+            { name: 'nameExecution', value: nameExecution },
+            { name: 'querry_id', value: querryId },
+            { name: 'execution_id', value: executionId },
+            { name: 'new_envmt_test', value: newEnvmtTest },
+            { name: 'new_envmt_prod_lu', value: newEnvmtProdLu },
+            { name: 'new_envmt_prod_ch', value: newEnvmtProdCh },
+            { name: 'new_start_date', value: newStartDate },
+            { name: 'new_end_date', value: newEndDate },
+            { name: 'new_frequency', value: newFrequency },
+            { name: 'new_status', value: newStatus },
+            { name: 'new_margin', value: newMargin },
+            { name: 'new_customer', value: newCustomers },
+            { name: 'newquerry_begin_date', value: newquerry_begin_date },
+            { name: 'newquerry_end_date', value: newquerry_end_date },
+
+            { name: 'have_parameters', value: newhave_parameters },
+            { name: 'new_time_execution', value: newTimeExecution },
+            { name: 'new_is_not_intraday_schedule', value: newIsNotIntradaySchedule },
+            { name: 'new_intraday_schedule', value: newIntradaySchedule },
+            { name: 'new_intraday_begin', value: newIntradayBegin },
+            { name: 'new_intraday_end', value: newIntradayEnd },
+            { name: 'new_intraday_frequency', value: newIntradayFrequency },
+            { name: 'new_intraday_weekday', value: newIntradayWeekday },
+
+            { name: 'new_listemail_cc', value: newListEmailCC },
+            { name: 'new_listemail', value: newListEmail },
+            { name: 'new_send_slack_empty', value: newSendSlackEmpty },
+            { name: 'new_send_mail_empty', value: newSendMailEmpty },
+            { name: 'new_Multi_Intraday', value: newMultiIntraday },
+            { name: 'new_Multi_Intraday_List', value: intradayListForExecution },
+            { name: 'new_file_extension', value: fileExtension },
+
+            { name: 'new_send_slack', value: newsendslack },
+            { name: 'new_send_mail', value: newsendmail },
+
+            ];
+            inputs.forEach(input => {
+            let inputElement = document.createElement('input');
+            inputElement.type = 'hidden';
+            inputElement.name = input.name;
+            inputElement.value = input.value;
+            form.appendChild(inputElement);
+            });
+
+            // Append the form to the document and submit it
+            document.body.appendChild(form);
+            form.submit();
+        }
+{% endblock %}

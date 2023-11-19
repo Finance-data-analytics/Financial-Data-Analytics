@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}
+    CSV details
+{% endblock %}
+
+
+{% block content %}
+   {% set rows = content.split('\n') %}
+        <div style="width: 100%; overflow-x: auto;">
+            <table class="table table-dark">
+                {% for row in rows %}
+                <tr>
+                    {% set cells = row.split(',') %}
+                    {% for cell in cells %}
+                    <td>{{ cell.replace('"', '') }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+{% endblock %}

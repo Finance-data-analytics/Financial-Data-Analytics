@@ -13,7 +13,6 @@
     $req->execute(array($_SESSION['user']));
     $data = $req->fetch();
 ?>
-
 <head>
     <html lang="fr">
     <meta charset="utf-8" />
@@ -52,6 +51,7 @@
 }
 </script>
 </div>
+
   <!-- TradingView Widget END -->
 
 

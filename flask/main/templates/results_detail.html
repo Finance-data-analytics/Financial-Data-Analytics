@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}
+    Results Details
+{% endblock %}
+
+{% block content %}
+    <div class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchBar">
+
+        <!-- Filter Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Filter
+            </button>
+            <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                <h6 class="dropdown-header">Order By:</h6>
+                <button class="dropdown-item" onclick="filterTable('name', 'asc')">Name Ascending</button>
+                <button class="dropdown-item" onclick="filterTable('name', 'desc')">Name Descending</button>
+                <button class="dropdown-item" onclick="filterTable('date_modified', 'asc')">Date Ascending</button>
+                <button class="dropdown-item" onclick="filterTable('date_modified', 'desc')">Date Descending</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-hover table-dark" id="queryTable">
+        <thead>
+            <tr>
+                <th scope="col">File Name</th>
+                <th scope="col">Date Modified</th>
+                <th scope="col">Zero row returned</th>
+                <th scope="col">Open</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+                <tr>
+                    <td>{{ file.name }}</td>
+                    <td>{{ file.date_modified }}</td>
+                    <td>{{ file.Zero_row_returned }}</td>
+                    <td>
+                        <a href="{{ url_for('main.open_file', file_path=file.path) }}" class="btn btn-outline btn-danger">Download</a>
+                        <a href="{{ url_for('main.view_file', file_path=file.path) }}" class="btn btn-outline btn-primary" target="_blank">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block JS %}
+    document.getElementById('searchBar').addEventListener('keyup', function() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById('searchBar');
+        filter = input.value.toUpperCase();
+        table = document.getElementById('queryTable');
+        tr = table.getElementsByTagName('tr');
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td')[0];  // Change this to the column index you want to filter on
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                } else {
+                    tr[i].style.display = 'none';
+                }
+            }
+        }
+    });
+    function filterTable(order = null, order_direction = null) {
+        let searchValue = document.getElementById("searchBar").value.toLowerCase();
+        let tableRows = document.querySelectorAll("#queryTable tbody tr");
+
+        // Filter based on search term
+        tableRows.forEach(function(row) {
+            let fileName = row.querySelector("td").innerText.toLowerCase();
+            if (fileName.includes(searchValue)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // If ordering details are provided, sort accordingly
+        if (order && order_direction) {
+            let rowsArray = Array.from(tableRows);
+            rowsArray.sort((a, b) => {
+                let colA, colB;
+                if (order === "name") {
+                    colA = a.querySelector("td").innerText.toLowerCase();
+                    colB = b.querySelector("td").innerText.toLowerCase();
+                } else if (order === "date_modified") {
+                    colA = Date.parse(a.cells[1].innerText);
+                    colB = Date.parse(b.cells[1].innerText);
+                }
+
+                return order_direction === "asc" ? (colA > colB ? 1 : -1) : (colA < colB ? 1 : -1);
+            });
+
+            let tbody = document.querySelector("#queryTable tbody");
+            rowsArray.forEach(row => tbody.appendChild(row));
+        }
+    }
+{% endblock %}
