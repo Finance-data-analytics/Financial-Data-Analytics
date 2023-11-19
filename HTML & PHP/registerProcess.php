@@ -2,7 +2,7 @@
     require_once 'config.php'; // On inclu la connexion à la bdd
 
     // Si les variables existent et qu'elles ne sont pas vides
-    if(!empty($_POST['pseudo']) && !empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_retype']) && !empty($_POST['birthdate']))
+    if(!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['password_retype']) && !empty($_POST['birthdate']))
     {
         // Patch XSS
         $name = htmlspecialchars($_POST['name']);
@@ -20,7 +20,7 @@
         $email = strtolower($email); // on transforme toute les lettres majuscule en minuscule pour éviter que Foo@gmail.com et foo@gmail.com soient deux compte différents ..
         
         // Si la requete renvoie un 0 alors l'utilisateur n'existe pas 
-        if($row == 0){ 
+        if($row == 0){
             if(strlen($name) <= 100){ // On verifie que la longueur du pseudo <= 100
                 if(strlen($email) <= 100){ // On verifie que la longueur du mail <= 100
                     if(filter_var($email, FILTER_VALIDATE_EMAIL)){ // Si l'email est de la bonne forme
@@ -29,7 +29,7 @@
                             // On hash le mot de passe avec Bcrypt, via un coût de 12
                             $cost = ['cost' => 12];
                             $password = password_hash($password, PASSWORD_BCRYPT, $cost);
-                            
+
                             // On insère dans la base de données
                             $insert = $bdd->prepare('INSERT INTO users(email, password, name, birthdate, idpf,picprofile) VALUES(:email, :password, :name, :birthdate, :idpf,:picprofile)');
                             $insert->execute(array(

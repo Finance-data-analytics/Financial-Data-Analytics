@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -133,7 +133,7 @@
                 <h1>Create Account</h1>
                 <span>or use your email for registeration</span>
                 <input type="text" name="name" placeholder="Name">
-                <input type="email" placeholder="Email">
+                <input type="email" name="email" placeholder="Email">
                 <input type="password" name="password" placeholder="Password">
                 <input type="password" name="password_retype" placeholder="Retype Your Password" require="required">
                 <input type="date" name="birthdate" placeholder="birthdate">
