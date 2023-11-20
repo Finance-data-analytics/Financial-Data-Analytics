@@ -48,10 +48,45 @@ const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
 const loginBtn = document.getElementById('login');
 
+
 registerBtn.addEventListener('click', () => {
     container.classList.add("active");
 });
 
 loginBtn.addEventListener('click', () => {
     container.classList.remove("active");
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  var currentSlide = 0;
+  var slides = document.querySelectorAll(".slide");
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+
+  function showSlide(index) {
+      // Masquer toutes les slides
+      slides.forEach(slide => {
+          slide.style.display = 'none';
+      });
+
+      // Afficher la slide demandée
+      slides[index].style.display = 'block';
+  }
+
+  nextBtn.addEventListener('click', () => {
+      if (currentSlide < slides.length - 1) {
+          currentSlide++;
+          showSlide(currentSlide);
+      }
+  });
+
+  prevBtn.addEventListener('click', () => {
+      if (currentSlide > 0) {
+          currentSlide--;
+          showSlide(currentSlide);
+      }
+  });
+
+  // Initialisation
+  showSlide(currentSlide);
 });

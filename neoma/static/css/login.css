@@ -7,14 +7,6 @@ html {
     margin: 0;
     padding: 0;
 }
-html, body {
-    margin: 0;
-    padding: 0;
-    /* Add other styles as needed */
-}
-
-/* If there are other containers wrapping your form, you may want to reset their margins and padding as well */
-
 body {
     width: 100%;
     height: 100%;
@@ -259,6 +251,7 @@ footer {
     .container form{
         background-color: #fff;
         display: flex;
+        align-items: center;
         justify-content: center;
         flex-direction: column;
         padding: 0 40px;
@@ -283,24 +276,24 @@ footer {
         transition: all 0.6s ease-in-out;
     }
     
-    .previous{
+    .sign-in{
         left: 0;
         width: 50%;
         z-index: 2;
     }
     
-    .container.active .previous{
+    .container.active .sign-in{
         transform: translateX(100%);
     }
     
-    .after{
+    .sign-up{
         left: 0;
         width: 50%;
         opacity: 0;
         z-index: 1;
     }
     
-    .container.active .after{
+    .container.active .sign-up{
         transform: translateX(100%);
         opacity: 1;
         z-index: 5;
@@ -315,6 +308,21 @@ footer {
             opacity: 1;
             z-index: 5;
         }
+    }
+    
+    .social-icons{
+        margin: 20px 0;
+    }
+    
+    .social-icons a{
+        border: 1px solid #ccc;
+        border-radius: 20%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 3px;
+        width: 40px;
+        height: 40px;
     }
     
     .toggle-container{
@@ -382,101 +390,3 @@ footer {
     .container.active .toggle-right{
         transform: translateX(200%);
     }
-    /* Hide the default radio button */
-    .radio-label {
-        display: block; /* Each label will be a block, stacking vertically */
-        position: relative; /* Position relative to allow absolute positioning of pseudo-elements */
-        padding-left: 35px; /* Space for custom radio button */
-        margin-bottom: 12px; /* Space between each radio button */
-        cursor: pointer;
-        font-size: 18px;
-        user-select: none;
-        text-align: left; /* Align text to the left */
-    }
-    
-    .radio-label input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        left: 0; /* Position the actual radio button to the left */
-        top: 0;
-        width: 100%; /* Full width for clickable area */
-        height: 100%; /* Full height for clickable area */
-        margin: 0; /* Reset margin */
-    }
-    
-    .radio-label span {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 25px;
-        width: 25px;
-        background-color: #eee;
-        border-radius: 50%;
-        border: 2px solid #512da8;
-    }
-    
-    .radio-label input[type="radio"]:checked + span {
-        background-color: #512da8;
-    }
-    
-    .radio-label span::after {
-        content: '';
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        background: white;
-        display: none; /* Hide by default */
-    }
-    
-    .radio-label input[type="radio"]:checked + span::after {
-        display: block; /* Show when checked */
-    }
-    .question {
-        width: 80%; /* Adjust width as needed */
-        text-align: center; /* Center the text of the question */
-        margin-bottom: 20px; /* Space between questions */
-    }
-    
-    .navigation-buttons {
-        display: flex;
-        justify-content: space-between;
-        width: 100%; /* Full width of the section */
-        padding: 20px; /* Padding around the buttons */
-    }
-
-    .navigation-buttons button {
-        margin: 0 10px; /* Space between buttons if needed */
-}
-input[type="range"] {
-    -webkit-appearance: none;  /* Override default appearance */
-    width: 100%; /* Full width */
-    margin: 10px 0; /* Margin for spacing */
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px; /* Width of the handle */
-    height: 25px; /* Height of the handle */
-    border-radius: 50%; 
-    background: #512da8; /* Handle color */
-    cursor: pointer; /* Cursor on hover */
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 8px;
-    background: #ddd;
-    border-radius: 4px;
-}
-
-/* Style for output element */
-output {
-    display: block;
-    text-align: center;
-    margin: 10px 0;
-}

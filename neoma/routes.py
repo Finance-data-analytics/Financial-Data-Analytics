@@ -62,10 +62,17 @@ def combined_survey_investment():
     investment_form = InvestmentForm(prefix='investment')
 
     if request.method == 'POST':
+        # Extract values from slider inputs and convert them to the correct type
+        # before validation since they come as strings from the request
+        investment_form.capital.data = float(request.form.get('capital', 0))
+        investment_form.investment_horizon.data = int(request.form.get('investment_horizon', 1))
+        investment_form.nb_assets.data = int(request.form.get('nb_assets', 1))
+
         # Validate both forms
         risk_form_valid = risk_form.validate()
         investment_form_valid = investment_form.validate()
-
+        print(risk_form.data)
+        print(investment_form.data)
         if risk_form_valid and investment_form_valid:
             # Process risk form data
             total_score = evaluate_risk_aversion_from_form(risk_form)

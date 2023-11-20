@@ -43,16 +43,15 @@ class RiskAversionSurveyForm(FlaskForm):
     question11 = RadioField('11. Do you wish to include cryptocurrencies in your portfolio?', choices=[('a', 'Yes'), ('b', 'No')], validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-
 class InvestmentForm(FlaskForm):
-    capital = FloatField('Capital to Invest:',
-                         validators=[DataRequired(), NumberRange(min=0)],
+    capital = IntegerField('Capital to Invest:',
+                         validators=[DataRequired(), NumberRange(min=0, max=500000)],
                          render_kw={"placeholder": "Enter your capital to invest"})
     investment_horizon = IntegerField('Investment Horizon (in years):',
-                                      validators=[DataRequired(), NumberRange(min=1)],
+                                      validators=[DataRequired(), NumberRange(min=1, max=15)],
                                       render_kw={"placeholder": "Enter your investment horizon in years"})
     nb_assets = IntegerField('Number of Assets in Portfolio:',
-                             validators=[DataRequired(), NumberRange(min=1)],
+                             validators=[DataRequired(), NumberRange(min=1, max=20)],
                              render_kw={"placeholder": "How many assets do you want in your portfolio?"})
     submit = SubmitField('Submit')
 
