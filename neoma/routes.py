@@ -1,11 +1,10 @@
 from main import *
 from neoma import app
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from neoma.models import users
 from neoma.forms import *
 from neoma import db
 from flask_login import *
-
 
 @app.route('/')
 @app.route('/home')
@@ -55,6 +54,7 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
+
 @app.route('/combined_survey_investment', methods=['GET', 'POST'])
 @login_required
 def combined_survey_investment():
@@ -76,13 +76,21 @@ def combined_survey_investment():
             capital = investment_form.capital.data
             investment_horizon = investment_form.investment_horizon.data
             nb_stocks = investment_form.nb_assets.data
+
             flash('Investment details submitted successfully!', 'success')
+
             # Use recommend_and_display_portfolio function
-            combined_selected_assets,monetary_allocation,best_weights = recommend_and_display_portfolio(
+            crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_and_display_portfolio(
                 portfolio_type, capital, investment_horizon, nb_stocks)
-            print(combined_selected_assets,monetary_allocation,best_weights)
+
+            selected_stocks, selected_cryptos = calculate_top_5_portfolios(Top_5_Selection)
+
+            session['selected_stocks'] = selected_stocks
+            session['selected_cryptos'] = selected_cryptos
+            session['top_5_portfolios'] = Top_5_Selection
+            # Rediriger vers la route 'portfolio_options'
+            return redirect(url_for('portfolio_options'))
             # Redirect or perform other actions after processing both forms
-            return redirect(url_for('home_page'))
         else:
             # Handle the situation if one or both forms are invalid
             flash('Please correct the errors in the form.', 'danger')
@@ -90,10 +98,21 @@ def combined_survey_investment():
     return render_template('build_portfolio.html', risk_form=risk_form, investment_form=investment_form)
 
 
+@app.route('/select_portfolio', methods=['GET', 'POST'])
+@login_required
+def portfolio_options():
+    if 'top_5_portfolios' not in session:
+        flash("No portfolio data available.", "error")
+        return redirect(url_for('home_page'))
 
+    top_5_portfolios = session['top_5_portfolios']
+    plot_data = generate_plotly_data(top_5_portfolios)
 
+    if request.method == 'POST':
+        selected_index = int(request.form['portfolio_choice']) - 1
+        selected_portfolio = top_5_portfolios[selected_index]
+        # Further processing based on the selected portfolio
+        # ...
 
-
-
-
+    return render_template('portfolio_options.html', plot_data=plot_data)
 

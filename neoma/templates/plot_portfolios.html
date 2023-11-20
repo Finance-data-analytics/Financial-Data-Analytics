@@ -1,0 +1,17 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+    <div id="portfolio-plots"></div>
+
+    <form action="{{ url_for('select_portfolio') }}" method="post">
+        <label for="portfolio_choice">Select Portfolio Number:</label>
+        <input type="number" id="portfolio_choice" name="portfolio_choice" min="1" max="5" required>
+        <button type="submit">Select</button>
+    </form>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var plotData = {{ plot_data | safe }};
+        Plotly.newPlot('portfolio-plots', plotData);
+    </script>
+{% endblock %}

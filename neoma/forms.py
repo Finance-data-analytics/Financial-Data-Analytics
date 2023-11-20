@@ -81,13 +81,43 @@ def suggest_portfolio(score):
         return "No Crypto"
     elif score == 1:
         return "Beginner"
-    elif score <= max_score * 0.35:
-        return "Very Conservative"
     elif score <= max_score * 0.4:
-        return "Balanced"
+        return "Very Conservative"
     elif score <= max_score * 0.6:
-        return "Growth"
+        return "Balanced"
     elif score <= max_score * 0.8:
         return "Growth"
     else:
         return "Very Dynamic"
+
+
+class PortfolioSelectionForm(FlaskForm):
+    portfolio_choice = SelectField(
+        'Choose a Portfolio',
+        choices=[('1', 'Portfolio 1'), ('2', 'Portfolio 2'), ('3', 'Portfolio 3'), ('4', 'Portfolio 4'), ('5', 'Portfolio 5')],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Select Portfolio')
+
+
+def calculate_top_5_portfolios(data):
+    # Prompt the user to choose a portfolio
+    print("Which portfolio do you want? Enter a number from 1 to 5:")
+    user_input = input()
+
+    # Check the user's input and provide the corresponding portfolio
+    if user_input.isdigit():
+        index = int(user_input) - 1  # Adjust for 0-based indexing
+        if 0 <= index < len(data):
+            portfolio = data[index]
+            print("Portfolio", user_input, "selected.")
+
+            # Extract stock and crypto indices into separate lists
+            selected_stocks = portfolio['stocks']
+            selected_cryptos = portfolio['cryptos']
+
+            return selected_stocks, selected_cryptos
+        else:
+            print("Invalid input. Please enter a number between 1 and 5.")
+    else:
+        print("Invalid input. Please enter a valid number.")

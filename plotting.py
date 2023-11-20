@@ -1,3 +1,5 @@
+import json
+
 from config import *
 
 def plot_assets_and_cal(data_dict, rf_daily):
@@ -49,3 +51,21 @@ def plot_assets_and_cal_plotly(data_dict, rf_daily):
         fig.update_layout(title=data["title"], xaxis_title='Volatilité (Écart type du rendement)',
                           yaxis_title='Rendement attendu')
         fig.show()
+
+
+def generate_plotly_data(top_selections):
+    plot_data = []
+
+    for i, selection in enumerate(top_selections, start=1):
+        plot = {
+            'x': [selection['volatility']],
+            'y': [selection['return']],
+            'type': 'scatter',
+            'mode': 'markers+text',
+            'name': f'Top {i}',
+            'text': [f'{selection["stocks"]} | {selection["cryptos"]}'],
+            'textposition': 'top center'
+        }
+        plot_data.append(plot)
+
+    return json.dumps(plot_data)
