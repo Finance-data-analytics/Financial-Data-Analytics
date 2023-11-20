@@ -152,3 +152,4 @@ def portfolio_options():
         return render_template('plot_choosen_portfolio.html', plot_data=plot_data,data=data_portfolio)
 
     return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)
+romain
