@@ -127,13 +127,14 @@ def portfolio_options():
          , sharpe_arr_allocation) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected_stocks,
                                                 selected_cryptos)
 
-        session.pop('portfolio_bool', None)
         plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
-        data_portfolio = [ret_arr_allocation, vol_arr_allocation
-            , sharpe_arr_allocation]
+        max_sharpe_idx = sharpe_arr_allocation.argmax()
+        data_portfolio = [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx]
+            , sharpe_arr_allocation[max_sharpe_idx]]
 
         list_weight_selected_assets_json = json.dumps(best_weights.tolist())
         data_portfolio_json = json.dumps([arr.tolist() for arr in data_portfolio])
+
 
         new_portfolio = Portfolio(
             user_id=current_user.id,
@@ -147,18 +148,7 @@ def portfolio_options():
         )
         db.session.add(new_portfolio)
         db.session.commit()
-        # Query the Portfolio table for the current user's most recently added portfolio
-        new_portfolio = Portfolio.query.filter_by(user_id=current_user.id).order_by(Portfolio.id.desc()).first()
-
-        if new_portfolio:
-            # Convert the JSON data to a Python dictionary
-            data_portfolio = json.loads(new_portfolio.data_portfolio)
-
-            # Now you can print or work with your data_portfolio as needed
-            print(data_portfolio)
-        else:
-            print("No portfolio found for the user.")
-
-        return render_template('plot_choosen_portfolio.html', plot_data=plot_data)
+        session.pop('portfolio_bool', None)
+        return render_template('plot_choosen_portfolio.html', plot_data=plot_data,data=data_portfolio)
 
     return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)

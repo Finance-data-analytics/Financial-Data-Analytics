@@ -4,7 +4,11 @@
 {% endblock %}
 {% block content %}
     <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
-
+    <div>
+        <label>Expected Return:</label> <span>{{ data[0] }}</span><br>
+        <label>Volatility:</label> <span>{{ data[1] }}</span><br>
+        <label>Sharpe Ratio:</label> <span>{{ data[2] }}</span>
+    </div>
     <!-- Plotly JavaScript library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
@@ -16,9 +20,8 @@
             margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
             showlegend: false,
             autosize: true, // Allows plot to resize based on the container size
-            bordercolor: 'black',
+            bordercolor: 'white',
             borderwidth: 2,
-            paper_bgcolor: 'rgba(0,0,0,0)' // Set transparent background
         };
         var config = {
             displayModeBar: false, // Hides the toolbar
