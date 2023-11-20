@@ -1,3 +1,7 @@
+import datetime
+
+from sqlalchemy import func
+
 from neoma import db, login_manager
 from neoma import bcrypt
 from flask_login import UserMixin
@@ -12,7 +16,6 @@ class users(db.Model, UserMixin):
     _password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
-    idpf = db.Column(db.Integer, nullable=True)
     picprofile = db.Column(db.String(255), nullable=True)
 
     @property
@@ -25,3 +28,20 @@ class users(db.Model, UserMixin):
 
     def check_password_correction(self, attempted_password):
         return bcrypt.check_password_hash(self._password_hash, attempted_password)
+
+
+class Portfolio(db.Model):
+    __tablename__ = 'portfolio'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    list_selected_assets = db.Column(db.Text, nullable=False)  # JSON serialized list
+    list_weight_selected_assets = db.Column(db.Text, nullable=False)  # JSON serialized list
+    data_portfolio = db.Column(db.Text, nullable=False)  # JSON serialized data
+    is_invested = db.Column(db.Boolean, default=False, nullable=False)
+    capital = db.Column(db.Integer, nullable=False)
+    horizon = db.Column(db.Integer, nullable=False)
+    user = db.relationship('users', backref=db.backref('portfolio', lazy=True))
+
+    def __repr__(self):
+        return f'<Portfolio {self.name}>'

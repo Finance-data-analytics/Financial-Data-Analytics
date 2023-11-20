@@ -1,7 +1,7 @@
 from main import *
 from neoma import app
 from flask import render_template, redirect, url_for, flash, request, session
-from neoma.models import users
+from neoma.models import *
 from neoma.forms import *
 from neoma import db
 from flask_login import *
@@ -124,11 +124,41 @@ def portfolio_options():
         selected_cryptos = selected_portfolio.get('cryptos', [])
 
         (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation
-         ,sharpe_arr_allocation) = best_weigth (crypto_weight_limit,stocks_data,crypto_data,capital,selected_stocks,selected_cryptos)
+         , sharpe_arr_allocation) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected_stocks,
+                                                selected_cryptos)
 
-        session.pop('portfolio_bool',None)
-        plot_data = generate_optimal_weight_plot_data(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation)
+        session.pop('portfolio_bool', None)
+        plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
+        data_portfolio = [ret_arr_allocation, vol_arr_allocation
+            , sharpe_arr_allocation]
+
+        list_weight_selected_assets_json = json.dumps(best_weights.tolist())
+        data_portfolio_json = json.dumps([arr.tolist() for arr in data_portfolio])
+
+        new_portfolio = Portfolio(
+            user_id=current_user.id,
+            name='User Portfolio',
+            list_selected_assets=json.dumps(selected_stocks + selected_cryptos),
+            list_weight_selected_assets=list_weight_selected_assets_json,
+            data_portfolio=data_portfolio_json,
+            is_invested=False,
+            capital=capital,
+            horizon=session['investment_horizon'],
+        )
+        db.session.add(new_portfolio)
+        db.session.commit()
+        # Query the Portfolio table for the current user's most recently added portfolio
+        new_portfolio = Portfolio.query.filter_by(user_id=current_user.id).order_by(Portfolio.id.desc()).first()
+
+        if new_portfolio:
+            # Convert the JSON data to a Python dictionary
+            data_portfolio = json.loads(new_portfolio.data_portfolio)
+
+            # Now you can print or work with your data_portfolio as needed
+            print(data_portfolio)
+        else:
+            print("No portfolio found for the user.")
+
         return render_template('plot_choosen_portfolio.html', plot_data=plot_data)
 
-    return render_template('plot_portfolios.html', plot_data=plot_data,form=PortfolioSelection)
-
+    return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)
