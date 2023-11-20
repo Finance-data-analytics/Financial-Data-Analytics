@@ -127,8 +127,8 @@ def portfolio_options():
          ,sharpe_arr_allocation) = best_weigth (crypto_weight_limit,stocks_data,crypto_data,capital,selected_stocks,selected_cryptos)
 
         session.pop('portfolio_bool',None)
-        plot_div = optimal_weight_allocation(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation)
-        return redirect(url_for('plot_choosen_portfolio', plot_div=plot_div))
+        plot_data = generate_optimal_weight_plot_data(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation)
+        return render_template('plot_choosen_portfolio.html', plot_data=plot_data)
 
     return render_template('plot_portfolios.html', plot_data=plot_data,form=PortfolioSelection)
 

@@ -79,49 +79,51 @@ def generate_plotly_data(top_selections):
     return json.dumps(plot_data)  # Convertir en JSON pour passer au template
 
 
-def optimal_weight_allocation(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation):
-    # Generate the plot data using Plotly
-    trace = go.Scatter(
-        x=vol_arr_allocation,
-        y=ret_arr_allocation,
-        mode='markers',
-        marker=dict(
-            size=8,
-            color=sharpe_arr_allocation,  # set color equal to a variable
-            colorscale='Viridis',  # one of plotly colorscales
-            showscale=True,
-            colorbar=dict(title='Sharpe Ratio')
-        )
-    )
+def generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation):
+    plot_data = []
+
+    # Convert NumPy arrays to Python lists
+    vol_arr_list = vol_arr_allocation.tolist()
+    ret_arr_list = ret_arr_allocation.tolist()
+    sharpe_arr_list = sharpe_arr_allocation.tolist()
+
+    # Create the main scatter plot for all portfolios
+    main_trace = {
+        'x': vol_arr_list,
+        'y': ret_arr_list,
+        'mode': 'markers',
+        'type': 'scatter',
+        'marker': {
+            'size': 8,
+            'color': sharpe_arr_list,  # Color according to Sharpe Ratio
+            'colorscale': 'Viridis',
+            'showscale': True,
+            'colorbar': {
+                'title': 'Sharpe Ratio'
+            }
+        },
+        'name': 'Portfolios'
+    }
+    plot_data.append(main_trace)
 
     # Highlight the best portfolio
-    max_sharpe_idx = sharpe_arr_allocation.argmax()
-    best_portfolio_trace = go.Scatter(
-        x=[vol_arr_allocation[max_sharpe_idx]],
-        y=[ret_arr_allocation[max_sharpe_idx]],
-        mode='markers',
-        marker=dict(
-            size=14,
-            color='red',
-            line=dict(
-                width=1,
-                color='Black'
-            )
-        ),
-        name='Best Portfolio'
-    )
+    max_sharpe_idx = np.argmax(sharpe_arr_allocation)
+    best_portfolio_trace = {
+        'x': [vol_arr_list[max_sharpe_idx]],
+        'y': [ret_arr_list[max_sharpe_idx]],
+        'mode': 'markers',
+        'type': 'scatter',
+        'marker': {
+            'size': 14,
+            'color': 'red',
+            'line': {
+                'width': 2,
+                'color': 'Black'
+            }
+        },
+        'name': 'Best Portfolio'
+    }
+    plot_data.append(best_portfolio_trace)
 
-    layout = go.Layout(
-        title='Optimal Weight Allocation for Selected Stocks',
-        xaxis=dict(title='Volatility'),
-        yaxis=dict(title='Return'),
-        showlegend=True
-    )
-
-    fig = go.Figure(data=[trace, best_portfolio_trace], layout=layout)
-
-    # Convert the figure to HTML
-    plot_div = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-    # Render the template with the plot_div
-    return plot_div
+    # Convert the plot data to JSON for rendering with Plotly in the template
+    return json.dumps(plot_data)

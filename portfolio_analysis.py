@@ -145,6 +145,7 @@ def monte_carlo_selection(stocks_data, crypto_data, nb_simulations, nb_stocks, c
     selection_results = []
 
     for _ in range(nb_simulations):
+        print(_)
         historical_return = calculate_historical_return(stocks_data)
         selected_stocks = run_monte_carlo(stocks_data, 1, nb_stocks_ok, risk_profile, historical_return)
 
@@ -281,7 +282,7 @@ def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
 
     Top_5_Selection = monte_carlo_selection(
         stocks_data, crypto_data,
-        10000,
+        1000,
         nb_stocks, crypto_weight_limit, risk_adjustment_factor)
     return crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection
 
@@ -292,7 +293,7 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
                                                                                                          crypto_data,
                                                                                                          selected_stocks,
                                                                                                          selected_cryptos
-                                                                                                         , 10000,
+                                                                                                         , 1000,
                                                                                                          crypto_weight_limit)
     monetary_allocation = best_weights * capital
 

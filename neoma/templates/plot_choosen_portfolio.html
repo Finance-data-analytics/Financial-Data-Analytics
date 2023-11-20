@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Optimal Weight Allocation</title>
+{% extends 'base.html' %}
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+{% block content %}
+    <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
+
+    <!-- Plotly JavaScript library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-<body>
+    <script>
+        var plotData = JSON.parse('{{ plot_data | safe }}'); // Parse the JSON string into a JavaScript object
+        var layout = {
+            title: 'Top Portfolio Selections',
+            xaxis: { title: 'Volatility' },
+            yaxis: { title: 'Expected Return' },
+            margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+            showlegend: false,
+            autosize: true, // Allows plot to resize based on the container size
+            bordercolor: 'black',
+            borderwidth: 2,
+            paper_bgcolor: 'rgba(0,0,0,0)' // Set transparent background
+        };
+        var config = {
+            displayModeBar: false, // Hides the toolbar
+            responsive: true // Ensures the plot is responsive to window changes
+        };
+        Plotly.newPlot('portfolio-plots', plotData, layout, config);
+    </script>
 
-<div id="plotly-plot">
-    {{ plot_div|safe }}
-</div>
-
-</body>
-</html>
+{% endblock %}
