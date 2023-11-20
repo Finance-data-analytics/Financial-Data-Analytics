@@ -120,7 +120,7 @@ def get_data_crypto(tickers, start_date, end_date):
     return data, successful_crypto
 
 
-def get_data_stocks(tickers, isins, start_date, end_date,capital):
+def get_data_stocks(tickers, isins, start_date, end_date, capital):
     successful_retrievals = []
     data_list = []
 
@@ -202,9 +202,6 @@ def generate_plotting_data(capital):
     with pd.ExcelWriter("rendements_et_risques.xlsx") as writer:
         for sheet_name, result in results_dict.items():
             result.to_excel(writer, sheet_name=sheet_name)
-    # # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux
-    target_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)
-    target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)
 
     # Dictionary containing average daily returns and daily returns for each asset type
     data_dict = {

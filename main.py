@@ -10,16 +10,6 @@ def load_data(file_path, sheet_name, return_col, risk_col):
     return avg_daily_returns, volatility
 
 
-# File path and column names
-file_path = "rendements_et_risques.xlsx"
-return_col = "Rendement moyen"
-risk_col = "Risque"
-
-# Load and process data for stocks and crypto
-stocks_avg_daily_returns, stocks_volatility = load_data(file_path, "Stocks", return_col, risk_col)
-crypto_avg_daily_returns, crypto_volatility = load_data(file_path, "Crypto", return_col, risk_col)
-
-
 # Evaluate the user's risk aversion
 def user_interaction_and_evaluation():
     total_score = evaluate_risk_aversion()
@@ -32,14 +22,13 @@ def user_interaction_and_evaluation():
     return portfolio_suggestion, capital, investment_horizon, nb_stocks
 
 
-from data_retrieval import generate_plotting_data,recommend_portfolio
 
 
 def recommend_and_display_portfolio(portfolio_suggestion, capital, investment_horizon, nb_stocks):
-
+    from data_retrieval import generate_plotting_data, recommend_portfolio
     plotting_data = generate_plotting_data(capital)
     # Call the recommend_portfolio function with the user inputs
-    recommend_portfolio(
+    selected_stock_data = recommend_portfolio(
         nb_stocks,
         plotting_data["Stocks"]["data_stocks"],
         plotting_data["Cryptos"]["data_crypto"],
@@ -47,7 +36,7 @@ def recommend_and_display_portfolio(portfolio_suggestion, capital, investment_ho
         portfolio_suggestion,
         investment_horizon
     )
-    return plotting_data
+    return plotting_data,selected_stock_data
 # Convert the annual risk-free rate to a daily rate
 rf_annual = 0.0455  # 1% annual rate
 rf_daily = (1 + rf_annual) ** (1 / 365) - 1
@@ -55,5 +44,5 @@ rf_daily
 
 portfolio_suggestion, capital, investment_horizon, nb_stocks = user_interaction_and_evaluation()
 
-plotting_data = recommend_and_display_portfolio(portfolio_suggestion, capital, investment_horizon, nb_stocks)
+plotting_data,selected_stock_data = recommend_and_display_portfolio(portfolio_suggestion, capital, investment_horizon, nb_stocks)
 plot_assets_and_cal_plotly(plotting_data, rf_daily)

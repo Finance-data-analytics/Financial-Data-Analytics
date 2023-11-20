@@ -1,3 +1,4 @@
+
 window.addEventListener('DOMContentLoaded', (event) => {
     const element = document.querySelector('.element');
     element.classList.add('active');
@@ -54,4 +55,12 @@ registerBtn.addEventListener('click', () => {
 
 loginBtn.addEventListener('click', () => {
     container.classList.remove("active");
+});
+
+$(document).ready(function () {
+        window.setTimeout(function () {
+            $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                $(this).remove();
+            });
+        }, 2000);
 });
