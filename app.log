@@ -26,3 +26,4 @@
 20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/css/survey.css HTTP/1.1[0m" 304 -
 20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
 20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+20-Nov-23 23:03:17 - werkzeug - INFO -  * Detected change in 'c:\\UwAmp\\www\\Financial-Data-Analytics\\neoma\\models.py', reloading
