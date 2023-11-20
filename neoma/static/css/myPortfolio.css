@@ -1,0 +1,171 @@
+html {
+    scroll-behavior: smooth;
+    display: flex ;
+}
+*,
+::before,::after {
+    margin: 0;
+    padding: 0;
+}
+body {
+    width: 100%;
+    height: 100%;
+    min-width: 600px;
+    background-color: black; 
+    background-position: center;
+    font-family: Montserrat, Helvetica, sans-serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+h1 {
+    text-transform: uppercase;
+    color: black;
+    font-weight: 900;
+}
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 100px 20px 0;
+}
+p {
+    text-transform: uppercase;
+    color: #222;
+    font-weight: 900;
+}
+
+nav.navbar.navbar-expand-lg {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 0px 2px black;
+    font-size : 20px;
+}
+
+img.logo_esigelec {
+    height: 100px;
+    width: auto;
+}
+
+.container1 {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 2px 3px 3px black;
+    font-size: 20px;
+}
+#text{
+    font-size : 20px;
+}
+.container2 {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 600px;
+    margin-bottom: 20px;
+}
+
+.row {
+    width: 100%;
+}
+
+.texte {
+    margin-top: 25px;
+    font-size: 25px;
+    text-align: justify;
+}
+
+.animated-link {
+    display: inline-block;
+    background: black;
+    border-radius: 2px;
+    text-decoration: none;
+    margin-top: 15px;
+}
+imGauche.ImageGauche{
+    float : left;
+    margin-right : 10px;
+}
+
+    .animated-link span {
+        display: inline-block;
+        background: black;
+        color: #fff;
+        border:  solid rgb(0, 0, 0);
+        padding: 5px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 3px;
+        margin-top: 10px;
+    }
+
+    .animated-link:hover span {
+        transform: translate(-4px,-4px);
+        color: white;
+        background: #000;
+        opacity: 1;
+    }
+
+
+.content {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: -80px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 500px;
+    width: 100%;
+}
+
+
+footer {
+    text-align: center;
+    border-top: 5px solid #fff;
+    background-color: #000;
+    color: #fff;
+    padding: 10px 100px;
+     /* Marge interieur */
+    margin-top: 175px;
+   
+}
+
+    footer h1 {
+        text-align : center;
+        font-family: 'Playfair Display', sans-serif;
+        border-bottom: 1px solid #fff;
+        width: 15%;
+        margin-bottom: 30px;
+    }
+    footer h3 {
+        text-align: center;
+        font-family: 'Playfair Display', sans-serif;
+        margin: 0 auto;
+        display: block;
+        margin-bottom: auto;
+        line-height: normal;
+        
+    }
+
+    footer .mentions .mention {
+        margin-top: -5px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        footer .mentions .mention p {
+            margin-right: 30px;
+        }
+
+    footer #contact {
+        color: rgb(181, 181, 181);
+    }
+
+    footer .mention {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+    }

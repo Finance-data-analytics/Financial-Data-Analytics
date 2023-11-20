@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+
+{% endblock %}
+
+{% block content %}
+</body>
+<div class="container">
+    <h2>My Portfolios</h2>
+    {% for portfolio in portfolios %}
+    <div class="portfolio">
+        <h3>{{ portfolio.Name }}</h3>
+        <!-- Display other portfolio details here -->
+    </div>
+    {% endfor %}
+</div>
+
+    
+    <!-- Fin haut de page-->
+    <!--Debut de section 1 -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+<footer>
+
+    <div class="container-fluid">
+        <div class="row">
+            <h1>Read More</h1>
+            <div class="mention col-lg-4">
+                <h3>General Terms of Sale</h3>
+                <p>
+                Our General Terms of Sale outline the agreement between our company and our clients. These terms include information on order processing, delivery procedures, and return policies. We commit to providing high-quality services and products, ensuring customer satisfaction is at the forefront of our operations. Our terms also detail payment methods, warranty information, and the process for handling disputes.
+                </p>
+            </div>
+            <div class="mention col-lg-4">
+                <h3>Cookie Management Policy</h3>
+                <p>
+                Our Cookie Management Policy describes how we use cookies to enhance user experience on our website. We use cookies for website functionality, analytics, and personalized content. Users have the option to manage their cookie preferences, ensuring a balance between personalization and privacy. Our policy provides detailed information on the types of cookies used and how they contribute to a better user experience.
+                </p>
+            </div>
+            <div class="mention col-lg-4">
+                <h3>Data Protection Policy</h3>
+                <p>
+                The Data Protection Policy of our website is dedicated to safeguarding the personal information of our users. We adhere to strict privacy standards and employ robust security measures to protect user data. This policy outlines the types of data we collect, how it is used, and the rights of users regarding their personal information. We are committed to transparency and accountability in all our data handling practices.
+            </div>
+        </div>
+        <p id="contact">Contact :  | &copy; 2023, NEOMA</p>
+    </div>
+</footer>
+{% endblock %}
+
