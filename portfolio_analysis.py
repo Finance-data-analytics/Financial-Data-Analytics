@@ -295,18 +295,12 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
                                                                                                          , 10000,
                                                                                                          crypto_weight_limit)
     monetary_allocation = best_weights * capital
-    combined_selected_assets = selected_stocks.append(selected_cryptos)
-    print(combined_selected_assets)
-    return combined_selected_assets, monetary_allocation, best_weights, [ret_arr_allocation, vol_arr_allocation,
-                                                                         sharpe_arr_allocation]
-    # print(best_weights)
-    # print(combined_selected_assets)
-    # print(monetary_allocation)
-    # # Print the monetary allocation for the selected stocks and cryptos
-    # print("Monetary allocation and Weights for the Best Portfolio:")
-    # for asset, (allocation, weight) in zip(combined_selected_assets, zip(monetary_allocation, best_weights)):
-    #     print(f"{asset}: ${allocation:,.2f} ({weight:.2%})")
-    #
+
+    combined_selected_assets = selected_stocks + selected_cryptos
+    return combined_selected_assets, monetary_allocation, best_weights,ret_arr_allocation, vol_arr_allocation,sharpe_arr_allocation
+
+
+
     # # Plot the results of the second Monte Carlo simulation
     # plt.figure(figsize=(12, 8))
     # plt.scatter(vol_arr_allocation, ret_arr_allocation, c=sharpe_arr_allocation, cmap='plasma')

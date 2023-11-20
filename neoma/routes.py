@@ -74,8 +74,7 @@ def combined_survey_investment():
         # Validate both forms
         risk_form_valid = risk_form.validate()
         investment_form_valid = investment_form.validate()
-        print(risk_form.data)
-        print(investment_form.data)
+
         if risk_form_valid and investment_form_valid:
             # Process risk form data
             total_score = evaluate_risk_aversion_from_form(risk_form)
@@ -123,13 +122,13 @@ def portfolio_options():
         # Extract stocks and cryptos from the selected portfolio
         selected_stocks = selected_portfolio.get('stocks', [])
         selected_cryptos = selected_portfolio.get('cryptos', [])
-        print(selected_cryptos)
-        print(selected_stocks)
-        combined_selected_assets, monetary_allocation, best_weights, [ret_arr_allocation, vol_arr_allocation,
-                                                                      sharpe_arr_allocation] = best_weigth (crypto_weight_limit,stocks_data,crypto_data,capital,selected_stocks,selected_cryptos)
-        print(combined_selected_assets,best_weights)
+
+        (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation
+         ,sharpe_arr_allocation) = best_weigth (crypto_weight_limit,stocks_data,crypto_data,capital,selected_stocks,selected_cryptos)
+
         session.pop('portfolio_bool',None)
-        return redirect(url_for('next_view_function', portfolio_number=selected_portfolio_number))
+        plot_div = optimal_weight_allocation(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation)
+        return redirect(url_for('plot_choosen_portfolio', plot_div=plot_div))
 
     return render_template('plot_portfolios.html', plot_data=plot_data,form=PortfolioSelection)
 

@@ -139,3 +139,5 @@ def transform_top_5_selection(top_5_selection):
         top_5_transformed.append(transformed_portfolio)
 
     return top_5_transformed
+
+

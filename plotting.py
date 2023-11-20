@@ -1,5 +1,7 @@
 import json
 
+import plotly
+
 from config import *
 
 def plot_assets_and_cal(data_dict, rf_daily):
@@ -76,3 +78,50 @@ def generate_plotly_data(top_selections):
 
     return json.dumps(plot_data)  # Convertir en JSON pour passer au template
 
+
+def optimal_weight_allocation(vol_arr_allocation,ret_arr_allocation,sharpe_arr_allocation):
+    # Generate the plot data using Plotly
+    trace = go.Scatter(
+        x=vol_arr_allocation,
+        y=ret_arr_allocation,
+        mode='markers',
+        marker=dict(
+            size=8,
+            color=sharpe_arr_allocation,  # set color equal to a variable
+            colorscale='Viridis',  # one of plotly colorscales
+            showscale=True,
+            colorbar=dict(title='Sharpe Ratio')
+        )
+    )
+
+    # Highlight the best portfolio
+    max_sharpe_idx = sharpe_arr_allocation.argmax()
+    best_portfolio_trace = go.Scatter(
+        x=[vol_arr_allocation[max_sharpe_idx]],
+        y=[ret_arr_allocation[max_sharpe_idx]],
+        mode='markers',
+        marker=dict(
+            size=14,
+            color='red',
+            line=dict(
+                width=1,
+                color='Black'
+            )
+        ),
+        name='Best Portfolio'
+    )
+
+    layout = go.Layout(
+        title='Optimal Weight Allocation for Selected Stocks',
+        xaxis=dict(title='Volatility'),
+        yaxis=dict(title='Return'),
+        showlegend=True
+    )
+
+    fig = go.Figure(data=[trace, best_portfolio_trace], layout=layout)
+
+    # Convert the figure to HTML
+    plot_div = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+    # Render the template with the plot_div
+    return plot_div
