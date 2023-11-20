@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import *
-from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
+from wtforms.validators import *
 from neoma.models import users
 
 
@@ -41,6 +41,19 @@ class RiskAversionSurveyForm(FlaskForm):
     question9 = RadioField('9. What is your main objective in investing?', choices=[('a', 'Preserve capital and maintain stable growth'), ('b', 'Balance growth and security, with a moderate approach'), ('c', 'Seek high growth, even if it means greater risk.')], validators=[DataRequired()])
     question10 = RadioField('10. Faced with a very popular new investment trend, like a speculative bubble, what would be your approach?', choices=[('a', 'Avoid completely, too risky for my taste'), ('b', 'Invest a small amount not to miss a potential opportunity'), ('c', 'Invest significantly, hoping to make a big profit.')], validators=[DataRequired()])
     question11 = RadioField('11. Do you wish to include cryptocurrencies in your portfolio?', choices=[('a', 'Yes'), ('b', 'No')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class InvestmentForm(FlaskForm):
+    capital = FloatField('Capital to Invest:',
+                         validators=[DataRequired(), NumberRange(min=0)],
+                         render_kw={"placeholder": "Enter your capital to invest"})
+    investment_horizon = IntegerField('Investment Horizon (in years):',
+                                      validators=[DataRequired(), NumberRange(min=1)],
+                                      render_kw={"placeholder": "Enter your investment horizon in years"})
+    nb_assets = IntegerField('Number of Assets in Portfolio:',
+                             validators=[DataRequired(), NumberRange(min=1)],
+                             render_kw={"placeholder": "How many assets do you want in your portfolio?"})
     submit = SubmitField('Submit')
 
 

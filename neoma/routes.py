@@ -54,15 +54,37 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-@app.route('/survey', methods=['GET', 'POST'])
-def survey():
-    form = RiskAversionSurveyForm()
-    if form.validate_on_submit():
-        total_score = evaluate_risk_aversion_from_form(form)
-        portfolio_type = suggest_portfolio(total_score)
-        flash(f'Your recommended portfolio type is: {portfolio_type}', 'success')
-        return redirect(url_for('home_page'))  # Redirect to the homepage or result page
-    return render_template('build_portfolio.html', form=form)
+@app.route('/combined_survey_investment', methods=['GET', 'POST'])
+@login_required
+def combined_survey_investment():
+    risk_form = RiskAversionSurveyForm(prefix='risk')
+    investment_form = InvestmentForm(prefix='investment')
+
+    if request.method == 'POST':
+        # Validate both forms
+        risk_form_valid = risk_form.validate()
+        investment_form_valid = investment_form.validate()
+
+        if risk_form_valid and investment_form_valid:
+            # Process risk form data
+            total_score = evaluate_risk_aversion_from_form(risk_form)
+            portfolio_type = suggest_portfolio(total_score)
+            flash(f'Your recommended portfolio type is: {portfolio_type}', 'success')
+
+            # Process investment form data
+            capital = investment_form.capital.data
+            investment_horizon = investment_form.investment_horizon.data
+            nb_stocks = investment_form.nb_assets.data
+            flash('Investment details submitted successfully!', 'success')
+
+            # Redirect or perform other actions after processing both forms
+            return redirect(url_for('home_page'))
+        else:
+            # Handle the situation if one or both forms are invalid
+            flash('Please correct the errors in the form.', 'danger')
+
+    return render_template('build_portfolio.html', risk_form=risk_form, investment_form=investment_form)
+
 
 
 
