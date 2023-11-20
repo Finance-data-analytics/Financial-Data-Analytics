@@ -58,25 +58,33 @@ def plot_assets_and_cal_plotly(data_dict, rf_daily):
 def generate_plotly_data(top_selections):
     plot_data = []
 
-    colors = ['red', 'green', 'blue', 'orange', 'purple']  # Définir une liste de couleurs
+    colors = ['red', 'green', 'blue', 'orange', 'purple']  # Define a list of colors
 
     for i, selection in enumerate(top_selections, start=1):
+        stocks = ', '.join(selection['stocks'])  # Convert list of stocks to a comma-separated string
+        cryptos = ', '.join(selection['cryptos']) if selection['cryptos'] else 'None'  # Do the same for cryptos
+
+        hover_text = f"Choice {i}: Score {selection['score']:.2f}<br>Stocks: {stocks}<br>Cryptos: {cryptos}"
+
         plot = {
             'x': [selection['volatility']],
             'y': [selection['return']],
             'type': 'scatter',
             'mode': 'markers+text',
-            'name': f'Top {i}',
-            'text': [f'Choice {i}: Score {selection["score"]:.2f}'],  # Ajouter le numéro de choix ici
-            'textposition': 'top center',
             'marker': {
-                'color': colors[i-1],  # Utiliser une couleur de la liste définie ci-dessus
-                'size': 10  # Vous pouvez ajuster la taille si nécessaire
-            }
+                'color': colors[i-1],  # Use a color from the defined list
+                'size': 10  # Adjust the size if necessary
+            },
+            'name': f"Top {i}",
+            'text': [f"Choice {i}: Score {selection['score']:.2f}"],
+            'textposition': 'top center',
+            'hoverinfo': 'text',
+            'hovertext': hover_text,
         }
         plot_data.append(plot)
 
-    return json.dumps(plot_data)  # Convertir en JSON pour passer au template
+    return json.dumps(plot_data)  # Convert to JSON to pass to the template
+
 
 
 def generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation):

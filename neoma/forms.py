@@ -100,29 +100,6 @@ class PortfolioSelectionForm(FlaskForm):
     submit = SubmitField('Select Portfolio')
 
 
-def calculate_top_5_portfolios(data):
-    # Prompt the user to choose a portfolio
-    print("Which portfolio do you want? Enter a number from 1 to 5:")
-    user_input = input()
-
-    # Check the user's input and provide the corresponding portfolio
-    if user_input.isdigit():
-        index = int(user_input) - 1  # Adjust for 0-based indexing
-        if 0 <= index < len(data):
-            portfolio = data[index]
-            print("Portfolio", user_input, "selected.")
-
-            # Extract stock and crypto indices into separate lists
-            selected_stocks = portfolio['stocks']
-            selected_cryptos = portfolio['cryptos']
-
-            return selected_stocks, selected_cryptos
-        else:
-            print("Invalid input. Please enter a number between 1 and 5.")
-    else:
-        print("Invalid input. Please enter a valid number.")
-
-
 def transform_top_5_selection(top_5_selection):
     # Supposons que top_5_selection est une liste de dictionnaires contenant des objets pandas.Index
     top_5_transformed = []
