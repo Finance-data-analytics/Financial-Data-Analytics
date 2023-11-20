@@ -1,3 +1,4 @@
+from main import *
 from neoma import app
 from flask import render_template, redirect, url_for, flash, request
 from neoma.models import users
@@ -76,7 +77,10 @@ def combined_survey_investment():
             investment_horizon = investment_form.investment_horizon.data
             nb_stocks = investment_form.nb_assets.data
             flash('Investment details submitted successfully!', 'success')
-
+            # Use recommend_and_display_portfolio function
+            combined_selected_assets,monetary_allocation,best_weights = recommend_and_display_portfolio(
+                portfolio_type, capital, investment_horizon, nb_stocks)
+            print(combined_selected_assets,monetary_allocation,best_weights)
             # Redirect or perform other actions after processing both forms
             return redirect(url_for('home_page'))
         else:

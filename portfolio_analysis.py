@@ -210,7 +210,12 @@ def run_full_monte_carlo(data, nb_simulations, risk_profile, historical_return):
         weights = np.random.random(len(data.columns))
         weights /= np.sum(weights)
 
-        daily_returns = data.pct_change(fill_method='ffill').dropna().dot(weights)
+        # First, forward-fill any missing values
+        data_ffilled = data.ffill()
+
+        # Then, compute the percentage change
+        daily_returns = data_ffilled.pct_change().dropna().dot(weights)
+
         annual_return = daily_returns.mean() * 252
         annual_volatility = daily_returns.std() * np.sqrt(252)
         sharpe_ratio = annual_return / annual_volatility
@@ -315,30 +320,32 @@ def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
     monetary_allocation = best_weights * capital
     # Création d'une liste combinée des actifs sélectionnés
     combined_selected_assets = selected_stocks.append(selected_cryptos)
-    print(best_weights)
-    print(combined_selected_assets)
-    print(monetary_allocation)
-    # Print the monetary allocation for the selected stocks and cryptos
-    print("Monetary allocation and Weights for the Best Portfolio:")
-    for asset, (allocation, weight) in zip(combined_selected_assets, zip(monetary_allocation, best_weights)):
-        print(f"{asset}: ${allocation:,.2f} ({weight:.2%})")
 
-    # Plot the results of the second Monte Carlo simulation
-    plt.figure(figsize=(12, 8))
-    plt.scatter(vol_arr_allocation, ret_arr_allocation, c=sharpe_arr_allocation, cmap='plasma')
-    plt.colorbar(label='Sharpe Ratio')
-    plt.xlabel('Volatility')
-    plt.ylabel('Return')
-    plt.title('Optimal Weight Allocation for Selected Stocks')
-
-    # Highlight the best portfolio with a red dot
-    max_sharpe_idx = sharpe_arr_allocation.argmax()  # Index of the portfolio with the highest Sharpe Ratio
-    plt.scatter(vol_arr_allocation[max_sharpe_idx], ret_arr_allocation[max_sharpe_idx], c='red', s=50,
-                edgecolors='black', label='Best Portfolio')
-
-    # Show plot with legend
-    plt.legend()
-    plt.show()
+    return combined_selected_assets,monetary_allocation,best_weights
+    # print(best_weights)
+    # print(combined_selected_assets)
+    # print(monetary_allocation)
+    # # Print the monetary allocation for the selected stocks and cryptos
+    # print("Monetary allocation and Weights for the Best Portfolio:")
+    # for asset, (allocation, weight) in zip(combined_selected_assets, zip(monetary_allocation, best_weights)):
+    #     print(f"{asset}: ${allocation:,.2f} ({weight:.2%})")
+    #
+    # # Plot the results of the second Monte Carlo simulation
+    # plt.figure(figsize=(12, 8))
+    # plt.scatter(vol_arr_allocation, ret_arr_allocation, c=sharpe_arr_allocation, cmap='plasma')
+    # plt.colorbar(label='Sharpe Ratio')
+    # plt.xlabel('Volatility')
+    # plt.ylabel('Return')
+    # plt.title('Optimal Weight Allocation for Selected Stocks')
+    #
+    # # Highlight the best portfolio with a red dot
+    # max_sharpe_idx = sharpe_arr_allocation.argmax()  # Index of the portfolio with the highest Sharpe Ratio
+    # plt.scatter(vol_arr_allocation[max_sharpe_idx], ret_arr_allocation[max_sharpe_idx], c='red', s=50,
+    #             edgecolors='black', label='Best Portfolio')
+    #
+    # # Show plot with legend
+    # plt.legend()
+    # plt.show()
 
 
 def get_crypto_weight_limit(portfolio_suggestion, investment_horizon):
