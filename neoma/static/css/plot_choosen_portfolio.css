@@ -249,3 +249,15 @@ footer {
     color: antiquewhite
 }
 
+#expected-return,
+#volatility,
+#sharpe-ratio {
+    color: #ffffff; /* White color for text */
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    padding: 5px; /* Padding for the text */
+    border-radius: 5px; /* Rounded corners */
+    margin: 2px; /* Space between spans */
+    display: inline-block; /* Align items in a row */
+    font-weight: bold; /* Make text bold */
+}
+
