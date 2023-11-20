@@ -61,7 +61,7 @@
                         <a href="{{ url_for('login_register_page') }}" class="animated-link">
                             <span class="material-symbols-outlined material-icons-white" style="font-size: 40px;">account_circle</span>
                         </a>
-                        <a href="#contact" class="animated-link">
+                        <a href="{{ url_for('survey') }}" class="animated-link">
                             <span> Build Portflio </span>
                         </a>
                         <a href="{{ url_for('logout_page') }}" class="animated-link">
@@ -77,7 +77,7 @@
                         <a href="" class="animated-link">
                             <span> Our Team </span>
                         </a>
-                        <a asp-action="Stocks" asp-controller="Home" class="animated-link">
+                        <a href="{{ url_for('survey') }}" class="animated-link">
                             <span> Build Portflio </span>
                         </a>
                         <a asp-action="Index" asp-controller="Companies" class="animated-link">

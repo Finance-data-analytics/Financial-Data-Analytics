@@ -1,14 +1,16 @@
 from neoma import app
 from flask import render_template, redirect, url_for, flash, request
 from neoma.models import users
-from neoma.forms import RegisterForm, LoginForm
+from neoma.forms import *
 from neoma import db
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import *
+
 
 @app.route('/')
 @app.route('/home')
 def home_page():
     return render_template('index.html')
+
 
 @app.route('/login_register', methods=['GET', 'POST'])
 def login_register_page():
@@ -52,7 +54,15 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-
+@app.route('/survey', methods=['GET', 'POST'])
+def survey():
+    form = RiskAversionSurveyForm()
+    if form.validate_on_submit():
+        total_score = evaluate_risk_aversion_from_form(form)
+        portfolio_type = suggest_portfolio(total_score)
+        flash(f'Your recommended portfolio type is: {portfolio_type}', 'success')
+        return redirect(url_for('home_page'))  # Redirect to the homepage or result page
+    return render_template('build_portfolio.html', form=form)
 
 
 

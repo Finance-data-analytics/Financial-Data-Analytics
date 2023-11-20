@@ -1,0 +1,46 @@
+<!-- survey.html -->
+{% extends 'base.html' %}
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Risk Aversion Survey</h2>
+    <form method="POST" action="{{ url_for('survey') }}">
+        {{ form.hidden_tag() }}
+
+        {% macro render_question(field) %}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {% for subfield in field %}
+                <div class="form-check">
+                    {{ subfield }} {{ subfield.label(class="form-check-label") }}
+                    {% if subfield.flags.required %}<span class="text-danger">*</span>{% endif %}
+                </div>
+            {% endfor %}
+            {% if field.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ field.errors|join(', ') }}
+                </div>
+            {% endif %}
+        </div>
+        {% endmacro %}
+
+        {{ render_question(form.question1) }}
+        {{ render_question(form.question2) }}
+        {{ render_question(form.question3) }}
+        {{ render_question(form.question4) }}
+        {{ render_question(form.question5) }}
+        {{ render_question(form.question6) }}
+        {{ render_question(form.question7) }}
+        {{ render_question(form.question8) }}
+        {{ render_question(form.question9) }}
+        {{ render_question(form.question10) }}
+        {{ render_question(form.question11) }}
+
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
