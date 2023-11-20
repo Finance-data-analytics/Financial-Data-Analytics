@@ -12,3 +12,4 @@ cryptos_market_cap.xlsx
 rendements_et_risques.xlsx
 stocks.xlsx
 __pycache__/survey.cpython-311.pyc
+neoma/__pycache__/routes.cpython-311.pyc
