@@ -1,12 +1,28 @@
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:16 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
-20-Nov-23 22:21:48 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:21:48] "GET /select_portfolio HTTP/1.1" 200 -
-20-Nov-23 22:21:48 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:21:48] "[36mGET /static/css/plot_portfolio.css HTTP/1.1[0m" 304 -
-20-Nov-23 22:21:48 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:21:48] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
-20-Nov-23 22:22:35 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:22:35] "POST /select_portfolio HTTP/1.1" 200 -
-20-Nov-23 22:22:35 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:22:35] "[36mGET /static/css/index.css HTTP/1.1[0m" 304 -
-20-Nov-23 22:22:35 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:22:35] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:55:57 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: query2.finance.yahoo.com. Connection pool size: 10
+20-Nov-23 22:56:27 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:56:27] "GET /select_portfolio HTTP/1.1" 200 -
+20-Nov-23 22:56:27 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:56:27] "[36mGET /static/css/plot_portfolio.css HTTP/1.1[0m" 304 -
+20-Nov-23 22:56:27 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:56:27] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:57:57 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:57:57] "POST /select_portfolio HTTP/1.1" 200 -
+20-Nov-23 22:57:57 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:57:57] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:57:57 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:57:57] "GET /static/css/plot_choosen_portfolio.css HTTP/1.1" 200 -
+20-Nov-23 22:58:08 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:08] "GET /combined_survey_investment HTTP/1.1" 200 -
+20-Nov-23 22:58:08 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:08] "[36mGET /static/css/survey.css HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:08 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:08] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:08 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:08] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "GET /combined_survey_investment HTTP/1.1" 200 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/css/survey.css HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "GET /combined_survey_investment HTTP/1.1" 200 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/css/survey.css HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:10 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:10] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "GET /combined_survey_investment HTTP/1.1" 200 -
+20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/css/survey.css HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/images/Logo.jpg HTTP/1.1[0m" 304 -
+20-Nov-23 22:58:11 - werkzeug - INFO - 127.0.0.1 - - [20/Nov/2023 22:58:11] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -

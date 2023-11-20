@@ -1,0 +1,251 @@
+html {
+    scroll-behavior: smooth;
+    display: flex ;
+}
+*,
+::before,::after {
+    margin: 0;
+    padding: 0;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    /* Add other styles as needed */
+}
+
+/* If there are other containers wrapping your form, you may want to reset their margins and padding as well */
+
+body {
+    width: 100%;
+    height: 100%;
+    min-width: 600px;
+    background-color: black; 
+    background-position: center;
+    font-family: Montserrat, Helvetica, sans-serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+h1 {
+    text-transform: uppercase;
+    color: black;
+    font-weight: 900;
+}
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 100px 20px 0;
+}
+p {
+    margin-top: 20px;
+    text-transform: uppercase;
+    color: white;
+    font-weight: 900;
+}
+
+nav.navbar.navbar-expand-lg {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 0px 2px black;
+    font-size : 20px;
+}
+
+img.logo_esigelec {
+    height: 100px;
+    width: auto;
+}
+
+.container1 {
+    margin-left: 0px;
+    min-width: 100%;
+    box-shadow: 2px 3px 3px black;
+    font-size: 20px;
+}
+#text{
+    font-size : 20px;
+}
+.container2 {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 600px;
+    margin-bottom: 20px;
+}
+
+.row {
+    width: 100%;
+}
+
+.texte {
+    margin-top: 25px;
+    font-size: 25px;
+    text-align: justify;
+}
+
+.animated-link {
+    display: inline-block;
+    background: black;
+    border-radius: 2px;
+    text-decoration: none;
+    margin-top: 15px;
+}
+    .animated-link span {
+        display: inline-block;
+        background: black;
+        color: #fff;
+        border:  solid rgb(0, 0, 0);
+        padding: 5px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 3px;
+        margin-top: 10px;
+    }
+
+    .animated-link:hover span {
+        transform: translate(-4px,-4px);
+        color: white;
+        background: #000;
+        opacity: 1;
+    }
+
+
+.content {
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    margin-top: -80px;
+    height: 100vh;
+    margin-left: 100px;
+    min-width: 100%;
+    height: 500px;
+    width: 100%;
+}
+
+
+footer {
+    text-align: center;
+    border-top: 5px solid #fff;
+    background-color: #000;
+    color: #fff;
+    padding: 10px 100px;
+     /* Marge interieur */
+    margin-top: 175px;
+   
+}
+
+    footer h1 {
+        text-align : center;
+        font-family: 'Playfair Display', sans-serif;
+        border-bottom: 1px solid #fff;
+        width: 15%;
+        margin-bottom: 30px;
+    }
+    footer h3 {
+        text-align: center;
+        font-family: 'Playfair Display', sans-serif;
+        margin: 0 auto;
+        display: block;
+        margin-bottom: auto;
+        line-height: normal;
+        
+    }
+
+    footer .mentions .mention {
+        margin-top: -5px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        footer .mentions .mention p {
+            margin-right: 30px;
+        }
+
+    footer #contact {
+        color: rgb(181, 181, 181);
+    }
+
+    footer .mention {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+}
+
+.icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+    .icon i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+    .icon img {
+        width: 50px;
+        height: 50px;
+    }
+/* Style for the dropdown */
+.form-control {
+    width: 100%; /* Full width */
+    padding: 10px; /* Some padding */
+    margin: 10px 0; /* Margin for some space around the dropdown */
+    display: inline-block; /* Allows the dropdown to sit next to other elements */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    box-sizing: border-box; /* Box-sizing to make sure padding doesn't affect width */
+    -webkit-appearance: none; /* Removes default styling on iOS */
+    -moz-appearance: none; /* Removes default styling on Firefox */
+    appearance: none; /* Removes default styling */
+    background-color: #f8f8f8; /* Light grey background */
+    position: relative; /* Position relative for positioning the arrow icon */
+  }
+  
+  /* Style for the arrow icon */
+  .form-control::after {
+    content: "\25BC"; /* Downward arrow */
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #333; /* Arrow color */
+    pointer-events: none; /* Prevents the arrow from being clickable */
+  }
+  
+  /* Style for the button */
+  .btn-primary {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 14px 20px; /* Some padding */
+    margin: 8px 0; /* Margin for some space around the button */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    width: 100%; /* Full width */
+  }
+  
+  .btn-primary:hover {
+    background-color: #45a049; /* Darker shade of green on hover */
+  }
+  
+  /* Ensure the form elements are contained within a div for alignment */
+  .form-group {
+    max-width: 300px; /* Maximum width of the form group */
+    margin: auto; /* Centers the form group */
+  }
+  /* Style for the first option to make it white */
+.form-control option:first-child {
+    color: antiquewhite
+}
+
