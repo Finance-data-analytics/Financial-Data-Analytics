@@ -295,9 +295,8 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
                                                                                                          , 10000,
                                                                                                          crypto_weight_limit)
     monetary_allocation = best_weights * capital
-    # Création d'une liste combinée des actifs sélectionnés
     combined_selected_assets = selected_stocks.append(selected_cryptos)
-
+    print(combined_selected_assets)
     return combined_selected_assets, monetary_allocation, best_weights, [ret_arr_allocation, vol_arr_allocation,
                                                                          sharpe_arr_allocation]
     # print(best_weights)
