@@ -1,3 +1,4 @@
+import pandas as pd
 from flask_wtf import FlaskForm
 from wtforms import *
 from wtforms.validators import *
@@ -121,3 +122,21 @@ def calculate_top_5_portfolios(data):
             print("Invalid input. Please enter a number between 1 and 5.")
     else:
         print("Invalid input. Please enter a valid number.")
+
+
+def transform_top_5_selection(top_5_selection):
+    # Supposons que top_5_selection est une liste de dictionnaires contenant des objets pandas.Index
+    top_5_transformed = []
+
+    for portfolio in top_5_selection:
+        transformed_portfolio = {
+            'stocks': portfolio['stocks'].tolist() if isinstance(portfolio['stocks'], pd.Index) else portfolio['stocks'],
+            'cryptos': portfolio['cryptos'].tolist() if isinstance(portfolio['cryptos'], pd.Index) else portfolio['cryptos'],
+            'return': portfolio['return'],
+            'volatility': portfolio['volatility'],
+            'sharpe_ratio': portfolio['sharpe_ratio'],
+            'score': portfolio['score']
+        }
+        top_5_transformed.append(transformed_portfolio)
+
+    return top_5_transformed

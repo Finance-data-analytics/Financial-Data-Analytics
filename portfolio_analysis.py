@@ -140,10 +140,8 @@ def evaluate_portfolio_score(annual_return, annual_volatility, risk_profile, his
 
 # Function to perform Monte Carlo simulation for stock selection
 def monte_carlo_selection(stocks_data, crypto_data, nb_simulations, nb_stocks, crypto_limit, risk_profile):
-    print(risk_profile)
     nb_crypto_ok = int(nb_stocks * crypto_limit)
     nb_stocks_ok = nb_stocks - nb_crypto_ok
-
     selection_results = []
 
     for _ in range(nb_simulations):
@@ -271,29 +269,6 @@ def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_c
     return best_weights, ret_arr, vol_arr, sharpe_arr
 
 
-def get_portfolio_by_input(data):
-    # Prompt the user to choose a portfolio
-    print("Which portfolio do you want? Enter a number from 1 to 5:")
-    user_input = input()
-
-    # Check the user's input and provide the corresponding portfolio
-    if user_input.isdigit():
-        index = int(user_input) - 1  # Adjust for 0-based indexing
-        if 0 <= index < len(data):
-            portfolio = data[index]
-            print("Portfolio", user_input, "selected.")
-
-            # Extract stock and crypto indices into separate lists
-            selected_stocks = portfolio['stocks']
-            selected_cryptos = portfolio['cryptos']
-
-            return selected_stocks, selected_cryptos
-        else:
-            print("Invalid input. Please enter a number between 1 and 5.")
-    else:
-        print("Invalid input. Please enter a valid number.")
-
-
 def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
                         portfolio_suggestion,
                         investment_horizon):
@@ -311,7 +286,7 @@ def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
     return crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection
 
 
-def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection, selected_stocks,
+def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected_stocks,
                 selected_cryptos):
     best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation = monte_carlo_allocation(stocks_data,
                                                                                                          crypto_data,

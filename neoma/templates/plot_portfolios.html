@@ -1,17 +1,45 @@
-{% extends 'base_layout.html' %}
-
+{% extends 'base.html' %}
+{% block stylesheet %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
 {% block content %}
-    <div id="portfolio-plots"></div>
 
-    <form action="{{ url_for('select_portfolio') }}" method="post">
-        <label for="portfolio_choice">Select Portfolio Number:</label>
-        <input type="number" id="portfolio_choice" name="portfolio_choice" min="1" max="5" required>
-        <button type="submit">Select</button>
+    <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
+
+    <!-- Flask-WTF form -->
+    <form action="{{ url_for('portfolio_options') }}" method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.portfolio_choice.label }}<br>
+            {{ form.portfolio_choice(class='form-control') }}
+        </div>
+        <div>
+            {{ form.submit(class='btn btn-primary') }}
+        </div>
     </form>
 
+
+    <style>
+
+
+    </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-        var plotData = {{ plot_data | safe }};
-        Plotly.newPlot('portfolio-plots', plotData);
+        var plotData = JSON.parse('{{ plot_data | safe }}');  // S'assurer que la donnée est convertie de JSON à un objet JavaScript
+        var layout = {
+            title: 'Top Portfolio Selections',
+            xaxis: { title: 'Volatility' },
+            yaxis: { title: 'Expected Return' },
+            margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+            showlegend: false
+        };
+        var config = {
+            displayModeBar: false,
+            responsive: true
+        };
+        Plotly.newPlot('portfolio-plots', plotData, layout, config);
     </script>
+
+
 {% endblock %}
+

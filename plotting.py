@@ -56,6 +56,8 @@ def plot_assets_and_cal_plotly(data_dict, rf_daily):
 def generate_plotly_data(top_selections):
     plot_data = []
 
+    colors = ['red', 'green', 'blue', 'orange', 'purple']  # Définir une liste de couleurs
+
     for i, selection in enumerate(top_selections, start=1):
         plot = {
             'x': [selection['volatility']],
@@ -63,9 +65,14 @@ def generate_plotly_data(top_selections):
             'type': 'scatter',
             'mode': 'markers+text',
             'name': f'Top {i}',
-            'text': [f'{selection["stocks"]} | {selection["cryptos"]}'],
-            'textposition': 'top center'
+            'text': [f'Choice {i}: Score {selection["score"]:.2f}'],  # Ajouter le numéro de choix ici
+            'textposition': 'top center',
+            'marker': {
+                'color': colors[i-1],  # Utiliser une couleur de la liste définie ci-dessus
+                'size': 10  # Vous pouvez ajuster la taille si nécessaire
+            }
         }
         plot_data.append(plot)
 
-    return json.dumps(plot_data)
+    return json.dumps(plot_data)  # Convertir en JSON pour passer au template
+

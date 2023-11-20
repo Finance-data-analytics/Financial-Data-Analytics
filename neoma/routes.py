@@ -6,6 +6,9 @@ from neoma.forms import *
 from neoma import db
 from flask_login import *
 
+from portfolio_analysis import best_weigth
+
+
 @app.route('/')
 @app.route('/home')
 def home_page():
@@ -77,17 +80,13 @@ def combined_survey_investment():
             investment_horizon = investment_form.investment_horizon.data
             nb_stocks = investment_form.nb_assets.data
 
+            # Store the data in the session
+            session['portfolio_type'] = portfolio_type
+            session['capital'] = capital
+            session['nb_stocks'] = nb_stocks
+            session['investment_horizon'] = investment_horizon
             flash('Investment details submitted successfully!', 'success')
 
-            # Use recommend_and_display_portfolio function
-            crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_and_display_portfolio(
-                portfolio_type, capital, investment_horizon, nb_stocks)
-
-            selected_stocks, selected_cryptos = calculate_top_5_portfolios(Top_5_Selection)
-
-            session['selected_stocks'] = selected_stocks
-            session['selected_cryptos'] = selected_cryptos
-            session['top_5_portfolios'] = Top_5_Selection
             # Rediriger vers la route 'portfolio_options'
             return redirect(url_for('portfolio_options'))
             # Redirect or perform other actions after processing both forms
@@ -101,18 +100,29 @@ def combined_survey_investment():
 @app.route('/select_portfolio', methods=['GET', 'POST'])
 @login_required
 def portfolio_options():
-    if 'top_5_portfolios' not in session:
-        flash("No portfolio data available.", "error")
-        return redirect(url_for('home_page'))
+    PortfolioSelection = PortfolioSelectionForm()
+    if 'portfolio_bool' not in session:
+        crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_and_display_portfolio(
+            session['portfolio_type'], session['capital'], session['investment_horizon'], session['nb_stocks'])
+        top_5_transformed = transform_top_5_selection(Top_5_Selection)
 
-    top_5_portfolios = session['top_5_portfolios']
-    plot_data = generate_plotly_data(top_5_portfolios)
+        plot_data = generate_plotly_data(top_5_transformed)
 
-    if request.method == 'POST':
-        selected_index = int(request.form['portfolio_choice']) - 1
-        selected_portfolio = top_5_portfolios[selected_index]
-        # Further processing based on the selected portfolio
-        # ...
+    if PortfolioSelection.validate_on_submit():
+        session['portfolio_bool'] = True
+        selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data)
+        selected_portfolio = top_5_transformed[selected_portfolio_number]
 
-    return render_template('portfolio_options.html', plot_data=plot_data)
+        # Extract stocks and cryptos from the selected portfolio
+        selected_stocks = selected_portfolio.get('stocks', [])
+        selected_cryptos = selected_portfolio.get('cryptos', [])
+        print(selected_cryptos)
+        print(selected_stocks)
+        combined_selected_assets, monetary_allocation, best_weights, [ret_arr_allocation, vol_arr_allocation,
+                                                                      sharpe_arr_allocation] = best_weigth (crypto_weight_limit,stocks_data,crypto_data,capital,selected_stocks,selected_cryptos)
+        print(combined_selected_assets,best_weights)
+        session.pop('portfolio_bool',None)
+        return redirect(url_for('next_view_function', portfolio_number=selected_portfolio_number))
+
+    return render_template('plot_portfolios.html', plot_data=plot_data,form=PortfolioSelection)
 
