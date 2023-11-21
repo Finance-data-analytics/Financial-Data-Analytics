@@ -390,3 +390,11 @@ footer {
     .container.active .toggle-right{
         transform: translateX(200%);
     }
+    #loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: white;
+    z-index: 9999;
+}
