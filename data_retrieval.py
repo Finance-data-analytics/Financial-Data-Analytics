@@ -44,11 +44,14 @@ def get_data_crypto(tickers, start_date, end_date):
     return data, successful_crypto
 
 
-def get_data_stocks(tickers, isins, start_date, end_date, capital):
+def get_data_stocks(tickers, isins, start_date, end_date):
     successful_retrievals = []
     data_list = []
+    from neoma import cache
 
     for index, (ticker, isin) in enumerate(zip(tickers, isins)):
+        progress = (index / len(ticker)) * 100
+        cache.set("data_fetch_progress", progress)
         try:
             print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")
             data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
@@ -57,16 +60,14 @@ def get_data_stocks(tickers, isins, start_date, end_date, capital):
                 data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
                 if not data.empty and not data.isna().any():
                     last_price = data.iloc[-1]
-                    if last_price < capital:
-                        successful_retrievals.append(ticker)  # Ajouter l'ISIN à la liste de réussite
-                        data.name = ticker  # Utiliser l'ISIN comme nom si la récupération ISIN a réussi
-                        data_list.append(data)
+                    successful_retrievals.append(ticker)  # Ajouter l'ISIN à la liste de réussite
+                    data.name = ticker  # Utiliser l'ISIN comme nom si la récupération ISIN a réussi
+                    data_list.append(data)
             else:
                 last_price = data.iloc[-1]
-                if last_price < capital:
-                    successful_retrievals.append(isin)  # Ajouter le ticker à la liste de réussite
-                    data.name = ticker  # Utiliser le ticker comme nom
-                    data_list.append(data)
+                successful_retrievals.append(isin)  # Ajouter le ticker à la liste de réussite
+                data.name = ticker  # Utiliser le ticker comme nom
+                data_list.append(data)
 
         except Exception as e:
             print(f"Failed to retrieve data for {ticker}/{isin}: {e}")
@@ -79,14 +80,14 @@ def get_data_stocks(tickers, isins, start_date, end_date, capital):
     return all_data, successful_retrievals
 
 
-def generate_plotting_data(capital):
+def generate_plotting_data():
     all_stocks = pd.read_excel("stocks.xlsx")
-    ticker = all_stocks['ticker'][:30].tolist()
-    isin = all_stocks['isin'][:30].tolist()
+    ticker = all_stocks['ticker'][:50].tolist()
+    isin = all_stocks['isin'][:50].tolist()
     list_ticker = [str(ticker) for ticker in ticker]
 
     crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', today())
-    stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', today(), capital)
+    stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', today())
 
     crypto_daily_returns = calculate_returns(crypto_data)
     stocks_daily_returns = calculate_returns(stocks_data)

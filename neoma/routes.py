@@ -1,5 +1,5 @@
 from main import *
-from neoma import app
+from neoma import app, cache
 from flask import render_template, redirect, url_for, flash, request, session
 from neoma.models import *
 from neoma.forms import *
@@ -7,13 +7,30 @@ from neoma import db
 from flask_login import *
 
 from portfolio_analysis import best_weigth
-from flask import jsonify 
+from flask import jsonify
+
+
+@app.route('/loading_status')
+def loading_status():
+    progress = cache.get("data_fetch_progress") or 0
+    print(progress)
+    return jsonify({"progress": progress})
+
 
 
 @app.route('/')
 @app.route('/home')
 def home_page():
-    return render_template('index.html')
+    plotting_data = cache.get("plotting_data")
+    progress = cache.get("data_fetch_progress") or 0
+    print(progress)
+    if plotting_data:
+        print("Plotting data retrieved from cache.")
+        # Use plotting_data for response
+    else:
+        print("Plotting data not yet available.")
+
+    return render_template('index.html',data=plotting_data)
 
 
 @app.route('/login_register', methods=['GET', 'POST'])
