@@ -30,7 +30,7 @@ h1 {
 }
 p {
     text-transform: uppercase;
-    color: #222;
+    color: antiquewhite;
     font-weight: 900;
 }
 
@@ -169,3 +169,118 @@ footer {
         display: flex;
         flex-wrap: wrap;
     }
+    /* Other CSS styles ... */
+    /* Styling for the portfolios list */
+    .portfolios-list {
+        width: 100%;
+        border-collapse: collapse; /* Remove space between borders */
+    }
+
+    .portfolios-list h2 {
+        color: white;
+        border-bottom: 1px solid #fff;
+    }
+
+    .portfolio-item {
+        border-bottom: 1px solid white; /* White separator between items */
+        padding: 1rem; /* Spacing inside each portfolio item */
+        color: white; /* Text color */
+    }
+
+    /* No additional container background, full width */
+    .container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+.portfolio-item {
+    border-bottom: 1px solid white; /* White separator between items */
+    padding: 1rem; /* Spacing inside each portfolio item */
+    color: white; /* Text color */
+    display: flex; /* Align items in a row */
+    justify-content: space-between; /* Space out the child elements */
+    align-items: center; /* Align items vertically */
+}
+
+.portfolio-detail {
+    margin-right: 20px; /* Add some space between the details */
+}
+
+/* Removes the square brackets from the list */
+.asset-list::before, .asset-list::after {
+    content: none;
+}
+
+/* Ajoutez ces styles à votre CSS existant */
+
+.portfolio {
+    display: flex; /* Aligner les éléments horizontalement */
+    justify-content: space-between; /* Espace entre les éléments */
+    align-items: center; /* Centrer les éléments verticalement */
+    color: white; /* Texte en blanc */
+    border-bottom: 1px solid white; /* Séparateur blanc entre les portfolios */
+    padding: 10px 0; /* Un peu de padding */
+}
+
+.portfolio h3 {
+    margin: 0 10px; /* Espace autour du titre */
+    white-space: nowrap; /* Empêcher le texte de passer à la ligne suivante */
+}
+
+/* Vous pouvez également vouloir ajouter des styles pour gérer les espacements */
+.container {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Si vous avez un conteneur autour de chaque détail du portefeuille */
+.portfolio-detail {
+    margin-right: 20px; /* Ajouter de l'espace entre les détails */
+}
+
+/* Pour les listes d'actifs, afin de supprimer les guillemets et les crochets */
+.asset-list::before, .asset-list::after {
+    content: none; /* Supprimer les contenus ajoutés par ::before et ::after */
+}
+/* Styles for Rename and Delete buttons */
+.btn-rename, .btn-delete {
+    padding: 5px 10px;
+    color: white;
+    background-color: #5cb85c; /* Green for Rename */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete {
+    background-color: #d9534f; /* Red for Delete */
+}
+
+.btn-rename:hover {
+    background-color: #4cae4c; /* Darker green on hover for Rename */
+}
+
+.btn-delete:hover {
+    background-color: #c9302c; /* Darker red on hover for Delete */
+}
+
+/* Additional styles for input */
+.input-rename {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-right: 5px;
+}
+
+/* Flex container for buttons and input */
+.portfolio-controls {
+    display: flex;
+    align-items: center;
+}
+
+/* Adding some space between the buttons */
+.portfolio-controls button {
+    margin-left: 5px;
+}

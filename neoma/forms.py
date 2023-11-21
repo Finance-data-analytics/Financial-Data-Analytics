@@ -117,4 +117,14 @@ def transform_top_5_selection(top_5_selection):
 
     return top_5_transformed
 
+# Définir la fonction dans votre fichier Python Flask
+def format_assets(asset_list):
+    # Supprime les crochets et les guillemets, puis sépare par les virgules
+    assets = asset_list.strip('[]').replace('"', '').split(', ')
+    # Rejoindre les éléments avec " | "
+    return ' | '.join(assets)
+
+def format_currency(value):
+    return "${:,.2f}".format(value)
+
 

@@ -6,6 +6,7 @@ from neoma.forms import *
 from neoma import db
 from flask_login import *
 from portfolio_analysis import best_weigth
+from flask import jsonify 
 
 @app.route('/')
 @app.route('/home')
@@ -130,8 +131,50 @@ def portfolio_options():
     return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)
 
 @app.route('/my_portfolio', methods=['GET', 'POST'])
-@login_required  # Assuming you have a login_required decorator to protect this route
+@login_required
 def my_portfolio():
-    user_id = session.get('user_id')  # Assuming you store the logged-in user's id in the session
+    user_id = current_user.id  # Ou une autre méthode pour obtenir l'ID utilisateur
+    print(f"User ID: {user_id}")
+
     portfolios = Portfolio.query.filter_by(user_id=user_id).all()
+    print(f"Portfolios: {portfolios}")
+
+    app.jinja_env.filters['format_currency'] = format_currency
+    # Ajoutez la fonction au contexte Jinja pour l'utiliser dans le template
+    app.jinja_env.filters['format_assets'] = format_assets
+
+    if not portfolios:
+        print("No portfolios found for user.")
+
     return render_template('myPortfolio.html', portfolios=portfolios)
+
+
+@login_required
+@app.route('/rename_portfolio', methods=['POST'])
+def rename_portfolio():
+    portfolio_id = request.form.get('portfolio_id')
+    new_name = request.form.get('new_name')
+    portfolio = Portfolio.query.get(portfolio_id)
+    if portfolio and portfolio.user_id == current_user.id:
+        portfolio.name = new_name
+        db.session.commit()
+        flash('Portfolio renamed successfully!', 'success')
+    else:
+        flash('Portfolio not found or access denied', 'error')
+    return redirect(url_for('my_portfolio'))
+
+@login_required
+@app.route('/delete_portfolio', methods=['POST'])
+def delete_portfolio():
+    portfolio_id = request.form.get('portfolio_id')
+    
+    # Logique pour trouver le portfolio par ID et le supprimer de la base de données
+    portfolio_to_delete = Portfolio.query.get(portfolio_id)
+    if portfolio_to_delete:
+        db.session.delete(portfolio_to_delete)
+        db.session.commit()
+        flash('Portfolio deleted successfully', 'success')
+    else:
+        flash('Portfolio not found', 'error')
+
+    return redirect(url_for('my_portfolio'))

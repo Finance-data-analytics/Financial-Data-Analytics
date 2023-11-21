@@ -112,3 +112,36 @@ function navigate(step) {
   }
   container.classList.toggle('active', step > 0);
 }
+function renamePortfolio(portfolioId) {
+  // Affichez le formulaire de renommage
+  document.getElementById('renameForm').style.display = 'block';
+  
+  // Stockez l'ID du portfolio dans un élément du formulaire pour une utilisation ultérieure
+  document.getElementById('renameForm').dataset.portfolioId = portfolioId;
+}
+
+function submitRename() {
+  var portfolioId = document.getElementById('renameForm').dataset.portfolioId;
+  var newName = document.getElementById('newName').value;
+
+  // Utilisez AJAX pour envoyer la demande de renommage
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/rename_portfolio', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({
+      portfolioId: portfolioId,
+      newName: newName
+  }));
+
+  xhr.onload = function () {
+      if (xhr.status == 200) {
+          // Mise à jour réussie, cachez le formulaire et actualisez la page ou mettez à jour l'interface utilisateur
+          document.getElementById('renameForm').style.display = 'none';
+          location.reload(); // Ou mettez à jour l'interface utilisateur comme nécessaire
+      } else {
+          // Gérer les erreurs ici
+          alert('Error renaming portfolio.');
+      }
+  };
+}
+
