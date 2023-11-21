@@ -11,8 +11,7 @@ html {
     position: fixed;
     top: 0;
     left: 0;
-    width: 0%;
-    height: 1px;
+    height: 5px;
     background-color: white;
     z-index: 9999;
 }

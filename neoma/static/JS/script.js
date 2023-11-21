@@ -1,11 +1,24 @@
 function updateProgressBar() {
     fetch('/loading_status')
         .then(response => response.json())
-        var progressBar = document.getElementById('myProgressBar');
-        progressBar.style.width = progress + '%';
+        .then(data => {
+            var progressBar = document.getElementById('loading-bar');
+            progressBar.style.width = data.progress + '%';
+
+            // Vérifier si la progression est à 100%
+            if (data.progress >= 100) {
+                // Masquer la barre de progression
+                progressBar.style.display = 'none';
+
+                // Optionnellement, arrêter de mettre à jour la barre de progression
+                clearInterval(progressBarUpdateInterval);
+            }
+        })
+        .catch(error => console.error('Error:', error));
 }
 
-setInterval(updateProgressBar, 1000);  // Mettre à jour la barre toutes les secondes
+
+setInterval(updateProgressBar, 500);  // Mettre à jour la barre toutes les secondes
 
 
 window.addEventListener('DOMContentLoaded', (event) => {

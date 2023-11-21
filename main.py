@@ -7,7 +7,7 @@ from main import *
 
 def recommend_and_display_portfolio(portfolio_suggestion, capital, investment_horizon, nb_stocks):
     from data_retrieval import generate_plotting_data, recommend_portfolio
-    plotting_data = generate_plotting_data(capital)
+    plotting_data = generate_plotting_data()
     # Call the recommend_portfolio function with the user inputs
     crypto_weight_limit,stocks_data,crypto_data,capital,Top_5_Selection = recommend_portfolio(
         nb_stocks,
