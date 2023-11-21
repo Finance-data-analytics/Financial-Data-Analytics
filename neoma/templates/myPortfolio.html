@@ -17,7 +17,6 @@
             {% endfor %}
         </div>
         <!-- Rename portfolio form -->
-        {% for portfolio in portfolios %}
         <form action="{{ url_for('rename_portfolio') }}" method="post">
             <input type="hidden" name="portfolio_id" value="{{ portfolio.id }}">
             <input type="text" name="new_name" placeholder="Enter new name">
@@ -28,7 +27,6 @@
             <input type="submit" class="btn-delete "value="Delete">
         </form>
         </div>
-        {% endfor %}
 
     </div>
     {% else %}
