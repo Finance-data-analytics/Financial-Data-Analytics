@@ -249,15 +249,39 @@ footer {
     color: antiquewhite
 }
 
-#expected-return,
-#volatility,
-#sharpe-ratio {
-    color: #ffffff; /* White color for text */
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-    padding: 5px; /* Padding for the text */
-    border-radius: 5px; /* Rounded corners */
-    margin: 2px; /* Space between spans */
-    display: inline-block; /* Align items in a row */
-    font-weight: bold; /* Make text bold */
+#portfolio-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px; /* Add space below the stats */
 }
 
+.stat-item {
+    display: flex; /* Utiliser flexbox */
+    flex-wrap: wrap; /* Permettre aux éléments de passer à la ligne suivante si nécessaire */
+    justify-content: flex-start; /* Aligner les éléments à gauche */
+    align-items: center; /* Centrer les éléments verticalement */
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-right: 10px; /* Ajuster selon vos besoins */
+    text-align: center;
+}
+
+.stat-item label {
+    font-weight: bold;
+    display: block; /* Ensure label is on its own line */
+}
+
+.stat-item span {
+    display: block; /* Ensure value is on its own line */
+    margin-top: 5px;
+}
+
+.back-button-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}

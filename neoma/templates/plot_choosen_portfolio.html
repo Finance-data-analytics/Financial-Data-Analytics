@@ -3,12 +3,41 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/plot_choosen_portfolio.css') }}">
 {% endblock %}
 {% block content %}
-    <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
-    <div>
-        <label>Expected Return:</label> <span>{{ data[0] }}</span><br>
-        <label>Volatility:</label> <span>{{ data[1] }}</span><br>
-        <label>Sharpe Ratio:</label> <span>{{ data[2] }}</span>
+    <div class="back-button-container">
+        <a href="{{ url_for('portfolio_options') }}" class="btn btn-primary">Back to Top 5 Portfolios</a>
     </div>
+    <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
+    <div id="portfolio-stats-wrapper" style="max-width: 1672px; margin: 20px auto;">
+        <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px; margin-right: 10px; justify-content: flex-start;">
+            <label style="color: #dc3545;">Details Composition:</label>
+            {% for asset_detail in portfolio_details %}
+                <div class="asset-item" style="padding: 5px; border-radius: 5px; margin-bottom: 5px;">{{ asset_detail }}</div>
+            {% endfor %}
+        </div>
+        <div id="portfolio-stats" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px; margin-right: 10px;">
+                <label style="color: #007bff;">Expected Return:</label>
+                <span>{{ data[0] }}</span>
+            </div>
+            <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px; margin-right: 10px;">
+                <label style="color: #dc3545;">Volatility:</label>
+                <span>{{ data[1] }}</span>
+            </div>
+            <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px;">
+                <label style="color: #17a2b8;">Sharpe Ratio:</label>
+                <span>{{ data[2] }}</span>
+            </div>
+        </div>
+        <div class="stat-item" style="background: white; padding: 10px; border-radius: 10px; text-align: center;">
+            <label style="color: #17a2b8;">Future Value:</label>
+            <span>{{ fv }} €</span>
+        </div>
+    </div>
+
+    <!-- Rest of your existing blocks for Expected Return, Volatility, etc. -->
+
+
+
     <!-- Plotly JavaScript library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
