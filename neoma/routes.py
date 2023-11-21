@@ -6,7 +6,7 @@ from neoma.forms import *
 from neoma import db
 from flask_login import *
 
-from portfolio_analysis import best_weigth
+from portfolio_analysis import best_weigth, recommend_portfolio
 from flask import jsonify
 
 
@@ -24,7 +24,7 @@ def home_page():
     progress = cache.get("data_fetch_progress") or 0
     print(progress)
     if plotting_data:
-        print("Plotting data retrieved from cache.")
+        print(plotting_data["Stocks"]["data_stocks"])
         # Use plotting_data for response
     else:
         print("Plotting data not yet available.")
@@ -113,13 +113,14 @@ def combined_survey_investment():
 @app.route('/select_portfolio', methods=['GET', 'POST'])
 @login_required
 def portfolio_options():
+    plotting_data = cache.get("plotting_data")
     PortfolioSelection = PortfolioSelectionForm()
     if 'top_5_portfolios' in session:
         plot_data = generate_plotly_data(session['top_5_portfolios'])
         session.pop('top_5_portfolios', None)
     else:
-        crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_and_display_portfolio(
-            session['portfolio_type'], session['capital'], session['investment_horizon'], session['nb_stocks'])
+        crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
+            session['nb_stocks'],plotting_data["Stocks"]["data_stocks"],plotting_data["Cryptos"]["data_crypto"],session['capital'],session['portfolio_type'], session['investment_horizon'])
         top_5_transformed = transform_top_5_selection(Top_5_Selection)
         plot_data = generate_plotly_data(top_5_transformed)
 

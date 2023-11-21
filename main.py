@@ -13,7 +13,7 @@ def recommend_and_display_portfolio(portfolio_suggestion, capital, investment_ho
         nb_stocks,
         plotting_data["Stocks"]["data_stocks"],
         plotting_data["Cryptos"]["data_crypto"],
-        capital,
+            capital,
         portfolio_suggestion,
         investment_horizon
     )
