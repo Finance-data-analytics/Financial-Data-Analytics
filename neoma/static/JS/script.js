@@ -18,8 +18,7 @@ function updateProgressBar() {
 }
 
 
-setInterval(updateProgressBar, 500);  // Mettre à jour la barre toutes les secondes
-
+progressBarUpdateInterval = setInterval(updateProgressBar, 500);
 
 window.addEventListener('DOMContentLoaded', (event) => {
   const element = document.querySelector('.element');

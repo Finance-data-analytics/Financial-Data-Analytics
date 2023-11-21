@@ -113,12 +113,14 @@ def combined_survey_investment():
 @app.route('/select_portfolio', methods=['GET', 'POST'])
 @login_required
 def portfolio_options():
-    plotting_data = cache.get("plotting_data")
     PortfolioSelection = PortfolioSelectionForm()
+
     if 'top_5_portfolios' in session:
         plot_data = generate_plotly_data(session['top_5_portfolios'])
         session.pop('top_5_portfolios', None)
+
     else:
+        plotting_data = cache.get("plotting_data")
         crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
             session['nb_stocks'],plotting_data["Stocks"]["data_stocks"],plotting_data["Cryptos"]["data_crypto"],session['capital'],session['portfolio_type'], session['investment_horizon'])
         top_5_transformed = transform_top_5_selection(Top_5_Selection)
