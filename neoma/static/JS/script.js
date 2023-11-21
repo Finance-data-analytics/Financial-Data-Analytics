@@ -1,3 +1,13 @@
+function updateProgressBar() {
+    fetch('/loading_status')
+        .then(response => response.json())
+        var progressBar = document.getElementById('myProgressBar');
+        progressBar.style.width = progress + '%';
+}
+
+setInterval(updateProgressBar, 1000);  // Mettre à jour la barre toutes les secondes
+
+
 window.addEventListener('DOMContentLoaded', (event) => {
   const element = document.querySelector('.element');
   element.classList.add('active');
@@ -144,14 +154,3 @@ function submitRename() {
       }
   };
 }
-
-function updateProgressBar() {
-    fetch('/loading_status')
-    .then(response => response.json())
-    .then(data => {
-        let progress = data.progress;
-        document.getElementById('progress-bar').style.width = progress + '%';
-    });
-}
-
-setInterval(updateProgressBar, 1000);  // Mettre à jour la barre toutes les secondes

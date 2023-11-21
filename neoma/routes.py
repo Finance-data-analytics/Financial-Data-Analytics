@@ -13,7 +13,6 @@ from flask import jsonify
 @app.route('/loading_status')
 def loading_status():
     progress = cache.get("data_fetch_progress") or 0
-    print(progress)
     return jsonify({"progress": progress})
 
 
