@@ -1,4 +1,5 @@
-from main import *
+import json
+
 from neoma import app, cache
 from flask import render_template, redirect, url_for, flash, request, session
 from neoma.models import *
@@ -6,6 +7,7 @@ from neoma.forms import *
 from neoma import db
 from flask_login import *
 
+from plotting import generate_plotly_data, generate_optimal_weight_plot_data
 from portfolio_analysis import best_weigth, recommend_portfolio
 from flask import jsonify
 
@@ -150,7 +152,6 @@ def portfolio_options():
                 f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
                 for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)
             ]
-            print(plot_data)
             future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
             new_portfolio = Portfolio(
                 user_id=current_user.id,
@@ -162,7 +163,7 @@ def portfolio_options():
                 capital=capital,
                 horizon=session['investment_horizon'],
                 future_value = json.dumps(future_value),
-                list_plotdata = json.dumps(plot_data),
+                list_plotdata =json.dumps( plot_data),
                 assets_info = json.dumps(assets_info)
             )
             db.session.add(new_portfolio)
@@ -233,15 +234,14 @@ def see_details(portfolio_id):
     # and you have a method to transform this data into a plotly readable format
     list_plotdata = json.loads(portfolio.list_plotdata)
     data_portfolio = json.loads(portfolio.data_portfolio)
-    print(list_plotdata)
-    
     # The future value and portfolio details can be directly accessed if they're columns in your model
     future_value = portfolio.future_value
-    assets_info = portfolio.assets_info  # This should be a serializable field, such as a JSON string
+    assets_info = json.loads(portfolio.assets_info)  # This should be a serializable field, such as a JSON string
 
     # Now you can render your template with the gathered data
     return render_template('seeDetails.html',
-                           list_plotdata=list_plotdata,
+                           portfolio=portfolio,
+                           plot_data=list_plotdata,
                            data=data_portfolio,
                            fv=future_value,
                            portfolio_details=assets_info)

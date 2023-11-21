@@ -3,6 +3,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/plot_choosen_portfolio.css') }}">
 {% endblock %}
 {% block content %}
+    <div style="text-align: center; color: white; margin-top: 20px;">
+        <h2>{{ portfolio.name }}</h2>
+    </div>
     <div id="portfolio-plots" style="overflow: hidden; border-radius: 50px; margin: 30px 40px auto 40px;"></div>
     <div id="portfolio-stats-wrapper" style="max-width: 1672px; margin: 20px auto;">
         <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px; margin-right: 10px; justify-content: flex-start;">
@@ -38,7 +41,8 @@
     <!-- Plotly JavaScript library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-        var plotData = JSON.parse('{{ data | safe }}'); // Parse the JSON string into a JavaScript object
+        var plotData = JSON.parse('{{ plot_data | safe }}'); // Parse the JSON string into a JavaScript object
+        console.log(plotData);
         var layout = {
             title: 'Top Portfolio Selections',
             xaxis: { title: 'Volatility' },

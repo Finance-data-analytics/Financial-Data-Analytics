@@ -1,227 +1,220 @@
-import pandas as pd
-import yfinance as yf
-import concurrent.futures
+from main import *
+from neoma import app, cache
+from flask import render_template, redirect, url_for, flash, request, session
+from neoma.models import *
+from neoma.forms import *
+from neoma import db
+from flask_login import *
 
-def check_ticker(index, ticker):
-    print(f"Checking line number: {index}")
-    try:
-        # Just grab the info, which is quicker than downloading historical data
-        stock_info = yf.Ticker(ticker).info
-        return ticker, True  # Return ticker and a status indicating success
-    except:
-        return ticker, False  # Return ticker and a status indicating failure
-
-# Load the Excel file into a DataFrame
-df = pd.read_excel('all_tickers.xlsx')
-
-# Get the list of tickers from the first column of the DataFrame
-tickers_to_check = df[df.columns[0]].tolist()
-
-# A dictionary to store the results of parallel checks
-results = {}
-
-# Using ThreadPoolExecutor to parallelize the process
-with concurrent.futures.ThreadPoolExecutor(max_workers=500) as executor:  # You can adjust max_workers as needed
-    future_to_ticker = {executor.submit(check_ticker, index+1, ticker): ticker for index, ticker in enumerate(tickers_to_check)}
-    for future in concurrent.futures.as_completed(future_to_ticker):
-        ticker = future_to_ticker[future]
-        try:
-            ticker, success = future.result()
-            results[ticker] = success
-        except Exception as e:
-            print(f"Error with ticker {ticker}: {e}")
-            results[ticker] = False
-
-# Remove tickers that had errors
-for ticker, success in results.items():
-    if not success:
-        df = df[df[df.columns[0]] != ticker]
-
-# Save the modified DataFrame back to the Excel file
-df.to_excel('all_tickers_good.xlsx', index=False)
-import yfinance as yf
-import numpy as np
-import pandas as pd
-import requests
-from matplotlib import cm
-from scipy.optimize import minimize
-import matplotlib.pyplot as plt
-def get_crypto_data():
-    headers = {
-        'Accepts': 'application/json',
-        'X-CMC_PRO_API_KEY': '8ec7c7d5-f5ee-44a7-9d90-99ea1fb90edf',
-    }
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=15'
-    response = requests.get(url, headers=headers)
-    data = response.json()
-    cryptos = data['data']
-
-    crypto_data = []
-    for crypto in cryptos:
-        name = crypto['name']
-        symbol = crypto['symbol']
-        market_cap = crypto['quote']['USD']['market_cap']
-        crypto_data.append({"Name": name, "Symbol": symbol, "Market Cap": market_cap})
-
-    crypto_df = pd.DataFrame(crypto_data)
-    crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
-    crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
-
-def get_data(tickers, start_date, end_date):
-    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
-    return data
-
-def calculate_returns(data):
-    returns = data.pct_change().dropna()
-    return returns
-
-def efficient_frontier(returns,target_return_):
-    cov_matrix = returns.cov()
-    avg_returns = returns.mean()
-
-    num_assets = len(returns.columns)
-    args = (avg_returns, cov_matrix)
-
-    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
-                   {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return_})
-
-    bounds = tuple((0, 1) for asset in range(num_assets))
-    results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)
-    return results
-
-def portfolio_volatility(weights, avg_returns, cov_matrix):
-    return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-
-get_crypto_data()
-crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
-crypto_symbols = crypto_data['Symbol'].tolist()
-
-all_stocks = pd.read_excel("all_tickers.xlsx")
-first_100_stocks = all_stocks['Symbol'][:500].tolist()
-first_100_stocks = [str(ticker) for ticker in first_100_stocks]
-
-crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
-stocks_data = get_data(first_100_stocks, '2019-01-01', '2023-10-01')
-
-crypto_daily_returns = calculate_returns(crypto_data)
-stocks_daily_returns = calculate_returns(stocks_data)
-
-crypto_avg_daily_returns = crypto_daily_returns.mean()
-stocks_avg_daily_returns = stocks_daily_returns.mean()
-
-crypto_risks = crypto_daily_returns.std()
-stocks_risks = stocks_daily_returns.std()
-
-# # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action
-# Create dictionary of results
-results_dict = {
-    "Stocks": pd.DataFrame({
-        "Rendement moyen": stocks_avg_daily_returns,
-        "Risque": stocks_risks
-    }),
-    "Crypto": pd.DataFrame({
-        "Rendement moyen": crypto_avg_daily_returns,
-        "Risque": crypto_risks
-    })
-}
-
-# Use ExcelWriter to save these DataFrames into separate sheets of the same Excel file
-with pd.ExcelWriter("rendements_et_risques.xlsx") as writer:
-    for sheet_name, result in results_dict.items():
-        result.to_excel(writer, sheet_name=sheet_name)
-# # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux
-target_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)
-target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)
-
-# Dictionary containing average daily returns and daily returns for each asset type
-data_dict = {
-    "Stocks": (stocks_avg_daily_returns, stocks_daily_returns),
-    "Crypto": (crypto_avg_daily_returns, crypto_daily_returns)
-}
-
-# Empty dictionary to store efficient portfolios for each asset type
-efficient_portfolios_dict = {}
-
-# Loop over the dictionary
-for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
-    target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)
-    efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
-    efficient_portfolios_dict[asset_type] = efficient_portfolios
-
-# Dictionary containing data for plotting
-plotting_data = {
-    "Cryptos": {
-        "risks": crypto_risks,
-        "avg_daily_returns": crypto_avg_daily_returns,
-        "symbols": crypto_symbols,
-        "efficient_portfolios": efficient_portfolios_dict["Crypto"],
-        "color": 'b',
-        "title": 'Cryptos: Rendement vs Risque'
-    },
-    "Stocks": {
-        "risks": stocks_risks,
-        "avg_daily_returns": stocks_avg_daily_returns,
-        "symbols": first_100_stocks,
-        "efficient_portfolios": efficient_portfolios_dict["Stocks"],
-        "color": 'r',
-        "title": 'Stocks: Rendement vs Risque'
-    }
-}
-
-# Adjust the plotting function to use the daily risk-free rate
-
-import plotly.graph_objects as go
+from portfolio_analysis import best_weigth, recommend_portfolio
+from flask import jsonify
 
 
-def plot_assets_and_cal_plotly(data_dict, rf_daily):
-    for key, data in data_dict.items():
-        # Create a scatter plot for assets
-        fig = go.Figure()
-
-        # Plotting individual asset points with their names
-        for ticker in data["symbols"]:
-            if ticker == 'nan' or ticker == '':
-                continue  # Skip this iteration if the ticker is 'nan' or an empty string
-
-            fig.add_trace(go.Scatter(x=[data["risks"][ticker]],
-                                     y=[data["avg_daily_returns"][ticker]],
-                                     mode='markers',
-                                     name=ticker))
-
-            # Plotting the efficient frontier
-        portfolio_volatilities = [portfolio['fun'] for portfolio in data["efficient_portfolios"]]
-        target_returns = np.linspace(data["avg_daily_returns"].min(), data["avg_daily_returns"].max(), 100)
-        fig.add_trace(go.Scatter(x=portfolio_volatilities, y=target_returns, mode='lines',
-                                 name='Frontière Efficient de Markowitz', line=dict(color='yellow')))
-
-        # Calculate the slope of the tangent for each portfolio on the efficient frontier
-        slopes = [(np.dot(data["avg_daily_returns"], portfolio.x) - rf_daily) / portfolio.fun for portfolio in
-                  data["efficient_portfolios"]]
-
-        # Find the portfolio with the steepest slope
-        max_slope_idx = np.argmax(slopes)
-        tangent_portfolio = data["efficient_portfolios"][max_slope_idx]
-
-        # Return and volatility of the tangent portfolio
-        tangent_return = np.dot(data["avg_daily_returns"], tangent_portfolio.x)
-        tangent_volatility = tangent_portfolio.fun
-
-        # Plot the CAL
-        x = np.linspace(0, max(portfolio_volatilities), 100)
-        y = rf_daily + (tangent_return - rf_daily) / tangent_volatility * x
-        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers', name='CAL', line=dict(color='green', dash='dash')))
-
-        # Layout settings
-        fig.update_layout(title=data["title"], xaxis_title='Volatilité (Écart type du rendement)',
-                          yaxis_title='Rendement attendu')
-        fig.show()
+@app.route('/loading_status')
+def loading_status():
+    progress = cache.get("data_fetch_progress") or 0
+    return jsonify({"progress": progress})
 
 
-# Convert the annual risk-free rate to a daily rate
-rf_annual = 0.01  # 1% annual rate
-rf_daily = (1 + rf_annual)**(1/365) - 1
-rf_daily
+@app.route('/')
+@app.route('/home')
+def home_page():
+    plotting_data = cache.get("plotting_data")
+    progress = cache.get("data_fetch_progress") or 0
+    print(progress)
+    if plotting_data:
+        print(plotting_data["Stocks"]["data_stocks"])
+        # Use plotting_data for response
+    else:
+        print("Plotting data not yet available.")
 
-# Plot the assets and CAL using the daily risk-free rate
-plot_assets_and_cal_plotly(plotting_data, rf_daily)
+    return render_template('index.html', data=plotting_data)
 
+
+@app.route('/login_register', methods=['GET', 'POST'])
+def login_register_page():
+    login_form = LoginForm(prefix='login')
+    register_form = RegisterForm(prefix='register')
+    # Logique de connexion
+    if 'login-submit' in request.form and login_form.validate_on_submit():
+        attempted_user = users.query.filter_by(email=login_form.email.data).first()
+        if attempted_user and attempted_user.check_password_correction(
+                attempted_password=login_form.password.data):
+            login_user(attempted_user)
+            flash(f'Success! You are logged in as: {attempted_user.name}', category='success')
+            return redirect(url_for('home_page'))
+        else:
+            flash('Username and password do not match! Please try again', category='danger')
+    # Logique d'inscription
+    if 'register-submit' in request.form and register_form.validate_on_submit():
+        user_to_create = users(
+            name=register_form.name.data,
+            email=register_form.email_address.data,
+            password=register_form.password1.data,  # This will call the setter
+            birthdate=register_form.birthdate.data
+        )
+        db.session.add(user_to_create)
+        db.session.commit()
+        login_user(user_to_create)
+        flash(f"Account created successfully! You are now logged in as {user_to_create.name}", category='success')
+        return redirect(url_for('home_page'))
+    if register_form.errors != {}:  # If there are errors from the validations
+        for err_msg in register_form.errors.values():
+            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+    return render_template('login.html', login_form=login_form, register_form=register_form)
+
+
+@app.route('/logout')
+def logout_page():
+    logout_user()
+    flash("You have been logged out!", category='info')
+    return redirect(url_for("home_page"))
+
+
+@app.route('/combined_survey_investment', methods=['GET', 'POST'])
+@login_required
+def combined_survey_investment():
+    risk_form = RiskAversionSurveyForm(prefix='risk')
+    investment_form = InvestmentForm(prefix='investment')
+    if request.method == 'POST':
+        # Extract values from slider inputs and convert them to the correct type
+        # before validation since they come as strings from the request
+        investment_form.capital.data = float(request.form.get('capital', 0))
+        investment_form.investment_horizon.data = int(request.form.get('investment_horizon', 1))
+        investment_form.nb_assets.data = int(request.form.get('nb_assets', 1))
+        # Validate both forms
+        risk_form_valid = risk_form.validate()
+        investment_form_valid = investment_form.validate()
+        if risk_form_valid and investment_form_valid:
+            # Process risk form data
+            total_score = evaluate_risk_aversion_from_form(risk_form)
+            portfolio_type = suggest_portfolio(total_score)
+            flash(f'Your recommended portfolio type is: {portfolio_type}', 'success')
+            # Process investment form data
+            capital = investment_form.capital.data
+            investment_horizon = investment_form.investment_horizon.data
+            nb_stocks = investment_form.nb_assets.data
+            # Store the data in the session
+            session['portfolio_type'] = portfolio_type
+            session['capital'] = capital
+            session['nb_stocks'] = nb_stocks
+            session['investment_horizon'] = investment_horizon
+            flash('Investment details submitted successfully!', 'success')
+            # Rediriger vers la route 'portfolio_options'
+            return redirect(url_for('portfolio_options'))
+            # Redirect or perform other actions after processing both forms
+        else:
+            # Handle the situation if one or both forms are invalid
+            flash('Please correct the errors in the form.', 'danger')
+    return render_template('build_portfolio.html', risk_form=risk_form, investment_form=investment_form)
+
+
+@app.route('/select_portfolio', methods=['GET', 'POST'])
+@login_required
+def portfolio_options():
+    PortfolioSelection = PortfolioSelectionForm()
+
+    if 'top_5_portfolios' in session:
+        plot_data = generate_plotly_data(session['top_5_portfolios'])
+        session.pop('top_5_portfolios', None)
+
+    else:
+        plotting_data = cache.get("plotting_data")
+        crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
+            session['nb_stocks'], plotting_data["Stocks"]["data_stocks"], plotting_data["Cryptos"]["data_crypto"],
+            session['capital'], session['portfolio_type'], session['investment_horizon'])
+        top_5_transformed = transform_top_5_selection(Top_5_Selection)
+        plot_data = generate_plotly_data(top_5_transformed)
+
+        if PortfolioSelection.validate_on_submit():
+            session['top_5_portfolios'] = top_5_transformed
+            session['portfolio_bool'] = True
+            selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data)
+            selected_portfolio = top_5_transformed[selected_portfolio_number]
+            # Extract stocks and cryptos from the selected portfolio
+            selected_stocks = selected_portfolio.get('stocks', [])
+            selected_cryptos = selected_portfolio.get('cryptos', [])
+            (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation
+             , sharpe_arr_allocation) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital,
+                                                    selected_stocks,
+                                                    selected_cryptos)
+            plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
+
+            max_sharpe_idx = sharpe_arr_allocation.argmax()
+            data_portfolio = [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx]
+                , sharpe_arr_allocation[max_sharpe_idx]]
+            list_weight_selected_assets_json = json.dumps(best_weights.tolist())
+
+            capital_allocation = [weight * capital for weight in best_weights]
+            # Combine the assets, weights, and capital into a single list for the template
+            assets_info = [
+                f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
+                for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)
+            ]
+            future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
+            new_portfolio = Portfolio(
+                user_id=current_user.id,
+                name='User Portfolio',
+                list_selected_assets=json.dumps(selected_stocks + selected_cryptos),
+                list_weight_selected_assets=list_weight_selected_assets_json,
+                data_portfolio=json.dumps(data_portfolio),
+                is_invested=False,
+                capital=capital,
+                horizon=session['investment_horizon'],
+            )
+            db.session.add(new_portfolio)
+            db.session.commit()
+            session.pop('portfolio_bool', None)
+
+            return render_template('plot_choosen_portfolio.html', plot_data=plot_data, data=data_portfolio,
+                                   fv=round(future_value, 3), portfolio_details=assets_info)
+    return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)
+
+
+@app.route('/my_portfolio', methods=['GET', 'POST'])
+@login_required
+def my_portfolio():
+    user_id = current_user.id  # Ou une autre méthode pour obtenir l'ID utilisateur
+
+    portfolios = Portfolio.query.filter_by(user_id=user_id).all()
+
+    app.jinja_env.filters['format_currency'] = format_currency
+    # Ajoutez la fonction au contexte Jinja pour l'utiliser dans le template
+    app.jinja_env.filters['format_assets'] = format_assets
+
+    if not portfolios:
+        print("No portfolios found for user.")
+
+    return render_template('myPortfolio.html', portfolios=portfolios)
+
+
+@login_required
+@app.route('/rename_portfolio', methods=['POST'])
+def rename_portfolio():
+    portfolio_id = request.form.get('portfolio_id')
+    new_name = request.form.get('new_name')
+    portfolio = Portfolio.query.get(portfolio_id)
+    if portfolio and portfolio.user_id == current_user.id:
+        portfolio.name = new_name
+        db.session.commit()
+        flash('Portfolio renamed successfully!', 'success')
+    else:
+        flash('Portfolio not found or access denied', 'error')
+    return redirect(url_for('my_portfolio'))
+
+
+@login_required
+@app.route('/delete_portfolio', methods=['POST'])
+def delete_portfolio():
+    portfolio_id = request.form.get('portfolio_id')
+
+    # Logique pour trouver le portfolio par ID et le supprimer de la base de données
+    portfolio_to_delete = Portfolio.query.get(portfolio_id)
+    if portfolio_to_delete:
+        db.session.delete(portfolio_to_delete)
+        db.session.commit()
+        flash('Portfolio deleted successfully', 'success')
+    else:
+        flash('Portfolio not found', 'error')
+
+    return redirect(url_for('my_portfolio'))
