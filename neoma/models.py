@@ -42,6 +42,12 @@ class Portfolio(db.Model):
     capital = db.Column(db.Integer, nullable=False)
     horizon = db.Column(db.Integer, nullable=False)
     user = db.relationship('users', backref=db.backref('portfolio', lazy=True))
+    future_value = db.Column(db.Integer, nullable=False)
+    list_plotdata = db.Column(db.Text, nullable=False)
+    assets_info = db.Column(db.String(255), nullable=False)
+
+
+
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'

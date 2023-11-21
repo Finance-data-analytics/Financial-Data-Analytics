@@ -150,6 +150,7 @@ def portfolio_options():
                 f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
                 for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)
             ]
+            print(plot_data)
             future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
             new_portfolio = Portfolio(
                 user_id=current_user.id,
@@ -160,6 +161,9 @@ def portfolio_options():
                 is_invested=False,
                 capital=capital,
                 horizon=session['investment_horizon'],
+                future_value = json.dumps(future_value),
+                list_plotdata = json.dumps(plot_data),
+                assets_info = json.dumps(assets_info)
             )
             db.session.add(new_portfolio)
             db.session.commit()
@@ -218,3 +222,26 @@ def delete_portfolio():
         flash('Portfolio not found', 'error')
 
     return redirect(url_for('my_portfolio'))
+
+@app.route('/see_details/<int:portfolio_id>', methods=['GET'])
+@login_required
+def see_details(portfolio_id):
+    # Fetch the portfolio from the database
+    portfolio = Portfolio.query.get_or_404(portfolio_id)
+
+    # Assuming you have stored JSON data in your Portfolio model
+    # and you have a method to transform this data into a plotly readable format
+    list_plotdata = json.loads(portfolio.list_plotdata)
+    data_portfolio = json.loads(portfolio.data_portfolio)
+    print(list_plotdata)
+    
+    # The future value and portfolio details can be directly accessed if they're columns in your model
+    future_value = portfolio.future_value
+    assets_info = portfolio.assets_info  # This should be a serializable field, such as a JSON string
+
+    # Now you can render your template with the gathered data
+    return render_template('seeDetails.html',
+                           list_plotdata=list_plotdata,
+                           data=data_portfolio,
+                           fv=future_value,
+                           portfolio_details=assets_info)
