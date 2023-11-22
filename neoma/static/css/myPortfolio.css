@@ -123,32 +123,33 @@ imGauche.ImageGauche{
 
 
 footer {
-    text-align: center;
-    border-top: 5px solid #fff;
-    background-color: #000;
-    color: #fff;
-    padding: 10px 100px;
-     /* Marge interieur */
-    margin-top: 175px;
-   
+    position: absolute; /* You might not need this if your content naturally pushes the footer down */
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: #f1f1f1;
+    padding: 1rem 0; /* Adjust padding to control height */
+    font-size: 0.9rem;
 }
 
-    footer h1 {
-        text-align : center;
-        font-family: 'Playfair Display', sans-serif;
-        border-bottom: 1px solid #fff;
-        width: 15%;
-        margin-bottom: 30px;
-    }
-    footer h3 {
-        text-align: center;
-        font-family: 'Playfair Display', sans-serif;
-        margin: 0 auto;
-        display: block;
-        margin-bottom: auto;
-        line-height: normal;
-        
-    }
+footer h1, footer h3 {
+    color: #fff; /* White color for headings in footer */
+    margin-bottom: 1rem; /* Margin bottom for spacing */
+}
+
+footer p {
+    color: #ccc; /* Light gray for paragraph text for better readability */
+    line-height: 1.6; /* Line height for better text flow */
+}
+
+footer a {
+    color: #4da6ff; /* Highlight links with a light blue color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Add underline on hover for links */
+}
 
     footer .mentions .mention {
         margin-top: -5px;

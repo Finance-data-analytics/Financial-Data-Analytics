@@ -26,7 +26,22 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
 }
+#text_left .text-content {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for text */
+    padding: 1rem;
+    border-left: 4px solid #f0f0f0; /* A subtle left border for style */
+    font-size: 1.2rem; /* Adjust the font size as needed */
+}
 
+#text_left .text-content p {
+    margin-bottom: 0; /* Remove space between paragraphs */
+    line-height: 1.4; /* Slightly increase line-height for readability */
+}
+
+#text_left .text-content p:first-child {
+    font-weight: bold; /* Emphasize the first paragraph */
+}
 h1 {
     text-transform: uppercase;
     color: #faebd7;
@@ -255,30 +270,31 @@ imGauche.ImageGauche{
             }
 
 footer {
-    text-align: center;
-    border-top: 5px solid #fff;
-    background-color: #000;
-    color: #fff;
-    padding: 30px 100px;
-    /* Marge interieur */
+    background-color: #333; /* Dark background for footer */
+    color: #f1f1f1; /* Light text color for contrast */
+    padding: 2rem 0; /* Padding for top and bottom */
+    font-size: 0.9rem; /* Smaller font size for footer text */
+    height: 412px;
 }
 
-    footer h1 {
-        text-align : center;
-        font-family: 'Playfair Display', sans-serif;
-        border-bottom: 1px solid #fff;
-        width: 15%;
-        margin-bottom: 30px;
-    }
-    footer h3 {
-        text-align: center;
-        font-family: 'Playfair Display', sans-serif;
-        margin: 0 auto;
-        display: block;
-        margin-bottom: auto;
-        line-height: normal;
-        
-    }
+footer h1, footer h3 {
+    color: #fff; /* White color for headings in footer */
+    margin-bottom: 1rem; /* Margin bottom for spacing */
+}
+
+footer p {
+    color: #ccc; /* Light gray for paragraph text for better readability */
+    line-height: 1.6; /* Line height for better text flow */
+}
+
+footer a {
+    color: #4da6ff; /* Highlight links with a light blue color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Add underline on hover for links */
+}
 
     footer .mentions .mention {
         margin-top: -5px;
@@ -301,27 +317,33 @@ footer {
     }
 .icon-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 20px;
+    grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns instead of 4 */
+    grid-gap: 20px; /* Space between grid items */
+    padding: 20px; /* Padding around the grid */
+}
+.icon img {
+    filter: invert(100%); /* This will invert the white icon to be dark */
+}
+.icon-grid .icon {
+    background-color: #f8f9fa; /* Light background for each icon block */
+    padding: 1rem; /* Padding inside the blocks */
+    border-radius: 0.5rem; /* Rounded corners for the blocks */
+    transition: all 0.3s ease; /* Transition for hover effect */
 }
 
-.icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+.icon-grid .icon:hover {
+    transform: translateY(-5px); /* Slight lift effect on hover */
 }
 
-    .icon i {
-        font-size: 48px;
-        margin-bottom: 10px;
-    }
-    .icon img {
-        width: 50px;
-        height: 50px;
-    }
+.icon-grid .icon img {
+    max-width: 100%; /* Ensure the image is responsive */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 1rem; /* Space between image and text */
+}
 
+.icon-grid .icon p {
+    color: #333; /* Dark text for contrast on light background */
+}
 footer .p {
     text-align: center;
 }
@@ -401,4 +423,5 @@ font-weight: bold;
 font-size: 20px;
 margin-bottom: 20px;
 }
+
 

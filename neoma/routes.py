@@ -23,10 +23,8 @@ def loading_status():
 @app.route('/home')
 def home_page():
     plotting_data = cache.get("plotting_data")
-    progress = cache.get("data_fetch_progress") or 0
-    print(progress)
     if plotting_data:
-        print(plotting_data["Stocks"]["data_stocks"])
+        print("Plotting data available.")
         # Use plotting_data for response
     else:
         print("Plotting data not yet available.")
@@ -179,10 +177,9 @@ def portfolio_options():
 @login_required
 def my_portfolio():
     user_id = current_user.id  # Ou une autre méthode pour obtenir l'ID utilisateur
-    print(f"User ID: {user_id}")
 
     portfolios = Portfolio.query.filter_by(user_id=user_id).all()
-    print(f"Portfolios: {portfolios}")
+
 
     app.jinja_env.filters['format_currency'] = format_currency
     # Ajoutez la fonction au contexte Jinja pour l'utiliser dans le template

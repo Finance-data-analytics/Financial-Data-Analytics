@@ -123,32 +123,33 @@ imGauche.ImageGauche{
 
 
 footer {
-    text-align: center;
-    border-top: 5px solid #fff;
-    background-color: #000;
-    color: #fff;
-    padding: 10px 100px;
-     /* Marge interieur */
-    margin-top: 175px;
-   
+    position: absolute; /* You might not need this if your content naturally pushes the footer down */
+    bottom: 0;
+    background-color: #333; /* Dark background for footer */
+    color: #f1f1f1; /* Light text color for contrast */
+    padding: 2rem 0; /* Padding for top and bottom */
+    font-size: 0.9rem; /* Smaller font size for footer text */
+    height: 412px;
 }
 
-    footer h1 {
-        text-align : center;
-        font-family: 'Playfair Display', sans-serif;
-        border-bottom: 1px solid #fff;
-        width: 15%;
-        margin-bottom: 30px;
-    }
-    footer h3 {
-        text-align: center;
-        font-family: 'Playfair Display', sans-serif;
-        margin: 0 auto;
-        display: block;
-        margin-bottom: auto;
-        line-height: normal;
-        
-    }
+footer h1, footer h3 {
+    color: #fff; /* White color for headings in footer */
+    margin-bottom: 1rem; /* Margin bottom for spacing */
+}
+
+footer p {
+    color: #ccc; /* Light gray for paragraph text for better readability */
+    line-height: 1.6; /* Line height for better text flow */
+}
+
+footer a {
+    color: #4da6ff; /* Highlight links with a light blue color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Add underline on hover for links */
+}
 
     footer .mentions .mention {
         margin-top: -5px;
@@ -201,14 +202,15 @@ footer {
     }
     
     .container{
+        margin-top: 3%;
         background-color: #fff;
         border-radius: 30px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
         position: relative;
         overflow: hidden;
-        width: 768px;
+        width: 95%;
         max-width: 100%;
-        min-height: 480px;
+        min-height: 600px;
     }
     
     .container p{

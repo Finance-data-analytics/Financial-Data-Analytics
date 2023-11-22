@@ -31,20 +31,19 @@
         <div class="col-sm-12 col-lg-5">
             <h1 style="margin-top: 20%;"></h1>
         </div>
-        <div class="row">
-            <div class="col-sm-12 col-lg-7 element" id="text_left">
-                <p style="color: #fff; font-size: 30px; padding:1em; color:antiquewhite" class="lead highlight uppercase">Neoma Venture is at the forefront of revolutionizing portfolio management with a focus on risk-adjusted strategies.</p>
-                <p style="color: #fff; font-size: 30px; padding:1em; color:antiquewhite">For over a decade, we have been innovating in the financial services sector, now managing over <span class="highlight">$3 billion in assets</span></p>
-                <p style="color: #fff; font-size: 30px; padding:1em; color:antiquewhite"> Our unique approach combines cutting-edge technology with tailored risk assessment tools, ensuring our clients' portfolios are optimized for their individual risk tolerance.</p>
-                <p style="color: #fff; font-size: 30px; padding:1em; color:antiquewhite">Neoma Venture prides itself on its ability to provide intelligent, dynamic, and forward-thinking investment solutions. Our team of experts works tirelessly to identify opportunities across a diverse range of markets, enabling our clients to achieve their financial goals with
-                    confidence.</p>
+        <div class="row align-items-center my-5">
+            <div class="col-lg-6" id="text_left">
+                <div class="text-content">
+                    <p>Neoma Venture is at the forefront of revolutionizing portfolio management with a focus on risk-adjusted strategies.</p>
+                    <p>For over a decade, we have been innovating in the financial services sector, now managing over $3 billion in assets.</p>
+                    <p>Our unique approach combines cutting-edge technology with tailored risk assessment tools, ensuring optimized portfolios.</p>
+                    <p>Neoma Venture provides dynamic and forward-thinking investment solutions, enabling our clients to achieve their financial goals with confidence.</p>
+                </div>
             </div>
-            <div class="col-sm-12 col-lg-6 animate-on-scroll" id="droite">
-                <img src="{{ url_for('static', filename='images/imageIphone.png') }}" alt="Iphone">
-
+            <div class="col-lg-6" id="right">
+                <img src="{{ url_for('static', filename='images/imageIphone.png') }}" alt="Iphone" class="img-fluid">
             </div>
         </div>
-        <p>
 
     
         <div class="col-sm-12 col-lg-5">
@@ -77,31 +76,4 @@
         </div>
         <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
-
-<footer>
-
-    <div class="container-fluid">
-        <div class="row">
-            <h1>Read More</h1>
-            <div class="mention col-lg-4">
-                <h3>General Terms of Sale</h3>
-                <p>
-                Our General Terms of Sale outline the agreement between our company and our clients. These terms include information on order processing, delivery procedures, and return policies. We commit to providing high-quality services and products, ensuring customer satisfaction is at the forefront of our operations. Our terms also detail payment methods, warranty information, and the process for handling disputes.
-                </p>
-            </div>
-            <div class="mention col-lg-4">
-                <h3>Cookie Management Policy</h3>
-                <p>
-                Our Cookie Management Policy describes how we use cookies to enhance user experience on our website. We use cookies for website functionality, analytics, and personalized content. Users have the option to manage their cookie preferences, ensuring a balance between personalization and privacy. Our policy provides detailed information on the types of cookies used and how they contribute to a better user experience.
-                </p>
-            </div>
-            <div class="mention col-lg-4">
-                <h3>Data Protection Policy</h3>
-                <p>
-                The Data Protection Policy of our website is dedicated to safeguarding the personal information of our users. We adhere to strict privacy standards and employ robust security measures to protect user data. This policy outlines the types of data we collect, how it is used, and the rights of users regarding their personal information. We are committed to transparency and accountability in all our data handling practices.
-            </div>
-        </div>
-        <p id="contact">Contact :  | &copy; 2023, NEOMA</p>
-    </div>
-</footer>
 {% endblock %}
