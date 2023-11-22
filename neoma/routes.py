@@ -176,15 +176,32 @@ def portfolio_options():
 @app.route('/my_portfolio', methods=['GET', 'POST'])
 @login_required
 def my_portfolio():
-    user_id = current_user.id  # Ou une autre méthode pour obtenir l'ID utilisateur
 
-    portfolios = Portfolio.query.filter_by(user_id=user_id).all()
+    portfolios = Portfolio.query.filter_by(user_id=current_user.id).all()
 
+    for portfolio in portfolios:
+        # Ensure that list_selected_assets is a proper JSON string
+        # You might need to adjust this part if list_selected_assets is already a list or formatted differently
+        assets_list = json.loads(portfolio.list_selected_assets)
+        weights_list = json.loads(portfolio.list_weight_selected_assets)
+        # Separate stocks and cryptocurrencies
+        stocks = [asset for asset in assets_list if not asset.endswith('-USD')]
+        cryptos = [asset for asset in assets_list if asset.endswith('-USD')]
+
+        crypto_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if asset.endswith('-USD'))*100
+        stock_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if not asset.endswith('-USD'))*100
+
+        # Store the weights as percentages
+        portfolio.crypto_weight_percentage = round(crypto_weights,2)
+        portfolio.stock_weight_percentage = round(stock_weights,2)
+
+        # Store them back in the portfolio object, possibly in new attributes
+        portfolio.stocks = stocks
+        portfolio.cryptos = cryptos
 
     app.jinja_env.filters['format_currency'] = format_currency
     # Ajoutez la fonction au contexte Jinja pour l'utiliser dans le template
     app.jinja_env.filters['format_assets'] = format_assets
-
     if not portfolios:
         print("No portfolios found for user.")
 
@@ -206,10 +223,8 @@ def rename_portfolio():
     return redirect(url_for('my_portfolio'))
 
 @login_required
-@app.route('/delete_portfolio', methods=['POST'])
-def delete_portfolio():
-    portfolio_id = request.form.get('portfolio_id')
-    
+@app.route('/delete_portfolio/<int:portfolio_id>', methods=['GET'])
+def delete_portfolio(portfolio_id):
     # Logique pour trouver le portfolio par ID et le supprimer de la base de données
     portfolio_to_delete = Portfolio.query.get(portfolio_id)
     if portfolio_to_delete:

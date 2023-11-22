@@ -6,41 +6,78 @@
 
 {% block content %}
 <div class="accordion" id="portfolioAccordion">
-    <div style="text-align: center; color: white; margin-top: 20px;">
+    <div style="text-align: center; color: white; margin-top: 20px; margin-bottom: 2em;">
        <h2>My Portfolios</h2>
     </div>
   {% for portfolio in portfolios %}
     <div class="card">
       <div class="card-header" id="heading{{ portfolio.id }}">
-        <h2 class="mb-0">
-          <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ portfolio.id }}" aria-expanded="true" aria-controls="collapse{{ portfolio.id }}">
-            {{ portfolio.name }} - {{ portfolio.capital | format_currency }}
-          </button>
-        </h2>
-      </div>
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <h2 class="mb-0 flex-grow-1">
+                <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ portfolio.id }}" aria-expanded="true" aria-controls="collapse{{ portfolio.id }}">
+                    {{ portfolio.name }} - {{ portfolio.capital | format_currency }}
+                </button>
+            </h2>
+            <span class="portfolio-distribution">
+                ({{ portfolio.crypto_weight_percentage }}% crypto, {{ portfolio.stock_weight_percentage }}% stocks)
+                <button class="btn-excel-export" onclick="location.href='{{ url_for('rename_portfolio', portfolio_id=portfolio.id) }}'">
+                <img src="{{ url_for('static', filename='images/excel_export_logo.svg') }}" alt="icone2">
+            </button>
+            </span>
+        </div>
+    </div>
 
       <div id="collapse{{ portfolio.id }}" class="collapse" aria-labelledby="heading{{ portfolio.id }}" data-parent="#portfolioAccordion">
         <div class="card-body">
-          <!-- Your details here -->
-          <div>Assets: {{ portfolio.list_selected_assets }}</div>
-          <form action="{{ url_for('rename_portfolio') }}" method="post">
-            <!-- Rename form inputs and submit button -->
-          </form>
-          <form action="{{ url_for('delete_portfolio') }}" method="post">
-            <!-- Delete form inputs and submit button -->
-          </form>
-          <a href="{{ url_for('see_details', portfolio_id=portfolio.id) }}">See more details</a>
+          <div>Stocks: {{ portfolio.stocks | join(', ') }}</div>
+
+          {% if portfolio.cryptos|length > 0 %}
+            <div>Cryptocurrencies: {{ portfolio.cryptos | join(', ') }}</div>
+          {% endif %}
+
+
+          <div class="buttons-container" style="margin-top: 1em;">
+                <a class="btn-details" href="{{ url_for('see_details', portfolio_id=portfolio.id) }}">See more details</a>
+                <a class="btn-delete" href="{{ url_for('delete_portfolio', portfolio_id=portfolio.id) }}">Delete</a>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-rename" data-toggle="modal" data-target="#renameModal{{ portfolio.id }}">
+                    Rename
+                </button>
+            </div>
         </div>
       </div>
+    </div>
+    <!-- Rename Modal -->
+    <div class="modal fade" id="renameModal{{ portfolio.id }}" tabindex="-1" role="dialog" aria-labelledby="renameModalLabel{{ portfolio.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="renameModalLabel{{ portfolio.id }}">Rename Portfolio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('rename_portfolio') }}" method="post">
+                        <div class="form-group">
+                            <label for="nameInput{{ portfolio.id }}">New Name:</label>
+                            <input type="text" class="form-control" id="nameInput{{ portfolio.id }}" name="new_name" placeholder="Enter new name" required>
+                            <input type="hidden" name="portfolio_id" value="{{ portfolio.id }}">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
   {% else %}
     <div>No portfolios found.</div>
   {% endfor %}
 </div>
-
-    <!-- Fin haut de page-->
-    <!--Debut de section 1 -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
+
 

@@ -1,0 +1,19 @@
+<changelist name="Changes" date="1700070497568" recycled="false">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/shelved.patch" />
+  <option name="DESCRIPTION" value="Changes" />
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="all_tickers.xlsx" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/all_tickers.xlsx" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="cryptos_market_cap.xlsx" />
+    <option name="AFTER_PATH" value="cryptos_market_cap.xlsx" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/cryptos_market_cap.xlsx" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="rendements_et_risques.xlsx" />
+    <option name="AFTER_PATH" value="rendements_et_risques.xlsx" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/rendements_et_risques.xlsx" />
+  </binary>
+</changelist>

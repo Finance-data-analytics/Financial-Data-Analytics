@@ -30,8 +30,7 @@ body {
     color: #fff;
     background: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for text */
     padding: 1rem;
-    border-left: 4px solid #f0f0f0; /* A subtle left border for style */
-    font-size: 1.2rem; /* Adjust the font size as needed */
+    font-size: 2.2rem; /* Adjust the font size as needed */
 }
 
 #text_left .text-content p {
@@ -424,4 +423,32 @@ font-size: 20px;
 margin-bottom: 20px;
 }
 
+/* Custom close button style */
+.close {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.close:hover,
+.close:focus {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.close span {
+    font-size: 24px; /* Adjust the size of the 'X' as needed */
+    font-weight: bold;
+}
+
+/* Optional: Add a circle background on hover */
+.close:hover span {
+    background-color: #f2f2f2; /* Light grey background */
+    border-radius: 50%;
+    padding: 0 6px; /* Adjust padding to fit the circle */
+}
 

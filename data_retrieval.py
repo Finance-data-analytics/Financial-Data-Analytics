@@ -47,9 +47,11 @@ def get_data_crypto(tickers, start_date, end_date):
 def get_data_stocks(tickers, isins, start_date, end_date):
     successful_retrievals = []
     data_list = []
+    i=0
     from neoma import cache
     for index, (ticker, isin) in enumerate(zip(tickers, isins)):
-        progress = (index +1 / len(tickers)) * 100
+        i+=1
+        progress = (i / len(tickers)) * 100
         cache.set("data_fetch_progress", progress)
         try:
             print(f"Processing {index + 1}/{len(tickers)}: {ticker}/{isin}")

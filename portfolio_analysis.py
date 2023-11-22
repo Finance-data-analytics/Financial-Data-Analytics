@@ -282,7 +282,7 @@ def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
 
     Top_5_Selection = monte_carlo_selection(
         stocks_data, crypto_data,
-        100,
+        1000,
         nb_stocks, crypto_weight_limit, risk_adjustment_factor)
     return crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection
 
@@ -293,7 +293,7 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
                                                                                                          crypto_data,
                                                                                                          selected_stocks,
                                                                                                          selected_cryptos
-                                                                                                         , 100,
+                                                                                                         , 1000,
                                                                                                          crypto_weight_limit)
     monetary_allocation = best_weights * capital
 

@@ -1,0 +1,345 @@
+Index: test.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/test.py b/test.py
+--- a/test.py	(revision f148a2443b198a1e244e06be06e665376cfaed94)
++++ b/test.py	(date 1700066651350)
+@@ -1,0 +1,140 @@
++from config import *
++from portfolio_analysis import calculate_returns, efficient_frontier
++
++
++def get_crypto_data():
++    headers = {
++        'Accepts': 'application/json',
++        'X-CMC_PRO_API_KEY': '8ec7c7d5-f5ee-44a7-9d90-99ea1fb90edf',
++    }
++    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=30'
++    response = requests.get(url, headers=headers)
++    data = response.json()
++    cryptos = data['data']
++
++    # Liste des symboles des stablecoins à exclure
++    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP', 'UNI']
++
++    crypto_data = []
++    for crypto in cryptos:
++        name = crypto['name']
++        symbol = crypto['symbol']
++        # Excluez les cryptos si elles sont dans la liste des stablecoins
++        if symbol not in stablecoins:
++            market_cap = crypto['quote']['USD']['market_cap']
++            crypto_data.append({"Name": name, "Symbol": symbol, "Market Cap": market_cap})
++
++    crypto_df = pd.DataFrame(crypto_data)
++    crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
++    crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
++
++
++get_crypto_data()
++crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
++crypto_symbols = crypto_data['Symbol'].tolist()
++
++
++def get_data(tickers, start_date, end_date):
++    try:
++        data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
++        return data
++    except Exception as e:
++        print(f"Failed to fetch data for ticker {tickers}: {e}")
++
++
++def get_data_with_fallback(tickers, isins, start_date, end_date):
++    data = pd.DataFrame()
++    for ticker, isin in zip(tickers, isins):
++        try:
++            # Try fetching data with the ticker
++            ticker_data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
++            data[ticker] = ticker_data
++        except Exception as ticker_error:
++            try:
++                # If ticker fails, try with ISIN
++                isin_data = yf.download(isin, start=start_date, end=end_date)['Adj Close']
++                data[ticker] = isin_data
++            except Exception as isin_error:
++                print(f"Failed to fetch data for ticker {ticker} and ISIN {isin}: {isin_error}")
++    return data
++
++
++all_stocks = pd.read_excel("stocks.xlsx")
++first_100_stocks = all_stocks.head(10)  # Assuming you want the first 100 stocks
++tickers = first_100_stocks['ticker'].tolist()
++isins = first_100_stocks['isin'].tolist()
++
++crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
++stocks_data = get_data_with_fallback(tickers, isins, '2019-01-01', '2023-10-01')
++
++crypto_data = crypto_data.dropna(axis=1, how='all')
++stocks_data = stocks_data.dropna(axis=1, how='all')
++
++crypto_daily_returns = calculate_returns(crypto_data)
++stocks_daily_returns = calculate_returns(stocks_data)
++
++crypto_avg_daily_returns = crypto_daily_returns.mean()
++stocks_avg_daily_returns = stocks_daily_returns.mean()
++
++crypto_risks = crypto_daily_returns.std()
++stocks_risks = stocks_daily_returns.std()
++# # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action
++# Create dictionary of results
++results_dict = {
++    "Stocks": pd.DataFrame({
++        "Rendement moyen": stocks_avg_daily_returns,
++        "Risque": stocks_risks
++    }),
++    "Crypto": pd.DataFrame({
++        "Rendement moyen": crypto_avg_daily_returns,
++        "Risque": crypto_risks
++    })
++}
++
++# Use ExcelWriter to save these DataFrames into separate sheets of the same Excel file
++with pd.ExcelWriter("rendements_et_risques.xlsx") as writer:
++    for sheet_name, result in results_dict.items():
++        result.to_excel(writer, sheet_name=sheet_name)
++# # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux
++target_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)
++target_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)
++
++# Dictionary containing average daily returns and daily returns for each asset type
++data_dict = {
++    "Stocks": (stocks_avg_daily_returns, stocks_daily_returns),
++    "Crypto": (crypto_avg_daily_returns, crypto_daily_returns)
++}
++
++# Empty dictionary to store efficient portfolios for each asset type
++efficient_portfolios_dict = {}
++
++# Loop over the dictionary
++for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
++    target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)
++    efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
++    efficient_portfolios_dict[asset_type] = efficient_portfolios
++
++# Convert the annual risk-free rate to a daily rate
++rf_annual = 0.01  # 1% annual rate
++rf_daily = (1 + rf_annual) ** (1 / 365) - 1
++rf_daily
++
++# Dictionary containing data for plotting
++plotting_data = {
++    "Cryptos": {
++        "risks": crypto_risks,
++        "avg_daily_returns": crypto_avg_daily_returns,
++        "symbols": crypto_symbols,
++        "efficient_portfolios": efficient_portfolios_dict["Crypto"],
++        "color": 'b',
++        "title": 'Cryptos: Rendement vs Risque'
++    },
++    "Stocks": {
++        "risks": stocks_risks,
++        "avg_daily_returns": stocks_avg_daily_returns,
++        "symbols": first_100_stocks,
++        "efficient_portfolios": efficient_portfolios_dict["Stocks"],
++        "color": 'r',
++        "title": 'Stocks: Rendement vs Risque'
++    }
++}
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from config import *\nfrom data_retrieval import *\nfrom portfolio_analysis import *\nfrom plotting import *\n\n# Load the data back into a DataFrame\nstocks_data = pd.read_excel(\"rendements_et_risques.xlsx\", sheet_name=\"Stocks\")\ncrypto_data = pd.read_excel(\"rendements_et_risques.xlsx\", sheet_name=\"Crypto\")\n\n# Now you can access `stocks_avg_daily_returns` and `crypto_avg_daily_returns` from the DataFrames\nstocks_avg_daily_returns = stocks_data[\"Rendement moyen\"]\ncrypto_avg_daily_returns = crypto_data[\"Rendement moyen\"]\n\ncapital = float(input(\"Veuillez entrer votre capital à investir: \"))\ninvestment_horizon = int(input(\"Veuillez entrer votre horizon d'investissement (en années): \"))\nrisk_tolerance = input(\"Veuillez choisir votre tolérance au risque (faible, moyenne, élevée): \")\n\n# Plot the assets and CAL using the daily risk-free rate\nplot_assets_and_cal_plotly(plotting_data, rf_daily)\n\n# Récupération des noms des stocks et des cryptos depuis les fichiers Excel\nprint(crypto_data.columns)\ncrypto_names = crypto_data.columns.tolist()\nstock_data = pd.read_excel(\"stocks.xlsx\")\nstock_names = stock_data['Name'].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.\n\n# Récupération de l'investissement recommandé\nstock_investment, crypto_investment = recommend_portfolio(\n    capital, \n    investment_horizon, \n    risk_tolerance, \n    stocks_avg_daily_returns, \n    crypto_avg_daily_returns,\n    stocks_daily_returns, # Assuming this is needed based on your portfolio_analysis.py\n    crypto_daily_returns  # Assuming this is needed based on your portfolio_analysis.py\n)\n\n# Affichage de la répartition du portefeuille d'actions\nprint(\"\\nRépartition du portefeuille d'actions :\")\nfor ticker, name, amount in zip(first_100_stocks, stock_names, stock_investment):\n    if amount > 0:\n        print(f\"{name} ({ticker}): {amount:.2f} USD\")\n\n# Affichage de la répartition du portefeuille de cryptomonnaies\nprint(\"\\nRépartition du portefeuille de cryptomonnaies :\")\nfor ticker, name, amount in zip(crypto_symbols, crypto_names, crypto_investment):\n    if amount > 0:\n        print(f\"{name} ({ticker}): {amount:.2f} USD\")\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision f148a2443b198a1e244e06be06e665376cfaed94)
++++ b/main.py	(date 1700067061361)
+@@ -21,15 +21,15 @@
+ # Récupération des noms des stocks et des cryptos depuis les fichiers Excel
+ print(crypto_data.columns)
+ crypto_names = crypto_data.columns.tolist()
+-stock_data = pd.read_excel("stocks.xlsx")
+-stock_names = stock_data['Name'].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.
++stock_data = pd.read_excel("all_tickers.xlsx")
++stock_names = stock_data['Name'][:80].tolist()  # Assuming your Excel file for stocks contains a 'Name' column for stock names.
+ 
+ # Récupération de l'investissement recommandé
+ stock_investment, crypto_investment = recommend_portfolio(
+-    capital, 
+-    investment_horizon, 
+-    risk_tolerance, 
+-    stocks_avg_daily_returns, 
++    capital,
++    investment_horizon,
++    risk_tolerance,
++    stocks_avg_daily_returns,
+     crypto_avg_daily_returns,
+     stocks_daily_returns, # Assuming this is needed based on your portfolio_analysis.py
+     crypto_daily_returns  # Assuming this is needed based on your portfolio_analysis.py
+@@ -45,4 +45,4 @@
+ print("\nRépartition du portefeuille de cryptomonnaies :")
+ for ticker, name, amount in zip(crypto_symbols, crypto_names, crypto_investment):
+     if amount > 0:
+-        print(f"{name} ({ticker}): {amount:.2f} USD")
++        print(f"{name} ({ticker}): {amount:.2f} USD")
+\ No newline at end of file
+Index: plotting.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from config import *\nfrom portfolio_analysis import *\n\ndef plot_assets_and_cal(data_dict, rf_daily):\n    # Loop over the dictionary to plot for each asset type\n    for key, data in data_dict.items():\n        plt.figure(figsize=(12, 6))\n        # Plotting the efficient frontier\n\ndef plot_assets_and_cal_plotly(data_dict, rf_daily):\n    for key, data in data_dict.items():\n        # Create a scatter plot for assets\n        fig = go.Figure()\n\n        # Plotting individual asset points with their names\n        for ticker in data[\"symbols\"]:\n            if ticker == 'nan' or ticker == '':\n                continue  # Skip this iteration if the ticker is 'nan' or an empty string\n\n            fig.add_trace(go.Scatter(x=[data[\"risks\"][ticker]],\n                                     y=[data[\"avg_daily_returns\"][ticker]],\n                                     mode='markers',\n                                     name=ticker))\n\n            # Plotting the efficient frontier\n        portfolio_volatilities = [portfolio['fun'] for portfolio in data[\"efficient_portfolios\"]]\n        target_returns = np.linspace(data[\"avg_daily_returns\"].min(), data[\"avg_daily_returns\"].max(), 100)\n        fig.add_trace(go.Scatter(x=portfolio_volatilities, y=target_returns, mode='lines',\n                                 name='Frontière Efficient de Markowitz', line=dict(color='yellow')))\n\n        # Calculate the slope of the tangent for each portfolio on the efficient frontier\n        slopes = [(np.dot(data[\"avg_daily_returns\"], portfolio.x) - rf_daily) / portfolio.fun for portfolio in\n                  data[\"efficient_portfolios\"]]\n\n        # Find the portfolio with the steepest slope\n        max_slope_idx = np.argmax(slopes)\n        tangent_portfolio = data[\"efficient_portfolios\"][max_slope_idx]\n\n        # Return and volatility of the tangent portfolio\n        tangent_return = np.dot(data[\"avg_daily_returns\"], tangent_portfolio.x)\n        tangent_volatility = tangent_portfolio.fun\n\n        # Plot the CAL\n        x = np.linspace(0, max(portfolio_volatilities), 100)\n        y = rf_daily + (tangent_return - rf_daily) / tangent_volatility * x\n        fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers', name='CAL', line=dict(color='green', dash='dash')))\n\n        # Layout settings\n        fig.update_layout(title=data[\"title\"], xaxis_title='Volatilité (Écart type du rendement)',\n                          yaxis_title='Rendement attendu')\n        fig.show()\n\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/plotting.py b/plotting.py
+--- a/plotting.py	(revision f148a2443b198a1e244e06be06e665376cfaed94)
++++ b/plotting.py	(date 1700067069159)
+@@ -51,4 +51,3 @@
+         fig.show()
+ 
+ 
+-
+Index: portfolio_analysis.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from config import *\nfrom data_retrieval import *\n\ndef portfolio_volatility(weights, avg_returns, cov_matrix):\n    return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))\n\ndef calculate_returns(data):\n    returns = data.pct_change().dropna()\n    return returns\n\ndef efficient_frontier(returns,target_return_,min_diversification=0):\n    cov_matrix = returns.cov()\n    avg_returns = returns.mean()\n\n    num_assets = len(returns.columns)\n    args = (avg_returns, cov_matrix)\n\n    if min_diversification:\n        cons = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - min_diversification},)\n\n    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1},\n                   {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return_})\n\n    bounds = tuple((0, 1) for asset in range(num_assets))\n    results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)\n    return results\n\ndef recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns,stocks_daily_returns,crypto_daily_returns):\n    if investment_horizon <= 3:  # Short term\n        target_return = stocks_avg_daily_returns.min()\n    elif investment_horizon <= 7:  # Medium term\n        target_return = stocks_avg_daily_returns.mean()\n    else:  # Long term\n        target_return = stocks_avg_daily_returns.max()\n\n    if risk_tolerance == \"faible\":\n        target_return -= 0.01\n        max_crypto_weight = 0  # No crypto for low-risk profile\n        min_stock_diversification = 0.8  # At least 80% diversification among stocks\n    elif risk_tolerance == \"moyenne\":\n        max_crypto_weight = 0.2  # Up to 20% crypto for medium-risk profile\n        min_stock_diversification = 0.5  # At least 50% diversification among stocks\n    else:  # élevée\n        target_return += 0.01\n        max_crypto_weight = 0.5  # Up to 50% crypto for high-risk profile\n        min_stock_diversification = 0.2  # At least 20% diversification among stocks\n\n    stock_portfolio = efficient_frontier(stocks_daily_returns, target_return, min_diversification=min_stock_diversification)['x']\n    crypto_portfolio = efficient_frontier(crypto_daily_returns, target_return)['x']\n\n    # Ensure we don't exceed the max_crypto_weight for the risk profile\n    total_crypto_weight = np.sum(crypto_portfolio)\n    if total_crypto_weight > max_crypto_weight:\n        crypto_portfolio = (crypto_portfolio / total_crypto_weight) * max_crypto_weight\n\n    # Remaining weight is for stocks\n    total_stock_weight = 1 - total_crypto_weight\n\n    total_stock_investment = capital * total_stock_weight\n    total_crypto_investment = capital * total_crypto_weight\n    \n    stock_investment = stock_portfolio * total_stock_investment\n    crypto_investment = crypto_portfolio * total_crypto_investment\n\n    return stock_investment, crypto_investment\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/portfolio_analysis.py b/portfolio_analysis.py
+--- a/portfolio_analysis.py	(revision f148a2443b198a1e244e06be06e665376cfaed94)
++++ b/portfolio_analysis.py	(date 1700067076320)
+@@ -1,14 +1,17 @@
+ from config import *
+ from data_retrieval import *
+ 
++
+ def portfolio_volatility(weights, avg_returns, cov_matrix):
+     return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+ 
++
+ def calculate_returns(data):
+     returns = data.pct_change().dropna()
+     return returns
+ 
+-def efficient_frontier(returns,target_return_,min_diversification=0):
++
++def efficient_frontier(returns, target_return_, min_diversification=0):
+     cov_matrix = returns.cov()
+     avg_returns = returns.mean()
+ 
+@@ -22,10 +25,13 @@
+                    {'type': 'eq', 'fun': lambda x: np.sum(x * avg_returns) - target_return_})
+ 
+     bounds = tuple((0, 1) for asset in range(num_assets))
+-    results = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, constraints=constraints, bounds=bounds)
++    results = minimize(portfolio_volatility, num_assets * [1. / num_assets, ], args=args, constraints=constraints,
++                       bounds=bounds)
+     return results
+ 
+-def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns,stocks_daily_returns,crypto_daily_returns):
++
++def recommend_portfolio(capital, investment_horizon, risk_tolerance, stocks_avg_daily_returns, crypto_avg_daily_returns,
++                        stocks_daily_returns, crypto_daily_returns):
+     if investment_horizon <= 3:  # Short term
+         target_return = stocks_avg_daily_returns.min()
+     elif investment_horizon <= 7:  # Medium term
+@@ -45,7 +51,8 @@
+         max_crypto_weight = 0.5  # Up to 50% crypto for high-risk profile
+         min_stock_diversification = 0.2  # At least 20% diversification among stocks
+ 
+-    stock_portfolio = efficient_frontier(stocks_daily_returns, target_return, min_diversification=min_stock_diversification)['x']
++    stock_portfolio = \
++    efficient_frontier(stocks_daily_returns, target_return, min_diversification=min_stock_diversification)['x']
+     crypto_portfolio = efficient_frontier(crypto_daily_returns, target_return)['x']
+ 
+     # Ensure we don't exceed the max_crypto_weight for the risk profile
+@@ -58,9 +65,8 @@
+ 
+     total_stock_investment = capital * total_stock_weight
+     total_crypto_investment = capital * total_crypto_weight
+-    
++
+     stock_investment = stock_portfolio * total_stock_investment
+     crypto_investment = crypto_portfolio * total_crypto_investment
+ 
+     return stock_investment, crypto_investment
+-
+Index: data_retrieval.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from config import *\nfrom portfolio_analysis import calculate_returns, efficient_frontier\n\n\ndef get_crypto_data():\n    headers = {\n        'Accepts': 'application/json',\n        'X-CMC_PRO_API_KEY': '8ec7c7d5-f5ee-44a7-9d90-99ea1fb90edf',\n    }\n    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=30'\n    response = requests.get(url, headers=headers)\n    data = response.json()\n    cryptos = data['data']\n\n    # Liste des symboles des stablecoins à exclure\n    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP', 'UNI']\n\n    crypto_data = []\n    for crypto in cryptos:\n        name = crypto['name']\n        symbol = crypto['symbol']\n        # Excluez les cryptos si elles sont dans la liste des stablecoins\n        if symbol not in stablecoins:\n            market_cap = crypto['quote']['USD']['market_cap']\n            crypto_data.append({\"Name\": name, \"Symbol\": symbol, \"Market Cap\": market_cap})\n\n    crypto_df = pd.DataFrame(crypto_data)\n    crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')\n    crypto_df.to_excel(\"cryptos_market_cap.xlsx\", index=False)\n\n\nget_crypto_data()\ncrypto_data = pd.read_excel(\"cryptos_market_cap.xlsx\")\ncrypto_symbols = crypto_data['Symbol'].tolist()\n\n\ndef get_data(tickers, start_date, end_date):\n    try:\n        data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']\n        return data\n    except Exception as e:\n        print(f\"Failed to fetch data for ticker {tickers}: {e}\")\n\n\nall_stocks = pd.read_excel(\"stocks.xlsx\")\nfirst_100_stocks = all_stocks['ticker'].tolist()\nfirst_100_stocks = [str(ticker) for ticker in first_100_stocks]\n\ncrypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')\nstocks_data = get_data(first_100_stocks, '2019-01-01', '2023-10-01')\n\ncrypto_daily_returns = calculate_returns(crypto_data)\nstocks_daily_returns = calculate_returns(stocks_data)\n\ncrypto_avg_daily_returns = crypto_daily_returns.mean()\nstocks_avg_daily_returns = stocks_daily_returns.mean()\n\ncrypto_risks = crypto_daily_returns.std()\nstocks_risks = stocks_daily_returns.std()\n\n# # Créez un DataFrame pour stocker le rendement moyen et le risque de chaque action\n# Create dictionary of results\nresults_dict = {\n    \"Stocks\": pd.DataFrame({\n        \"Rendement moyen\": stocks_avg_daily_returns,\n        \"Risque\": stocks_risks\n    }),\n    \"Crypto\": pd.DataFrame({\n        \"Rendement moyen\": crypto_avg_daily_returns,\n        \"Risque\": crypto_risks\n    })\n}\n\n# Use ExcelWriter to save these DataFrames into separate sheets of the same Excel file\nwith pd.ExcelWriter(\"rendements_et_risques.xlsx\") as writer:\n    for sheet_name, result in results_dict.items():\n        result.to_excel(writer, sheet_name=sheet_name)\n# # Pour différentes cibles de rendement, définir la target_return et trouver les poids optimaux\ntarget_returns_stock = np.linspace(stocks_avg_daily_returns.min(), stocks_avg_daily_returns.max(), 100)\ntarget_returns_crypto = np.linspace(crypto_avg_daily_returns.min(), crypto_avg_daily_returns.max(), 100)\n\n# Dictionary containing average daily returns and daily returns for each asset type\ndata_dict = {\n    \"Stocks\": (stocks_avg_daily_returns, stocks_daily_returns),\n    \"Crypto\": (crypto_avg_daily_returns, crypto_daily_returns)\n}\n\n# Empty dictionary to store efficient portfolios for each asset type\nefficient_portfolios_dict = {}\n\n# Loop over the dictionary\nfor asset_type, (avg_daily_returns, daily_returns) in data_dict.items():\n    target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)\n    efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]\n    efficient_portfolios_dict[asset_type] = efficient_portfolios\n\n# Convert the annual risk-free rate to a daily rate\nrf_annual = 0.01  # 1% annual rate\nrf_daily = (1 + rf_annual) ** (1 / 365) - 1\nrf_daily\n\n# Dictionary containing data for plotting\nplotting_data = {\n    \"Cryptos\": {\n        \"risks\": crypto_risks,\n        \"avg_daily_returns\": crypto_avg_daily_returns,\n        \"symbols\": crypto_symbols,\n        \"efficient_portfolios\": efficient_portfolios_dict[\"Crypto\"],\n        \"color\": 'b',\n        \"title\": 'Cryptos: Rendement vs Risque'\n    },\n    \"Stocks\": {\n        \"risks\": stocks_risks,\n        \"avg_daily_returns\": stocks_avg_daily_returns,\n        \"symbols\": first_100_stocks,\n        \"efficient_portfolios\": efficient_portfolios_dict[\"Stocks\"],\n        \"color\": 'r',\n        \"title\": 'Stocks: Rendement vs Risque'\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/data_retrieval.py b/data_retrieval.py
+--- a/data_retrieval.py	(revision f148a2443b198a1e244e06be06e665376cfaed94)
++++ b/data_retrieval.py	(date 1700067101486)
+@@ -1,7 +1,6 @@
+ from config import *
+ from portfolio_analysis import calculate_returns, efficient_frontier
+ 
+-
+ def get_crypto_data():
+     headers = {
+         'Accepts': 'application/json',
+@@ -13,7 +12,7 @@
+     cryptos = data['data']
+ 
+     # Liste des symboles des stablecoins à exclure
+-    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP', 'UNI']
++    stablecoins = ['USDT', 'USDC', 'BUSD', 'DAI', 'TUSD', 'PAX', 'USDP','UNI']
+ 
+     crypto_data = []
+     for crypto in cryptos:
+@@ -28,22 +27,16 @@
+     crypto_df['Symbol'] = crypto_df['Symbol'].apply(lambda x: x + '-USD')
+     crypto_df.to_excel("cryptos_market_cap.xlsx", index=False)
+ 
+-
+-get_crypto_data()
+-crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
+-crypto_symbols = crypto_data['Symbol'].tolist()
+-
+-
+ def get_data(tickers, start_date, end_date):
+-    try:
+-        data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
+-        return data
+-    except Exception as e:
+-        print(f"Failed to fetch data for ticker {tickers}: {e}")
++    data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
++    return data
+ 
++get_crypto_data()
++crypto_data = pd.read_excel("cryptos_market_cap.xlsx")
++crypto_symbols = crypto_data['Symbol'].tolist()
+ 
+-all_stocks = pd.read_excel("stocks.xlsx")
+-first_100_stocks = all_stocks['ticker'].tolist()
++all_stocks = pd.read_excel("all_tickers.xlsx")
++first_100_stocks = all_stocks['Symbol'][:10].tolist()
+ first_100_stocks = [str(ticker) for ticker in first_100_stocks]
+ 
+ crypto_data = get_data(crypto_symbols, '2019-01-01', '2023-10-01')
+@@ -94,9 +87,10 @@
+     efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
+     efficient_portfolios_dict[asset_type] = efficient_portfolios
+ 
++
+ # Convert the annual risk-free rate to a daily rate
+ rf_annual = 0.01  # 1% annual rate
+-rf_daily = (1 + rf_annual) ** (1 / 365) - 1
++rf_daily = (1 + rf_annual)**(1/365) - 1
+ rf_daily
+ 
+ # Dictionary containing data for plotting
+@@ -117,4 +111,4 @@
+         "color": 'r',
+         "title": 'Stocks: Rendement vs Risque'
+     }
+-}
++}
+\ No newline at end of file
