@@ -129,7 +129,7 @@ def portfolio_options():
         if PortfolioSelection.validate_on_submit():
             session['top_5_portfolios'] = top_5_transformed
             session['portfolio_bool'] = True
-            selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data)
+            selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data)-1
             selected_portfolio = top_5_transformed[selected_portfolio_number]
             # Extract stocks and cryptos from the selected portfolio
             selected_stocks = selected_portfolio.get('stocks', [])

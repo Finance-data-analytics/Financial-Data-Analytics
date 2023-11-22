@@ -13,20 +13,6 @@ def calculate_historical_return(data):
     return historical_return
 
 
-def plot_top_selections(top_selections):
-    plt.figure(figsize=(12, 8))
-
-    for i, selection in enumerate(top_selections, start=1):
-        plt.scatter(selection['volatility'], selection['return'], label=f'Top {i} (Score: {selection["score"]:.2f})')
-        plt.text(selection['volatility'], selection['return'], f'{selection["stocks"]} | {selection["cryptos"]}')
-
-    plt.xlabel('Volatility')
-    plt.ylabel('Expected Return')
-    plt.title('Top 5 Portfolio Selections')
-    plt.legend()
-    plt.show()
-
-
 def calculate_returns(data):
     # Forward fill missing values
     data_ffilled = data.ffill()
@@ -299,25 +285,6 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
 
     combined_selected_assets = selected_stocks + selected_cryptos
     return combined_selected_assets, monetary_allocation, best_weights,ret_arr_allocation, vol_arr_allocation,sharpe_arr_allocation
-
-
-
-    # # Plot the results of the second Monte Carlo simulation
-    # plt.figure(figsize=(12, 8))
-    # plt.scatter(vol_arr_allocation, ret_arr_allocation, c=sharpe_arr_allocation, cmap='plasma')
-    # plt.colorbar(label='Sharpe Ratio')
-    # plt.xlabel('Volatility')
-    # plt.ylabel('Return')
-    # plt.title('Optimal Weight Allocation for Selected Stocks')
-    #
-    # # Highlight the best portfolio with a red dot
-    # max_sharpe_idx = sharpe_arr_allocation.argmax()  # Index of the portfolio with the highest Sharpe Ratio
-    # plt.scatter(vol_arr_allocation[max_sharpe_idx], ret_arr_allocation[max_sharpe_idx], c='red', s=50,
-    #             edgecolors='black', label='Best Portfolio')
-    #
-    # # Show plot with legend
-    # plt.legend()
-    # plt.show()
 
 
 def get_crypto_weight_limit(portfolio_suggestion, investment_horizon):

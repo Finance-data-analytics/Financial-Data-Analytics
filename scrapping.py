@@ -3,21 +3,6 @@ import psycopg2
 import requests
 from bs4 import BeautifulSoup
 
-# BASE_URL = "https://www.zonebourse.com/bourse/indices/"
-# headers = {
-#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-# }
-#
-# # Fetch the HTML content
-# response = requests.get(BASE_URL, headers=headers)
-# soup = BeautifulSoup(response.content, 'html.parser')
-#
-# # Extract the links from the targeted selector
-# links = [a['href'] for a in soup.select("a.link.link--blue.table-child--middle.align-top")]
-#
-# # Print the extracted links
-# for link in links:
-#     print(link)
 from bs4 import BeautifulSoup
 import time
 import requests
@@ -26,8 +11,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-
-from test import insert_into_db
 
 
 class ZoneBourseScraper:

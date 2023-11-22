@@ -82,21 +82,28 @@ def get_data_stocks(tickers, isins, start_date, end_date):
 
 
 def generate_plotting_data():
+    index_data = pd.read_excel("index.xlsx")
+    index_symbol = index_data['ticker'].tolist()
+
     all_stocks = pd.read_excel("stocks.xlsx")
-    ticker = all_stocks['ticker'][:50].tolist()
-    isin = all_stocks['isin'][:50].tolist()
+    ticker = all_stocks['ticker'][:10].tolist()
+    isin = all_stocks['isin'][:10].tolist()
     list_ticker = [str(ticker) for ticker in ticker]
 
+    index_data, successful_index = get_data_crypto(index_symbol, '2019-01-01', today())
     crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', today())
     stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', today())
 
+    index_daily_returns = calculate_returns(index_data)
     crypto_daily_returns = calculate_returns(crypto_data)
     stocks_daily_returns = calculate_returns(stocks_data)
 
     # Calculate average daily returns and risks for crypto and stocks
+    index_avg_daily_returns = index_daily_returns.mean()
     crypto_avg_daily_returns = crypto_daily_returns.mean()
     stocks_avg_daily_returns = stocks_daily_returns.mean()
 
+    index_risks = index_daily_returns.std()
     crypto_risks = crypto_daily_returns.std()
     stocks_risks = stocks_daily_returns.std()
 
@@ -112,6 +119,11 @@ def generate_plotting_data():
     stocks_avg_daily_returns_filtered = stocks_avg_daily_returns[stocks_to_keep]
     stocks_risks_filtered = stocks_risks[stocks_to_keep]
 
+    index_to_keep = ~(index_avg_daily_returns == 0) | ~(index_risks == 0)
+    index_daily_returns_filtered = index_daily_returns.loc[:, index_to_keep]
+    index_avg_daily_returns_filtered = index_avg_daily_returns[index_to_keep]
+    index_risks_filtered = index_risks[index_to_keep]
+
     # Create dictionary of results with filtered data
     results_dict = {
         "Stocks": pd.DataFrame({
@@ -121,7 +133,11 @@ def generate_plotting_data():
         "Crypto": pd.DataFrame({
             "Rendement moyen": crypto_avg_daily_returns_filtered,
             "Risque": crypto_risks_filtered
-        })
+        }),
+        "Index": pd.DataFrame({
+            "Rendement moyen": index_avg_daily_returns_filtered,  # If this is a scalar
+            "Risque": index_risks_filtered  # If this is a scalar
+        })  # Provide an index name
     }
 
     # Use ExcelWriter to save these DataFrames into separate sheets of the same Excel file
@@ -132,7 +148,8 @@ def generate_plotting_data():
     # Dictionary containing average daily returns and daily returns for each asset type
     data_dict = {
         "Stocks": (stocks_avg_daily_returns_filtered, stocks_daily_returns_filtered),
-        "Crypto": (crypto_avg_daily_returns_filtered, crypto_daily_returns_filtered)
+        "Crypto": (crypto_avg_daily_returns_filtered, crypto_daily_returns_filtered),
+        "Index": (index_avg_daily_returns_filtered, index_daily_returns_filtered)
     }
 
     # Empty dictionary to store efficient portfolios for each asset type
@@ -175,6 +192,15 @@ def generate_plotting_data():
             "title": 'Stocks: Rendement vs Risque',
             "list_ticker_isin": successful_symbols,
             "data_stocks": stocks_data
+        },
+        "Index": {
+            "risks": stocks_risks,
+            "avg_daily_returns": index_avg_daily_returns,
+            "symbols": index_symbol,
+            "efficient_portfolios": efficient_portfolios_dict["Index"],
+            "color": 'g',
+            "title": 'Index: Rendement vs Risque',
+            "data_stocks": index_data
         }
     }
     return plotting_data
