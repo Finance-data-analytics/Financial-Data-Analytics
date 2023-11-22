@@ -26,6 +26,7 @@ def home_page():
     plotting_data = cache.get("plotting_data")
     if plotting_data:
         print("Plotting data available.")
+        print(plotting_data["Stocks"]["symbols"])
         # Use plotting_data for response
     else:
         print("Plotting data not yet available.")
@@ -154,7 +155,7 @@ def portfolio_options():
             future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
             new_portfolio = Portfolio(
                 user_id=current_user.id,
-                name='User Portfolio',
+                name=f'User Portfolio - {current_user.id}',
                 list_selected_assets=json.dumps(selected_stocks + selected_cryptos),
                 list_weight_selected_assets=list_weight_selected_assets_json,
                 data_portfolio=json.dumps(data_portfolio),
@@ -262,27 +263,51 @@ def see_details(portfolio_id):
 @app.route('/download_portfolio_returns/<int:portfolio_id>')
 @login_required
 def download_portfolio_returns(portfolio_id):
+    plotting_data = cache.get("plotting_data")
+    if not plotting_data:
+        # Handle the error if plotting_data is not found in the cache
+        return "Error: Plotting data not found", 500
+
     # Récupérez les données de votre modèle de base de données
     portfolio = Portfolio.query.get_or_404(portfolio_id)
-    
-    # Récupérez le nom du portefeuille, supposons que vous avez un champ 'name' dans votre modèle de portefeuille
-    portfolio_name = portfolio.name
-    assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))  # Assurez-vous que data_prices est stocké au format JSON correct
-    prices=for asset in assets #chercher asset dans plotting data, si cela finin par -USD chercher dans crypto sinon stocks
+    portfolio_name = portfolio.name  # Supposition que 'name' est un champ dans votre modèle
+
+    # Convertissez la liste des actifs sélectionnés en DataFrame
+    selected_assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))
+    print(selected_assets.head())
+    # Initialisez un DataFrame vide pour les prix
+    prices = pd.DataFrame()
+
+    # Parcourez chaque actif et récupérez ses données de prix
+    for asset in selected_assets.iloc[:, 0]:
+    # Vérifiez si l'actif est une crypto-monnaie, une action ou un indice
+        if asset in plotting_data["Cryptos"]["symbols"]:
+            asset_prices = plotting_data["Cryptos"]["data_crypto"].get(asset)
+        elif asset in plotting_data["Stocks"]["symbols"]:
+            asset_prices = plotting_data["Stocks"]["data_stocks"].get(asset)
+        else:
+            return f"Error: Asset type for {asset} not found", 500
+
+    # Vérifiez si les prix de l'actif ont été trouvés
+    if asset_prices is not None:
+        prices[asset] = pd.Series(asset_prices)
+    else:
+        return f"Error: Prices for asset {asset} not found", 500
+
     # Calculez les rendements quotidiens
     daily_returns = prices.pct_change()
 
-    # Ouvrez le fichier Excel existant en mode append
+    # Créez le fichier Excel et ajoutez une nouvelle feuille avec les rendements quotidiens
     with pd.ExcelWriter('rendements_et_risques.xlsx', engine='openpyxl', mode='a') as writer:
-        # Écrivez les rendements quotidiens dans une nouvelle feuille nommée après le nom du portefeuille
-        sheet_name = f'Rendement_{portfolio.name}'
+        sheet_name = f'Rendement_{portfolio_name}'
         daily_returns.to_excel(writer, sheet_name=sheet_name)
 
     # Lisez le fichier mis à jour pour l'envoyer
+    output = BytesIO()
     with open('rendements_et_risques.xlsx', 'rb') as f:
-        data = f.read()
-    output = BytesIO(data)
+        output.write(f.read())
 
     # Retournez le fichier Excel en tant que réponse téléchargeable
     output.seek(0)
-    return send_file(output, attachment_filename='rendements_et_risques.xlsx', as_attachment=True)
+    
+    return send_file(output, as_attachment=True, attachment_filename='rendements_et_risques.xlsx')
