@@ -6,20 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="41395ae9-0214-43b7-bfa0-51968c561495" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/Logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/account.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/euro.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/hub.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/imageIphone.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/phone.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pictures/rocket.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cryptos_market_cap.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/cryptos_market_cap.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_retrieval.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/portfolio_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rendements_et_risques.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/rendements_et_risques.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scrapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/scrapping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/~$stocks.xlsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -274,7 +261,7 @@
       <workItem from="1700642610171" duration="10611000" />
       <workItem from="1700659403975" duration="53000" />
       <workItem from="1700660194017" duration="255000" />
-      <workItem from="1700664485981" duration="5988000" />
+      <workItem from="1700664485981" duration="6137000" />
     </task>
     <servers />
   </component>

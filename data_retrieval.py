@@ -194,7 +194,7 @@ def generate_plotting_data():
             "data_stocks": stocks_data
         },
         "Index": {
-            "risks": stocks_risks,
+            "risks": index_risks,
             "avg_daily_returns": index_avg_daily_returns,
             "symbols": index_symbol,
             "efficient_portfolios": efficient_portfolios_dict["Index"],
