@@ -127,8 +127,7 @@ img.logo_esigelec {
 
 
 footer {
-    position: absolute; /* You might not need this if your content naturally pushes the footer down */
-    bottom: 0;
+    margin-top: 10em;
     background-color: #333; /* Dark background for footer */
     color: #f1f1f1; /* Light text color for contrast */
     padding: 2rem 0; /* Padding for top and bottom */

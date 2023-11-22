@@ -37,7 +37,6 @@ p {
 nav.navbar.navbar-expand-lg {
     margin-left: 0px;
     min-width: 100%;
-    box-shadow: 0px 2px black;
     font-size : 20px;
 }
 
@@ -84,10 +83,6 @@ img.logo_esigelec {
     text-decoration: none;
     margin-top: 15px;
 }
-imGauche.ImageGauche{
-    float : left;
-    margin-right : 10px;
-}
 
     .animated-link span {
         display: inline-block;
@@ -123,8 +118,7 @@ imGauche.ImageGauche{
 
 
 footer {
-    position: absolute; /* You might not need this if your content naturally pushes the footer down */
-    bottom: 0;
+    margin-top: 34em;
     width: 100%;
     background-color: #333;
     color: #f1f1f1;
@@ -179,11 +173,9 @@ footer a:hover {
 
     .portfolios-list h2 {
         color: white;
-        border-bottom: 1px solid #fff;
     }
 
     .portfolio-item {
-        border-bottom: 1px solid white; /* White separator between items */
         padding: 1rem; /* Spacing inside each portfolio item */
         color: white; /* Text color */
     }
@@ -196,7 +188,6 @@ footer a:hover {
     }
 
 .portfolio-item {
-    border-bottom: 1px solid white; /* White separator between items */
     padding: 1rem; /* Spacing inside each portfolio item */
     color: white; /* Text color */
     display: flex; /* Align items in a row */
@@ -292,4 +283,35 @@ footer a:hover {
     height: 3px;
     background-color: white;
     z-index: 9999;
+}
+
+.card-header button {
+  background-color: #f8f9fa;
+  color: #333;
+  padding: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+.card-header {
+  padding: 0;
+  border: none;
+}
+
+.card-body {
+  background-color: #fff;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.card {
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,.2);
+  border: none;
+  border-radius: .25rem;
+}
+
+.accordion {
+  margin: 20px 0;
 }

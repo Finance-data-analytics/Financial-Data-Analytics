@@ -5,38 +5,39 @@
 {% endblock %}
 
 {% block content %}
-<div class="portfolios-list">
+<div class="accordion" id="portfolioAccordion">
     <div style="text-align: center; color: white; margin-top: 20px;">
        <h2>My Portfolios</h2>
     </div>
-    {% for portfolio in portfolios %}
-    <div class="portfolio-item">
-        <div class="portfolio-detail">{{ portfolio.name }}</div>
-        <div class="portfolio-detail">{{ portfolio.capital | format_currency }}</div>
-        <div class="portfolio-detail asset-list">
-            {% for asset in portfolio.list_selected_assets.split(',') %}
-            <span>{{ asset.strip() }}</span>{% if not loop.last %} | {% endif %}
-            {% endfor %}
-        </div>
-        <!-- Rename portfolio form -->
-        <form action="{{ url_for('rename_portfolio') }}" method="post">
-            <input type="hidden" name="portfolio_id" value="{{ portfolio.id }}">
-            <input type="text" name="new_name" placeholder="Enter new name">
-            <input type="submit" class="btn-rename" value="Rename">
-        </form>
-        <form action="{{ url_for('delete_portfolio') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this portfolio?');">
-            <input type="hidden" name="portfolio_id" value="{{ portfolio.id }}">
-            <input type="submit" class="btn-delete "value="Delete">
-        </form>
-            <a href="{{ url_for('see_details', portfolio_id=portfolio.id) }}">See more details</a>
+  {% for portfolio in portfolios %}
+    <div class="card">
+      <div class="card-header" id="heading{{ portfolio.id }}">
+        <h2 class="mb-0">
+          <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ portfolio.id }}" aria-expanded="true" aria-controls="collapse{{ portfolio.id }}">
+            {{ portfolio.name }} - {{ portfolio.capital | format_currency }}
+          </button>
+        </h2>
+      </div>
 
+      <div id="collapse{{ portfolio.id }}" class="collapse" aria-labelledby="heading{{ portfolio.id }}" data-parent="#portfolioAccordion">
+        <div class="card-body">
+          <!-- Your details here -->
+          <div>Assets: {{ portfolio.list_selected_assets }}</div>
+          <form action="{{ url_for('rename_portfolio') }}" method="post">
+            <!-- Rename form inputs and submit button -->
+          </form>
+          <form action="{{ url_for('delete_portfolio') }}" method="post">
+            <!-- Delete form inputs and submit button -->
+          </form>
+          <a href="{{ url_for('see_details', portfolio_id=portfolio.id) }}">See more details</a>
+        </div>
+      </div>
     </div>
-    {% else %}
-    <div class="portfolio-item">
-        <p>No portfolios found.</p>
-    </div>
-    {% endfor %}
+  {% else %}
+    <div>No portfolios found.</div>
+  {% endfor %}
 </div>
+
     <!-- Fin haut de page-->
     <!--Debut de section 1 -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
