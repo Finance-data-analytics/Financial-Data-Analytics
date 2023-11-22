@@ -267,8 +267,8 @@ def download_portfolio_returns(portfolio_id):
     
     # Récupérez le nom du portefeuille, supposons que vous avez un champ 'name' dans votre modèle de portefeuille
     portfolio_name = portfolio.name
-    prices = pd.DataFrame(json.loads(portfolio.data_prices))  # Assurez-vous que data_prices est stocké au format JSON correct
-
+    assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))  # Assurez-vous que data_prices est stocké au format JSON correct
+    prices=for asset in assets #chercher asset dans plotting data, si cela finin par -USD chercher dans crypto sinon stocks
     # Calculez les rendements quotidiens
     daily_returns = prices.pct_change()
 

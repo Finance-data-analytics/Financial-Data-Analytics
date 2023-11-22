@@ -20,10 +20,10 @@
             </h2>
             <span class="portfolio-distribution">
                 ({{ portfolio.crypto_weight_percentage }}% crypto, {{ portfolio.stock_weight_percentage }}% stocks)
-                <button class="btn-excel-export" onclick=location href="{{ url_for('download_portfolio_returns', portfolio_id=portfolio.id) }}">
-                    <img src="{{ url_for('static', filename='images/excel_export_logo.svg') }}" alt="icone2">
-                  </button>
-            </button>
+                <a class="btn-excel-export" href="{{ url_for('download_portfolio_returns',portfolio_id=portfolio.id) }}" asp-controller="excel" class="animated-link">
+                        <img src="{{ url_for('static', filename='images/excel_export_logo.svg') }}" alt="Logo excel"
+                             class="excel_logo">
+                </a>
             </span>
         </div>
     </div>
