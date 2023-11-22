@@ -260,6 +260,9 @@ def see_details(portfolio_id):
                            fv=future_value,
                            portfolio_details=assets_info)
 
+from flask import send_file
+import io
+
 @app.route('/download_portfolio_returns/<int:portfolio_id>')
 @login_required
 def download_portfolio_returns(portfolio_id):
@@ -274,13 +277,10 @@ def download_portfolio_returns(portfolio_id):
 
     # Convertissez la liste des actifs sélectionnés en DataFrame
     selected_assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))
-    print(selected_assets.head())
-    # Initialisez un DataFrame vide pour les prix
     prices = pd.DataFrame()
 
     # Parcourez chaque actif et récupérez ses données de prix
     for asset in selected_assets.iloc[:, 0]:
-    # Vérifiez si l'actif est une crypto-monnaie, une action ou un indice
         if asset in plotting_data["Cryptos"]["symbols"]:
             asset_prices = plotting_data["Cryptos"]["data_crypto"].get(asset)
         elif asset in plotting_data["Stocks"]["symbols"]:
@@ -288,26 +288,20 @@ def download_portfolio_returns(portfolio_id):
         else:
             return f"Error: Asset type for {asset} not found", 500
 
-    # Vérifiez si les prix de l'actif ont été trouvés
-    if asset_prices is not None:
-        prices[asset] = pd.Series(asset_prices)
-    else:
-        return f"Error: Prices for asset {asset} not found", 500
+        if asset_prices is not None:
+            prices[asset] = pd.Series(asset_prices)
+        else:
+            return f"Error: Prices for asset {asset} not found", 500
 
     # Calculez les rendements quotidiens
     daily_returns = prices.pct_change()
 
-    # Créez le fichier Excel et ajoutez une nouvelle feuille avec les rendements quotidiens
-    with pd.ExcelWriter('rendements_et_risques.xlsx', engine='openpyxl', mode='a') as writer:
-        sheet_name = f'Rendement_{portfolio_name}'
-        daily_returns.to_excel(writer, sheet_name=sheet_name)
+    # Créez un tampon en mémoire pour le fichier Excel
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        daily_returns.to_excel(writer, sheet_name='Rendements Quotidiens')
 
-    # Lisez le fichier mis à jour pour l'envoyer
-    output = BytesIO()
-    with open('rendements_et_risques.xlsx', 'rb') as f:
-        output.write(f.read())
-
-    # Retournez le fichier Excel en tant que réponse téléchargeable
     output.seek(0)
-    
-    return send_file(output, as_attachment=True, attachment_filename='rendements_et_risques.xlsx')
+    filename = f"{portfolio_name}_rendements_et_risques.xlsx"
+
+    return send_file(output, as_attachment=True, download_name=filename, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
