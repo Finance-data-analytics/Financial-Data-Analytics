@@ -127,4 +127,12 @@ def format_assets(asset_list):
 def format_currency(value):
     return "${:,.2f}".format(value)
 
+def calculate_daily_returns(prices):
+    # Supposons que 'prices' est un DataFrame où chaque colonne représente une action
+    # Calculez les rendements quotidiens
+    daily_returns = prices.pct_change()
+    # Calculez les rendements moyens quotidiens
+    average_daily_returns = daily_returns.mean()
+    return daily_returns, average_daily_returns
+
 

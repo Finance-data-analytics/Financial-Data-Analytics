@@ -1,7 +1,8 @@
+from io import BytesIO
 import json
 
 from neoma import app, cache
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, send_file, url_for, flash, request, session
 from neoma.models import *
 from neoma.forms import *
 from neoma import db
@@ -257,3 +258,31 @@ def see_details(portfolio_id):
                            data=data_portfolio,
                            fv=future_value,
                            portfolio_details=assets_info)
+
+@app.route('/download_portfolio_returns/<int:portfolio_id>')
+@login_required
+def download_portfolio_returns(portfolio_id):
+    # Récupérez les données de votre modèle de base de données
+    portfolio = Portfolio.query.get_or_404(portfolio_id)
+    
+    # Récupérez le nom du portefeuille, supposons que vous avez un champ 'name' dans votre modèle de portefeuille
+    portfolio_name = portfolio.name
+    prices = pd.DataFrame(json.loads(portfolio.data_prices))  # Assurez-vous que data_prices est stocké au format JSON correct
+
+    # Calculez les rendements quotidiens
+    daily_returns = prices.pct_change()
+
+    # Ouvrez le fichier Excel existant en mode append
+    with pd.ExcelWriter('rendements_et_risques.xlsx', engine='openpyxl', mode='a') as writer:
+        # Écrivez les rendements quotidiens dans une nouvelle feuille nommée après le nom du portefeuille
+        sheet_name = f'Rendement_{portfolio.name}'
+        daily_returns.to_excel(writer, sheet_name=sheet_name)
+
+    # Lisez le fichier mis à jour pour l'envoyer
+    with open('rendements_et_risques.xlsx', 'rb') as f:
+        data = f.read()
+    output = BytesIO(data)
+
+    # Retournez le fichier Excel en tant que réponse téléchargeable
+    output.seek(0)
+    return send_file(output, attachment_filename='rendements_et_risques.xlsx', as_attachment=True)
