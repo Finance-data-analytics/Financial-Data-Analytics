@@ -27,11 +27,9 @@ def calculate_individual_alpha__and_beta(combined_data, plotting_data, ticker_to
     for stock in combined_data.columns:
         isin = ticker_to_isin.get(stock)
         if isin is None and "-USD" in stock:
-            print(f"Crypto identified: {stock}")
             index_returns = plotting_data["Cryptos"]["daily_returns"]['BTC-USD']
           # Passez au ticker suivant si ISIN n'est pas trouvé
         elif isin is None:
-            print(f"ISIN not found for ticker: {stock}")
             continue  # Passez au ticker suivant si ISIN n'est pas trouvé
         else:
             if isin.startswith("FR") or isin.startswith("LU") or isin.startswith("NL"):
@@ -47,7 +45,8 @@ def calculate_individual_alpha__and_beta(combined_data, plotting_data, ticker_to
 
 
         asset_beta = calculate_beta(combined_data[stock].ffill().pct_change(), index_returns)
-        asset_alpha = calculate_alpha(combined_data[stock].pct_change().mean() * 252, asset_beta, index_returns.mean() * 252)
+        asset_alpha = calculate_alpha(combined_data[stock].ffill().pct_change().mean() * 252, asset_beta,
+                                      index_returns.ffill().mean() * 252)
         asset_alphas.append(asset_alpha)
         asset_betas.append(asset_beta)
 
@@ -353,7 +352,6 @@ def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected
     monetary_allocation = best_weights * capital
 
     combined_selected_assets = selected_stocks + selected_cryptos
-    print(all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha)
     return combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha
 
 

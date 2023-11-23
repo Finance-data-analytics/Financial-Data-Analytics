@@ -13,11 +13,11 @@ from portfolio_analysis import best_weigth, recommend_portfolio
 from flask import jsonify
 import numpy as np
 
+
 @app.route('/loading_status')
 def loading_status():
     progress = cache.get("data_fetch_progress") or 0
     return jsonify({"progress": progress})
-
 
 
 @app.route('/')
@@ -30,7 +30,7 @@ def home_page():
     else:
         print("Plotting data not yet available.")
 
-    return render_template('index.html',data=plotting_data)
+    return render_template('index.html', data=plotting_data)
 
 
 @app.route('/login_register', methods=['GET', 'POST'])
@@ -111,6 +111,55 @@ def combined_survey_investment():
     return render_template('build_portfolio.html', risk_form=risk_form, investment_form=investment_form)
 
 
+def get_plot_data():
+    plotting_data = cache.get("plotting_data")
+    crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
+        session['nb_stocks'], plotting_data["Stocks"]["data_stocks"], plotting_data["Cryptos"]["data_crypto"],
+        session['capital'], session['portfolio_type'], session['investment_horizon'])
+
+    top_5_transformed = transform_top_5_selection(Top_5_Selection)
+
+    plot_data = generate_plotly_data(top_5_transformed)
+    return plot_data, top_5_transformed, crypto_weight_limit, stocks_data, crypto_data, capital
+
+
+def extract_selected_data(PortfolioSelection):
+    selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data) - 1
+    selected_portfolio = session['top_5_portfolios'][selected_portfolio_number]
+    # Extract stocks and cryptos from the selected portfolio
+    selected_stocks = selected_portfolio.get('stocks', [])
+    selected_cryptos = selected_portfolio.get('cryptos', [])
+
+    session['selected_stocks'] = selected_stocks
+    session['selected_cryptos'] = selected_cryptos
+
+
+def create_portfolio_session_data(crypto_weight_limit, capital, stocks_data, crypto_data, ticker_to_isin,
+                                  plotting_data):
+    (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation,
+     sharpe_arr_allocation, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha) = best_weigth(
+        crypto_weight_limit, stocks_data, crypto_data, capital,
+        session['selected_stocks'], session['selected_cryptos'], ticker_to_isin, plotting_data)
+
+    session['list_weight_selected_assets_json'] = json.dumps(best_weights.tolist())
+    capital_allocation = [weight * capital for weight in best_weights]
+    max_sharpe_idx = sharpe_arr_allocation.argmax()
+    future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
+
+    # Store the calculated data in session
+    session.update({
+        'plot_data': generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation),
+        'data_portfolio': [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx],
+                           sharpe_arr_allocation[max_sharpe_idx], all_alphas, all_betas, best_portfolio_beta,
+                           best_portfolio_alpha],
+        'assets_info': [f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
+                        for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)],
+        'future_value': future_value
+    })
+
+    return future_value
+
+
 @app.route('/select_portfolio', methods=['GET', 'POST'])
 @login_required
 def portfolio_options():
@@ -119,73 +168,33 @@ def portfolio_options():
     if 'top_5_portfolios' in session:
         plot_data = generate_plotly_data(session['top_5_portfolios'])
         session.pop('top_5_portfolios', None)
-
     else:
-        plotting_data = cache.get("plotting_data")
-        crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
-            session['nb_stocks'],plotting_data["Stocks"]["data_stocks"],plotting_data["Cryptos"]["data_crypto"],session['capital'],session['portfolio_type'], session['investment_horizon'])
-        top_5_transformed = transform_top_5_selection(Top_5_Selection)
-        plot_data = generate_plotly_data(top_5_transformed)
+        plot_data, top_5_transformed, crypto_weight_limit, stocks_data, crypto_data, capital = get_plot_data()
 
         if PortfolioSelection.validate_on_submit():
             session['top_5_portfolios'] = top_5_transformed
-            session['portfolio_bool'] = True
-            selected_portfolio_number = int(PortfolioSelection.portfolio_choice.data)-1
-            selected_portfolio = top_5_transformed[selected_portfolio_number]
-            # Extract stocks and cryptos from the selected portfolio
-            selected_stocks = selected_portfolio.get('stocks', [])
-            selected_cryptos = selected_portfolio.get('cryptos', [])
+            extract_selected_data(PortfolioSelection)
 
+            # Validate ticker and ISIN mapping
+            plotting_data = cache.get("plotting_data")
             isin_mapping = plotting_data["Stocks"]["list_isin"]
             ticker_mapping = plotting_data["Stocks"]["symbols"]
             if len(ticker_mapping) != len(isin_mapping):
                 raise ValueError("Ticker and ISIN lists must be of the same length")
             ticker_to_isin = dict(zip(ticker_mapping, isin_mapping))
 
-            # Retrieve ISINs for the selected stocks
-            (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation
-             , sharpe_arr_allocation,all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital,
-                                                    selected_stocks,
-                                                    selected_cryptos,ticker_to_isin,plotting_data)
-            plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
-            max_sharpe_idx = sharpe_arr_allocation.argmax()
-            data_portfolio = [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx]
-                , sharpe_arr_allocation[max_sharpe_idx],all_alphas,all_betas,best_portfolio_beta,best_portfolio_alpha]
-            list_weight_selected_assets_json = json.dumps(best_weights.tolist())
+            future_value = create_portfolio_session_data(crypto_weight_limit, capital, stocks_data, crypto_data,
+                                                         ticker_to_isin, plotting_data)
+            return render_template('plot_choosen_portfolio.html', plot_data=session['plot_data'],
+                                   data=session['data_portfolio'], fv=round(future_value, 3),
+                                   portfolio_details=session['assets_info'])
 
-            capital_allocation = [weight * capital for weight in best_weights]
-            # Combine the assets, weights, and capital into a single list for the template
-            assets_info = [
-                f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
-                for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)
-            ]
-            future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
-            new_portfolio = Portfolio(
-                user_id=current_user.id,
-                name='User Portfolio',
-                list_selected_assets=json.dumps(selected_stocks + selected_cryptos),
-                list_weight_selected_assets=list_weight_selected_assets_json,
-                data_portfolio=json.dumps(data_portfolio),
-                is_invested=False,
-                capital=capital,
-                horizon=session['investment_horizon'],
-                future_value = json.dumps(future_value),
-                list_plotdata =json.dumps( plot_data),
-                assets_info = json.dumps(assets_info)
-            )
-            db.session.add(new_portfolio)
-            db.session.commit()
-            session.pop('portfolio_bool', None)
-
-            return render_template('plot_choosen_portfolio.html', plot_data=plot_data, data=data_portfolio,
-                                   fv=round(future_value, 3),portfolio_details=assets_info)
     return render_template('plot_portfolios.html', plot_data=plot_data, form=PortfolioSelection)
 
 
 @app.route('/my_portfolio', methods=['GET', 'POST'])
 @login_required
 def my_portfolio():
-
     portfolios = Portfolio.query.filter_by(user_id=current_user.id).all()
 
     for portfolio in portfolios:
@@ -197,12 +206,12 @@ def my_portfolio():
         stocks = [asset for asset in assets_list if not asset.endswith('-USD')]
         cryptos = [asset for asset in assets_list if asset.endswith('-USD')]
 
-        crypto_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if asset.endswith('-USD'))*100
-        stock_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if not asset.endswith('-USD'))*100
+        crypto_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if asset.endswith('-USD')) * 100
+        stock_weights = sum(weights_list[i] for i, asset in enumerate(assets_list) if not asset.endswith('-USD')) * 100
 
         # Store the weights as percentages
-        portfolio.crypto_weight_percentage = round(crypto_weights,2)
-        portfolio.stock_weight_percentage = round(stock_weights,2)
+        portfolio.crypto_weight_percentage = round(crypto_weights, 2)
+        portfolio.stock_weight_percentage = round(stock_weights, 2)
 
         # Store them back in the portfolio object, possibly in new attributes
         portfolio.stocks = stocks
@@ -231,6 +240,7 @@ def rename_portfolio():
         flash('Portfolio not found or access denied', 'error')
     return redirect(url_for('my_portfolio'))
 
+
 @login_required
 @app.route('/delete_portfolio/<int:portfolio_id>', methods=['GET'])
 def delete_portfolio(portfolio_id):
@@ -244,6 +254,7 @@ def delete_portfolio(portfolio_id):
         flash('Portfolio not found', 'error')
 
     return redirect(url_for('my_portfolio'))
+
 
 @app.route('/see_details/<int:portfolio_id>', methods=['GET'])
 @login_required
@@ -272,6 +283,7 @@ def see_details(portfolio_id):
 @login_required
 def download_portfolio_returns(portfolio_id):
     plotting_data = cache.get("plotting_data")
+
     if not plotting_data:
         return "Error: Plotting data not found", 500
 
@@ -279,7 +291,7 @@ def download_portfolio_returns(portfolio_id):
     portfolio_name = portfolio.name
 
     # Ici, nous récupérons la valeur future comme étant la valeur totale du portefeuille
-    portfolio_value = portfolio.future_value  
+    portfolio_value = portfolio.future_value
 
     selected_assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))
     weights = pd.DataFrame(json.loads(portfolio.list_weight_selected_assets))  # Assurez-vous que ceci est correct
@@ -306,8 +318,8 @@ def download_portfolio_returns(portfolio_id):
     portfolio_volatility = np.sqrt(np.dot(asset_weights.T, np.dot(cov_matrix, asset_weights)))
 
     # Calculs de la VaR
-    var_95 = norm.ppf(1-0.95) * portfolio_volatility * portfolio_value
-    var_99 = norm.ppf(1-0.99) * portfolio_volatility * portfolio_value
+    var_95 = norm.ppf(1 - 0.95) * portfolio_volatility * portfolio_value
+    var_99 = norm.ppf(1 - 0.99) * portfolio_volatility * portfolio_value
 
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
@@ -318,5 +330,28 @@ def download_portfolio_returns(portfolio_id):
     output.seek(0)
     filename = f"{portfolio_name}_rendements_et_risques.xlsx"
 
-    return send_file(output, as_attachment=True, download_name=filename, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(output, as_attachment=True, download_name=filename,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
+
+@login_required
+@app.route('/add_portfolio', methods=['GET'])
+def add_portfolio():
+    plotting_data = cache.get("plotting_data")
+    new_portfolio = Portfolio(
+        user_id=current_user.id,
+        name='User Portfolio',
+        list_selected_assets=json.dumps(session['selected_stocks'] + session['selected_cryptos']),
+        list_weight_selected_assets=session['list_weight_selected_assets_json'],
+        data_portfolio=json.dumps(session['data_portfolio']),
+        is_invested=False,
+        capital=session['capital'],
+        horizon=session['investment_horizon'],
+        future_value=json.dumps(session['future_value']),
+        list_plotdata=json.dumps(session['plot_data']),
+        assets_info=json.dumps(session['assets_info'])
+    )
+    db.session.add(new_portfolio)
+    db.session.commit()
+    session.pop('top_5_portfolios', None)
+    return render_template('index.html', data=plotting_data)

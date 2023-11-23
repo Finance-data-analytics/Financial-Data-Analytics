@@ -424,9 +424,6 @@ footer a:hover {
     .radio-label input[type="radio"]:checked + span {
         background-color: #512da8;
     }
-    .radio-label input[type="radio"]:checked + span::after {
-        display: block; /* Show when checked */
-    }
     .radio-label span::after {
         content: '';
         position: absolute;
@@ -440,9 +437,7 @@ footer a:hover {
         display: none; /* Hide by default */
     }
     
-    .radio-label input[type="radio"]:checked + span::after {
-        display: block; /* Show when checked */
-    }
+
     .question {
         width: 80%; /* Adjust width as needed */
         text-align: center; /* Center the text of the question */
