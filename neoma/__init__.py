@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:8889/neoma_venturedb'
 app.config['SECRET_KEY'] = 'ec9439cfc6c796ae2029594d'
 app.config['SESSION_TYPE'] = 'filesystem'  # Specify the session type to filesystem
-app.config['SESSION_FILE_DIR'] = './session_file/'  # Make sure to provide the path to store sessapp.config['SESSION_PERMANENT'] = False
+app.config['SESSION_FILE_DIR'] = './neoma/session_file'  # Make sure to provide the path to store sessapp.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 
 db = SQLAlchemy(app)

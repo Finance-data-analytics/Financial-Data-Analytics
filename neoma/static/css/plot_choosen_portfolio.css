@@ -293,3 +293,20 @@ footer a:hover {
     background-color: white;
     z-index: 9999;
 }
+.btn-details {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+}
+
+.btn-details:hover {
+    background-color: #0056b3; /* A darker shade for hover effect */
+    color: #fff;
+    text-decoration: none;
+}

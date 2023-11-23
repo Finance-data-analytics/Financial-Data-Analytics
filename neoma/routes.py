@@ -69,6 +69,7 @@ def login_register_page():
 @app.route('/logout')
 def logout_page():
     logout_user()
+    session.clear()
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
@@ -353,5 +354,6 @@ def add_portfolio():
     )
     db.session.add(new_portfolio)
     db.session.commit()
-    session.pop('top_5_portfolios', None)
+
+
     return render_template('index.html', data=plotting_data)
