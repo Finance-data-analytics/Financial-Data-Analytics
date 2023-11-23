@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from portfolio_analysis import *
 
 
@@ -46,6 +48,7 @@ def get_data_crypto(tickers, start_date, end_date):
 
 def get_data_stocks(tickers, isins, start_date, end_date):
     successful_retrievals = []
+    successful_isin = []
     data_list = []
     i=0
     from neoma import cache
@@ -61,11 +64,13 @@ def get_data_stocks(tickers, isins, start_date, end_date):
                 data = yf.download(ticker, start=start_date, end=end_date)['Adj Close']
                 if not data.empty and not data.isna().any():
                     last_price = data.iloc[-1]
+                    successful_isin.append(isin)
                     successful_retrievals.append(ticker)  # Ajouter l'ISIN à la liste de réussite
                     data.name = ticker  # Utiliser l'ISIN comme nom si la récupération ISIN a réussi
                     data_list.append(data)
             else:
                 last_price = data.iloc[-1]
+                successful_isin.append(isin)
                 successful_retrievals.append(isin)  # Ajouter le ticker à la liste de réussite
                 data.name = ticker  # Utiliser le ticker comme nom
                 data_list.append(data)
@@ -78,7 +83,7 @@ def get_data_stocks(tickers, isins, start_date, end_date):
     else:
         all_data = pd.DataFrame()
 
-    return all_data, successful_retrievals
+    return all_data, successful_retrievals, successful_isin
 
 
 def generate_plotting_data():
@@ -90,9 +95,9 @@ def generate_plotting_data():
     isin = all_stocks['isin'][:10].tolist()
     list_ticker = [str(ticker) for ticker in ticker]
 
-    index_data, successful_index = get_data_crypto(index_symbol, '2019-01-01', today())
-    crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2019-01-01', today())
-    stocks_data, successful_symbols = get_data_stocks(list_ticker, isin, '2019-01-01', today())
+    index_data, successful_index = get_data_crypto(index_symbol, '2018-01-01', today() - timedelta(days=1))
+    crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2018-01-01', today() - timedelta(days=1))
+    stocks_data, successful_symbols,successful_isin = get_data_stocks(list_ticker, isin, '2018-01-01', today() - timedelta(days=1))
 
     index_daily_returns = calculate_returns(index_data)
     crypto_daily_returns = calculate_returns(crypto_data)
@@ -128,7 +133,8 @@ def generate_plotting_data():
     results_dict = {
         "Stocks": pd.DataFrame({
             "Rendement moyen": stocks_avg_daily_returns_filtered,
-            "Risque": stocks_risks_filtered
+            "Risque": stocks_risks_filtered,
+            "Isin": successful_isin
         }),
         "Crypto": pd.DataFrame({
             "Rendement moyen": crypto_avg_daily_returns_filtered,
@@ -180,7 +186,8 @@ def generate_plotting_data():
             "color": 'b',
             "title": 'Cryptos: Rendement vs Risque',
             "list_crypto": successful_crypto,
-            "data_crypto": crypto_data
+            "data_crypto": crypto_data,
+            "daily_returns": crypto_daily_returns
 
         },
         "Stocks": {
@@ -191,6 +198,7 @@ def generate_plotting_data():
             "color": 'r',
             "title": 'Stocks: Rendement vs Risque',
             "list_ticker_isin": successful_symbols,
+            "list_isin": successful_isin,
             "data_stocks": stocks_data
         },
         "Index": {
@@ -200,7 +208,8 @@ def generate_plotting_data():
             "efficient_portfolios": efficient_portfolios_dict["Index"],
             "color": 'g',
             "title": 'Index: Rendement vs Risque',
-            "data_stocks": index_data
+            "data_index": index_data,
+            "daily_returns":index_daily_returns
         }
     }
     return plotting_data

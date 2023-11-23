@@ -26,7 +26,6 @@ def home_page():
     plotting_data = cache.get("plotting_data")
     if plotting_data:
         print("Plotting data available.")
-        print(plotting_data["Stocks"]["symbols"])
         # Use plotting_data for response
     else:
         print("Plotting data not yet available.")
@@ -136,10 +135,20 @@ def portfolio_options():
             # Extract stocks and cryptos from the selected portfolio
             selected_stocks = selected_portfolio.get('stocks', [])
             selected_cryptos = selected_portfolio.get('cryptos', [])
+
+            isin_mapping = plotting_data["Stocks"]["list_isin"]
+            ticker_mapping = plotting_data["Stocks"]["symbols"]
+            if len(ticker_mapping) != len(isin_mapping):
+                raise ValueError("Ticker and ISIN lists must be of the same length")
+            ticker_to_isin = dict(zip(ticker_mapping, isin_mapping))
+            # Retrieve ISINs for the selected stocks
+            selected_stock_isins = [ticker_to_isin.get(ticker) for ticker in selected_stocks if
+                                    ticker in ticker_to_isin]
+            # Retrieve ISINs for the selected stocks
             (combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation
-             , sharpe_arr_allocation) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital,
+             , sharpe_arr_allocation,all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha) = best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital,
                                                     selected_stocks,
-                                                    selected_cryptos)
+                                                    selected_cryptos,ticker_to_isin,plotting_data)
             plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
             max_sharpe_idx = sharpe_arr_allocation.argmax()
             data_portfolio = [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx]
@@ -155,7 +164,7 @@ def portfolio_options():
             future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
             new_portfolio = Portfolio(
                 user_id=current_user.id,
-                name=f'User Portfolio - {current_user.id}',
+                name='User Portfolio',
                 list_selected_assets=json.dumps(selected_stocks + selected_cryptos),
                 list_weight_selected_assets=list_weight_selected_assets_json,
                 data_portfolio=json.dumps(data_portfolio),
@@ -259,6 +268,7 @@ def see_details(portfolio_id):
                            data=data_portfolio,
                            fv=future_value,
                            portfolio_details=assets_info)
+
 
 @app.route('/download_portfolio_returns/<int:portfolio_id>')
 @login_required

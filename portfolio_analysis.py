@@ -1,6 +1,77 @@
 from config import *
 
 
+def calculate_individual_alpha_beta(combined_data, market_returns, ticker_to_isin):
+    alphas = []
+    betas = []
+
+    asset_alphas, asset_beta = calculate_individual_alpha__and_beta(combined_data, market_returns, ticker_to_isin)
+    betas.append(asset_beta)
+    alphas.append(asset_alphas)
+
+    return alphas, betas
+
+
+def calculate_portfolio_beta_alpha(combined_data, market_returns, weights, ticker_to_isin):
+    asset_alphas, asset_betas = calculate_individual_alpha__and_beta(combined_data, market_returns, ticker_to_isin)
+
+    portfolio_beta = sum(w * beta for w, beta in zip(weights, asset_betas))
+    portfolio_alpha = sum(w * alpha for w, alpha in zip(weights, asset_alphas))
+
+    return portfolio_beta, portfolio_alpha
+
+
+def calculate_individual_alpha__and_beta(combined_data, plotting_data, ticker_to_isin):
+    asset_alphas = []
+    asset_betas = []
+    for stock in combined_data.columns:
+        isin = ticker_to_isin.get(stock)
+        if isin is None and "-USD" in stock:
+            print(f"Crypto identified: {stock}")
+            index_returns = plotting_data["Cryptos"]["daily_returns"]['BTC-USD']
+          # Passez au ticker suivant si ISIN n'est pas trouvé
+        elif isin is None:
+            print(f"ISIN not found for ticker: {stock}")
+            continue  # Passez au ticker suivant si ISIN n'est pas trouvé
+        else:
+            if isin.startswith("FR") or isin.startswith("LU") or isin.startswith("NL"):
+                index_returns = plotting_data["Index"]["daily_returns"]['^FCHI']
+            elif isin.startswith("DE"):
+                index_returns = plotting_data["Index"]["daily_returns"]['^GDAXI']
+            elif isin.startswith("US"):
+                index_returns = plotting_data["Index"]["daily_returns"]['^DJI']
+            elif isin.startswith("BE"):
+                index_returns = plotting_data["Index"]["daily_returns"]['^BFX']
+            elif isin.startswith("CH"):
+                index_returns = plotting_data["Index"]["daily_returns"]['^SSMI']
+
+
+        asset_beta = calculate_beta(combined_data[stock].ffill().pct_change(), index_returns)
+        asset_alpha = calculate_alpha(combined_data[stock].pct_change().mean() * 252, asset_beta, index_returns.mean() * 252)
+        asset_alphas.append(asset_alpha)
+        asset_betas.append(asset_beta)
+
+    return asset_betas, asset_betas
+
+
+def calculate_beta(asset_returns, market_returns):
+
+
+    # Maintenant, vous pouvez calculer la covariance et la variance
+    covariance = asset_returns.cov(market_returns)
+    variance = market_returns.var()
+
+    # Calculer le beta
+    beta = covariance / variance
+    return beta
+
+
+
+def calculate_alpha(asset_return, beta, market_return):
+    alpha = asset_return - (beta * market_return)
+    return alpha
+
+
 def calculate_historical_return(data):
     """
     Calcule le rendement historique moyen d'un portefeuille.
@@ -131,7 +202,6 @@ def monte_carlo_selection(stocks_data, crypto_data, nb_simulations, nb_stocks, c
     selection_results = []
 
     for _ in range(nb_simulations):
-        print(_)
         historical_return = calculate_historical_return(stocks_data)
         selected_stocks = run_monte_carlo(stocks_data, 1, nb_stocks_ok, risk_profile, historical_return)
 
@@ -216,35 +286,28 @@ def run_full_monte_carlo(data, nb_simulations, risk_profile, historical_return):
 
 # Function to perform Monte Carlo simulation for weight allocation in the selected stocks
 def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_cryptos, nb_simulations,
-                           crypto_weight_limit):
-    # Filtrer les données pour ne garder que les actifs sélectionnés
-    filtered_stock_data = stocks_data[selected_stocks]
-    filtered_crypto_data = crypto_data[selected_cryptos]
-
-    # Combinaison des données filtrées
-    combined_data = pd.concat([filtered_stock_data, filtered_crypto_data], axis=1)
-
+                           crypto_weight_limit, ticker_to_isin, index_data):
+    combined_data = pd.concat([stocks_data[selected_stocks], crypto_data[selected_cryptos]], axis=1)
     best_sharpe_ratio = -np.inf
     best_weights = None
 
-    # Initialisation des tableaux pour les retours, volatilités et ratios de Sharpe
+    # Initialisation des tableaux pour les retours, volatilités, ratios de Sharpe, bêtas et alphas
     ret_arr = np.zeros(nb_simulations)
     vol_arr = np.zeros(nb_simulations)
     sharpe_arr = np.zeros(nb_simulations)
+    all_alphas = []
+    all_betas = []
 
     for i in range(nb_simulations):
         weights = np.random.random(len(combined_data.columns))
         weights /= np.sum(weights)
 
-        # Vérifier la limite pour les cryptomonnaies
-        if sum(weights[len(filtered_stock_data.columns):]) <= crypto_weight_limit:
-            # Calculer le rendement et la volatilité du portefeuille
+        if sum(weights[len(selected_stocks):]) <= crypto_weight_limit:
             daily_returns = combined_data.ffill().pct_change().dropna().dot(weights)
             annual_return = daily_returns.mean() * 252
             annual_volatility = daily_returns.std() * np.sqrt(252)
             sharpe_ratio = annual_return / annual_volatility
 
-            # Stocker les résultats de chaque simulation
             ret_arr[i] = annual_return
             vol_arr[i] = annual_volatility
             sharpe_arr[i] = sharpe_ratio
@@ -253,7 +316,12 @@ def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_c
                 best_sharpe_ratio = sharpe_ratio
                 best_weights = weights
 
-    return best_weights, ret_arr, vol_arr, sharpe_arr
+            # Calcul des alphas et bêtas pour chaque actif
+    asset_alphas, asset_betas = calculate_individual_alpha_beta(combined_data, index_data,ticker_to_isin)
+    all_alphas.append(asset_alphas)
+    all_betas.append(asset_betas)
+    best_portfolio_beta, best_portfolio_alpha = calculate_portfolio_beta_alpha(combined_data, index_data, weights,ticker_to_isin)
+    return best_weights, ret_arr, vol_arr, sharpe_arr, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha
 
 
 def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
@@ -274,17 +342,19 @@ def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,
 
 
 def best_weigth(crypto_weight_limit, stocks_data, crypto_data, capital, selected_stocks,
-                selected_cryptos):
-    best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation = monte_carlo_allocation(stocks_data,
-                                                                                                         crypto_data,
-                                                                                                         selected_stocks,
-                                                                                                         selected_cryptos
-                                                                                                         , 1000,
-                                                                                                         crypto_weight_limit)
+                selected_cryptos, ticker_to_isin, index_data):
+    best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha = monte_carlo_allocation(
+        stocks_data,
+        crypto_data,
+        selected_stocks,
+        selected_cryptos
+        , 1000,
+        crypto_weight_limit, ticker_to_isin, index_data)
     monetary_allocation = best_weights * capital
 
     combined_selected_assets = selected_stocks + selected_cryptos
-    return combined_selected_assets, monetary_allocation, best_weights,ret_arr_allocation, vol_arr_allocation,sharpe_arr_allocation
+    print(all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha)
+    return combined_selected_assets, monetary_allocation, best_weights, ret_arr_allocation, vol_arr_allocation, sharpe_arr_allocation, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha
 
 
 def get_crypto_weight_limit(portfolio_suggestion, investment_horizon):
