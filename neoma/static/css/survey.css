@@ -131,7 +131,7 @@ imGauche.ImageGauche{
 
 
 footer {
-    margin-top: 11%;
+    margin-top: 23em;
     position: relative; /* You might not need this if your content naturally pushes the footer down */
     bottom: 0;
     background-color: #333; /* Dark background for footer */

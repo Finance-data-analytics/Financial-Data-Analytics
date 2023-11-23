@@ -165,8 +165,12 @@
         <div class="form-section" id="lastSection" style="display: none;">
             <!-- Capital to Invest Slider -->
                 <label for="capital">Capital to Invest:</label>
-                <input type="range" id="capital" name="capital" min="1" max="100000" value="0" oninput="this.nextElementSibling.value = this.value">
-                <output>0</output>
+                <input type="range" id="capitalRange" name="capital" min="1" max="100000" value="0" oninput="updateNumberInput(this.value)">
+                <div style="text-align: center;">
+                  <input type="number" id="capitalNumber" name="capitalNumber" min="1" max="100000" value="0" oninput="updateRangeInput(this.value)" style="width: auto; max-width: 150px; text-align: center; margin-left: auto; margin-right: auto;">
+                </div>
+
+
 
                 <!-- Investment Horizon Slider -->
                 <label for="investment_horizon">Investment Horizon (in years):</label>

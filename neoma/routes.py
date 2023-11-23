@@ -1,3 +1,4 @@
+import io
 from io import BytesIO
 import json
 from scipy.stats import norm
@@ -149,7 +150,7 @@ def portfolio_options():
             plot_data = generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation)
             max_sharpe_idx = sharpe_arr_allocation.argmax()
             data_portfolio = [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx]
-                , sharpe_arr_allocation[max_sharpe_idx]]
+                , sharpe_arr_allocation[max_sharpe_idx],all_alphas,all_betas,best_portfolio_beta,best_portfolio_alpha]
             list_weight_selected_assets_json = json.dumps(best_weights.tolist())
 
             capital_allocation = [weight * capital for weight in best_weights]

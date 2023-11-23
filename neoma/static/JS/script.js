@@ -166,3 +166,12 @@ function submitRename() {
       }
   };
 }
+function updateNumberInput(val) {
+  document.getElementById('capitalNumber').value = val;
+}
+
+function updateRangeInput(val) {
+  // Assurez-vous que la valeur est dans les limites min et max du slider
+  val = Math.max(document.getElementById('capitalRange').min, Math.min(val, document.getElementById('capitalRange').max));
+  document.getElementById('capitalRange').value = val;
+}
