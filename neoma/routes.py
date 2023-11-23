@@ -1,17 +1,16 @@
 from io import BytesIO
 import json
-
+from scipy.stats import norm
 from neoma import app, cache
 from flask import render_template, redirect, send_file, url_for, flash, request, session
 from neoma.models import *
 from neoma.forms import *
 from neoma import db
 from flask_login import *
-
 from plotting import generate_plotly_data, generate_optimal_weight_plot_data
 from portfolio_analysis import best_weigth, recommend_portfolio
 from flask import jsonify
-
+import numpy as np
 
 @app.route('/loading_status')
 def loading_status():
@@ -268,18 +267,18 @@ import io
 def download_portfolio_returns(portfolio_id):
     plotting_data = cache.get("plotting_data")
     if not plotting_data:
-        # Handle the error if plotting_data is not found in the cache
         return "Error: Plotting data not found", 500
 
-    # Récupérez les données de votre modèle de base de données
     portfolio = Portfolio.query.get_or_404(portfolio_id)
-    portfolio_name = portfolio.name  # Supposition que 'name' est un champ dans votre modèle
+    portfolio_name = portfolio.name
 
-    # Convertissez la liste des actifs sélectionnés en DataFrame
+    # Ici, nous récupérons la valeur future comme étant la valeur totale du portefeuille
+    portfolio_value = portfolio.future_value  
+
     selected_assets = pd.DataFrame(json.loads(portfolio.list_selected_assets))
+    weights = pd.DataFrame(json.loads(portfolio.list_weight_selected_assets))  # Assurez-vous que ceci est correct
     prices = pd.DataFrame()
 
-    # Parcourez chaque actif et récupérez ses données de prix
     for asset in selected_assets.iloc[:, 0]:
         if asset in plotting_data["Cryptos"]["symbols"]:
             asset_prices = plotting_data["Cryptos"]["data_crypto"].get(asset)
@@ -293,15 +292,25 @@ def download_portfolio_returns(portfolio_id):
         else:
             return f"Error: Prices for asset {asset} not found", 500
 
-    # Calculez les rendements quotidiens
-    daily_returns = prices.pct_change()
+    daily_returns = prices.pct_change().dropna()
+    cov_matrix = daily_returns.cov()
 
-    # Créez un tampon en mémoire pour le fichier Excel
+    # Ici, nous supposons que les poids sont stockés dans un DataFrame avec la même ordre que `selected_assets`
+    asset_weights = weights.values.flatten()  # Vous devez vous assurer que les poids sont correctement alignés avec `selected_assets`
+    portfolio_volatility = np.sqrt(np.dot(asset_weights.T, np.dot(cov_matrix, asset_weights)))
+
+    # Calculs de la VaR
+    var_95 = norm.ppf(1-0.95) * portfolio_volatility * portfolio_value
+    var_99 = norm.ppf(1-0.99) * portfolio_volatility * portfolio_value
+
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         daily_returns.to_excel(writer, sheet_name='Rendements Quotidiens')
+        var_df = pd.DataFrame({'VaR 95%': [var_95], 'VaR 99%': [var_99]})
+        var_df.to_excel(writer, sheet_name='VaR')
 
     output.seek(0)
     filename = f"{portfolio_name}_rendements_et_risques.xlsx"
 
     return send_file(output, as_attachment=True, download_name=filename, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
