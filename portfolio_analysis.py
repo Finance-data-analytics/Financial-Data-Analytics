@@ -49,8 +49,7 @@ def calculate_individual_alpha__and_beta(combined_data, plotting_data, ticker_to
                                       index_returns.ffill().mean() * 252)
         asset_alphas.append(asset_alpha)
         asset_betas.append(asset_beta)
-
-    return asset_betas, asset_betas
+    return asset_betas, asset_alphas
 
 
 def calculate_beta(asset_returns, market_returns):
@@ -294,8 +293,6 @@ def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_c
     ret_arr = np.zeros(nb_simulations)
     vol_arr = np.zeros(nb_simulations)
     sharpe_arr = np.zeros(nb_simulations)
-    all_alphas = []
-    all_betas = []
 
     for i in range(nb_simulations):
         weights = np.random.random(len(combined_data.columns))
@@ -316,11 +313,9 @@ def monte_carlo_allocation(stocks_data, crypto_data, selected_stocks, selected_c
                 best_weights = weights
 
             # Calcul des alphas et bêtas pour chaque actif
-    asset_alphas, asset_betas = calculate_individual_alpha_beta(combined_data, index_data,ticker_to_isin)
-    all_alphas.append(asset_alphas)
-    all_betas.append(asset_betas)
-    best_portfolio_beta, best_portfolio_alpha = calculate_portfolio_beta_alpha(combined_data, index_data, weights,ticker_to_isin)
-    return best_weights, ret_arr, vol_arr, sharpe_arr, all_alphas, all_betas, best_portfolio_beta, best_portfolio_alpha
+    asset_betas,asset_alphas = calculate_individual_alpha__and_beta(combined_data, index_data,ticker_to_isin)
+    best_portfolio_beta, best_portfolio_alpha = calculate_portfolio_beta_alpha(combined_data, index_data, best_weights,ticker_to_isin)
+    return best_weights, ret_arr, vol_arr, sharpe_arr, asset_alphas, asset_betas, best_portfolio_beta, best_portfolio_alpha
 
 
 def recommend_portfolio(nb_stocks, data_stock, data_crypto, capital,

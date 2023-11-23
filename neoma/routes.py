@@ -14,6 +14,18 @@ from flask import jsonify
 import numpy as np
 
 
+def clear_portfolio_data_from_session():
+    # List of keys to keep (related to authentication)
+    keys_to_keep = {'_fresh', 'csrf_token', '_user_id', '_id'}
+
+    # Create a list of keys to delete
+    keys_to_delete = [key for key in session.keys() if key not in keys_to_keep]
+
+    # Delete the keys related to portfolio data
+    for key in keys_to_delete:
+        session.pop(key, None)
+
+
 @app.route('/loading_status')
 def loading_status():
     progress = cache.get("data_fetch_progress") or 0
@@ -23,6 +35,7 @@ def loading_status():
 @app.route('/')
 @app.route('/home')
 def home_page():
+    clear_portfolio_data_from_session()
     plotting_data = cache.get("plotting_data")
     if plotting_data:
         print("Plotting data available.")
@@ -35,6 +48,7 @@ def home_page():
 
 @app.route('/login_register', methods=['GET', 'POST'])
 def login_register_page():
+    clear_portfolio_data_from_session()
     login_form = LoginForm(prefix='login')
     register_form = RegisterForm(prefix='register')
     # Logique de connexion
@@ -77,6 +91,7 @@ def logout_page():
 @app.route('/combined_survey_investment', methods=['GET', 'POST'])
 @login_required
 def combined_survey_investment():
+    clear_portfolio_data_from_session()
     risk_form = RiskAversionSurveyForm(prefix='risk')
     investment_form = InvestmentForm(prefix='investment')
     if request.method == 'POST':
@@ -114,8 +129,20 @@ def combined_survey_investment():
 
 def get_plot_data():
     plotting_data = cache.get("plotting_data")
+    stocks_data_original = plotting_data["Stocks"]["data_stocks"]
+
+    # Create a new DataFrame from the original to avoid modifying it directly
+    stocks_data_filtered = plotting_data["Stocks"]["data_stocks"].copy()
+
+    # Iterate over the columns of the DataFrame
+    for column in stocks_data_filtered.columns:
+        # Check the last value of the column
+        if stocks_data_filtered[column].iloc[-1] > session['capital']:
+            # Drop the column if the last value is greater than capital
+            stocks_data_filtered.drop(column, axis=1, inplace=True)
+
     crypto_weight_limit, stocks_data, crypto_data, capital, Top_5_Selection = recommend_portfolio(
-        session['nb_stocks'], plotting_data["Stocks"]["data_stocks"], plotting_data["Cryptos"]["data_crypto"],
+        session['nb_stocks'], stocks_data_filtered, plotting_data["Cryptos"]["data_crypto"],
         session['capital'], session['portfolio_type'], session['investment_horizon'])
 
     top_5_transformed = transform_top_5_selection(Top_5_Selection)
@@ -147,14 +174,17 @@ def create_portfolio_session_data(crypto_weight_limit, capital, stocks_data, cry
     max_sharpe_idx = sharpe_arr_allocation.argmax()
     future_value = capital * ((1 + ret_arr_allocation[max_sharpe_idx]) ** session['investment_horizon'])
 
+    flattened_alphas = all_alphas
+    flattened_betas = all_betas
+
     # Store the calculated data in session
     session.update({
         'plot_data': generate_optimal_weight_plot_data(vol_arr_allocation, ret_arr_allocation, sharpe_arr_allocation),
         'data_portfolio': [ret_arr_allocation[max_sharpe_idx], vol_arr_allocation[max_sharpe_idx],
                            sharpe_arr_allocation[max_sharpe_idx], all_alphas, all_betas, best_portfolio_beta,
                            best_portfolio_alpha],
-        'assets_info': [f"{asset} ({weight * 100:.1f}% - {cap:.2f}€)"
-                        for asset, weight, cap in zip(combined_selected_assets, best_weights, capital_allocation)],
+        'assets_info': [f"{asset} ({weight * 100:.1f}% - {cap:.2f}€ - β {beta:.2f} - α {alpha:.2f})"
+                        for asset, weight, cap,alpha,beta in zip(combined_selected_assets, best_weights, capital_allocation,flattened_alphas,flattened_betas)],
         'future_value': future_value
     })
 
@@ -196,8 +226,8 @@ def portfolio_options():
 @app.route('/my_portfolio', methods=['GET', 'POST'])
 @login_required
 def my_portfolio():
+    clear_portfolio_data_from_session()
     portfolios = Portfolio.query.filter_by(user_id=current_user.id).all()
-
     for portfolio in portfolios:
         # Ensure that list_selected_assets is a proper JSON string
         # You might need to adjust this part if list_selected_assets is already a list or formatted differently
@@ -354,6 +384,5 @@ def add_portfolio():
     )
     db.session.add(new_portfolio)
     db.session.commit()
-
-
+    clear_portfolio_data_from_session()
     return render_template('index.html', data=plotting_data)

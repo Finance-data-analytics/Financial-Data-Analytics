@@ -67,7 +67,7 @@ def evaluate_risk_aversion_from_form(form):
     total_score = 0
     for index in range(1, 12):  # Assuming you have 11 questions
         answer = getattr(form, f'question{index}').data
-        if index == 11 and answer == 'b':
+        if index == 11 and answer == 'b' or index == 6 and answer == 'a':
             return 50
         if index == 5 and answer == 'c':
             return 1  # Considered critical
@@ -81,11 +81,11 @@ def suggest_portfolio(score):
         return "No Crypto"
     elif score == 1:
         return "Beginner"
-    elif score <= max_score * 0.4:
+    elif score <= max_score * 0.341:
         return "Very Conservative"
     elif score <= max_score * 0.6:
         return "Balanced"
-    elif score <= max_score * 0.8:
+    elif score <= max_score * 0.84:
         return "Growth"
     else:
         return "Very Dynamic"

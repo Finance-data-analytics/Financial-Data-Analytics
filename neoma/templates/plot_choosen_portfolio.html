@@ -27,13 +27,21 @@
                 <label style="color: #17a2b8;">Sharpe Ratio:</label>
                 <span>{{ data[2] }}</span>
             </div>
+            <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px;">
+                <label style="color: #17a2b8;">Beta Portfolio:</label>
+                <span>{{ data[5] }}</span>
+            </div>
+            <div class="stat-item" style="flex: 1; background: white; padding: 10px; border-radius: 10px;">
+                <label style="color: #17a2b8;">Alpha Portfolio:</label>
+                <span>{{ data[6] }}</span>
+            </div>
         </div>
         <div class="stat-item" style="background: white; padding: 10px; border-radius: 10px; text-align: center;">
             <label style="color: #17a2b8;">Future Value:</label>
             <span>{{ fv }} €</span>
         </div>
     </div>
-    <div class="button-container">
+    <div class="button-container" style="justify-content: center;display: grid;">
         <a class="btn btn-primary btn-details" href="{{ url_for('add_portfolio') }}" role="button">Add to your portfolio</a>
     </div>    <!-- Rest of your existing blocks for Expected Return, Volatility, etc. -->
 
