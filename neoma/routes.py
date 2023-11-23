@@ -32,6 +32,17 @@ def loading_status():
     return jsonify({"progress": progress})
 
 
+@app.route('/check_plotting_data')
+def check_plotting_data():
+    plotting_data = cache.get("plotting_data")
+    if plotting_data:
+        print("Plotting data available.")
+        # Use plotting_data for response
+    else:
+        print("Plotting data not yet available.")
+    return jsonify({'isLoaded': plotting_data is not None})
+
+
 @app.route('/')
 @app.route('/home')
 def home_page():
@@ -43,7 +54,7 @@ def home_page():
     else:
         print("Plotting data not yet available.")
 
-    return render_template('index.html', data=plotting_data)
+    return render_template('index.html')
 
 
 @app.route('/login_register', methods=['GET', 'POST'])

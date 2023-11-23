@@ -91,8 +91,8 @@ def generate_plotting_data():
     index_symbol = index_data['ticker'].tolist()
 
     all_stocks = pd.read_excel("stocks.xlsx")
-    ticker = all_stocks['ticker'][:10].tolist()
-    isin = all_stocks['isin'][:10].tolist()
+    ticker = all_stocks['ticker'][:100].tolist()
+    isin = all_stocks['isin'][:100].tolist()
     list_ticker = [str(ticker) for ticker in ticker]
 
     index_data, successful_index = get_data_crypto(index_symbol, '2018-01-01', today() - timedelta(days=1))
@@ -162,10 +162,10 @@ def generate_plotting_data():
     efficient_portfolios_dict = {}
 
     # Loop over the dictionary
-    for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
-        target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)
-        efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
-        efficient_portfolios_dict[asset_type] = efficient_portfolios
+    # for asset_type, (avg_daily_returns, daily_returns) in data_dict.items():
+    #     target_returns = np.linspace(avg_daily_returns.min(), avg_daily_returns.max(), 100)
+    #     efficient_portfolios = [efficient_frontier(daily_returns, target_return) for target_return in target_returns]
+    #     efficient_portfolios_dict[asset_type] = efficient_portfolios
 
     file_path = "rendements_et_risques.xlsx"
 
@@ -182,7 +182,7 @@ def generate_plotting_data():
             "risks": crypto_risks_filtered,
             "avg_daily_returns": crypto_avg_daily_returns_filtered,
             "symbols": crypto_actualised,
-            "efficient_portfolios": efficient_portfolios_dict["Crypto"],
+            # "efficient_portfolios": efficient_portfolios_dict["Crypto"],
             "color": 'b',
             "title": 'Cryptos: Rendement vs Risque',
             "list_crypto": successful_crypto,
@@ -194,7 +194,7 @@ def generate_plotting_data():
             "risks": stocks_risks_filtered,
             "avg_daily_returns": stocks_avg_daily_returns_filtered,
             "symbols": stocks_actualised,
-            "efficient_portfolios": efficient_portfolios_dict["Stocks"],
+            # "efficient_portfolios": efficient_portfolios_dict["Stocks"],
             "color": 'r',
             "title": 'Stocks: Rendement vs Risque',
             "list_ticker_isin": successful_symbols,
@@ -205,7 +205,7 @@ def generate_plotting_data():
             "risks": index_risks,
             "avg_daily_returns": index_avg_daily_returns,
             "symbols": index_symbol,
-            "efficient_portfolios": efficient_portfolios_dict["Index"],
+            # "efficient_portfolios": efficient_portfolios_dict["Index"],
             "color": 'g',
             "title": 'Index: Rendement vs Risque',
             "data_index": index_data,

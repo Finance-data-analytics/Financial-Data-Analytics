@@ -175,3 +175,62 @@ function updateRangeInput(val) {
   val = Math.max(document.getElementById('capitalRange').min, Math.min(val, document.getElementById('capitalRange').max));
   document.getElementById('capitalRange').value = val;
 }
+
+function showLoadingSpinner(show) {
+    var loadingOverlay = document.getElementById('loadingOverlay');
+    if (show) {
+        console.log("Showing loading spinner.");
+        loadingOverlay.classList.add('active');
+    } else {
+        console.log("Hiding loading spinner.");
+        loadingOverlay.classList.remove('active');
+    }
+}
+
+function checkDataAndSubmit() {
+    showLoadingSpinner(true); // Affiche le spinner
+    console.log("Started data check process...");
+
+    fetch('/loading_status')
+        .then(response => {
+            console.log("Received response from /loading_status");
+            return response.json();
+        })
+        .then(data => {
+            console.log("Progress data: ", data);
+            if (data.progress >= 100) {
+                console.log("Progress is 100%. Now checking if plotting_data is loaded...");
+                // Vérifier si plotting_data est chargé
+                fetch('/check_plotting_data')
+                    .then(response => {
+                        console.log("Received response from /check_plotting_data");
+                        return response.json();
+                    })
+                    .then(plottingDataLoaded => {
+                        console.log("Is plotting_data loaded? ", plottingDataLoaded);
+                        if (plottingDataLoaded) {
+                            console.log("Plotting data is loaded. Submitting the form...");
+                            document.getElementById('surveyForm').submit(); // Soumettre le formulaire si les données sont chargées
+                        } else {
+                            console.log("Plotting data is not loaded. Will check again...");
+                            setTimeout(checkDataAndSubmit, 1000); // Sinon, réessayer après une seconde
+                        }
+                    });
+            } else {
+                console.log("Progress is not 100%. Will check again...");
+                setTimeout(checkDataAndSubmit, 1000); // Réessayer si le pourcentage n'est pas à 100
+            }
+        })
+        .catch(error => {
+            console.error('Error during data check process:', error);
+            showLoadingSpinner(false); // Cacher le spinner en cas d'erreur
+        });
+}
+
+document.getElementById('submitBtn').addEventListener('click', function(event) {
+    event.preventDefault(); // Empêcher la soumission normale du formulaire
+    console.log("Submit button clicked. Starting data check process...");
+    checkDataAndSubmit(); // Vérifier le statut de chargement puis soumettre
+});
+
+

@@ -3,8 +3,15 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/survey.css') }}">
 {% endblock %}
 {% block content %}
+<!-- Modal de chargement -->
+<!-- Modal de chargement -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
+
 <div class="container" id="container">
-    <form method="POST" action="{{ url_for('combined_survey_investment') }}">
+    <form id="surveyForm" action="/combined_survey_investment" method="post">
         {{ risk_form.hidden_tag() }}
         {{ investment_form.hidden_tag() }}
 
@@ -181,10 +188,10 @@
                 <label for="nb_assets">Number of Assets in Portfolio:</label>
                 <input type="range" id="nb_assets" name="nb_assets" min="1" max="20" value="1" oninput="this.nextElementSibling.value = this.value">
                 <output>1</output>
-            
+
             <div class="navigation-buttons">
                 <button type="button" class="btn btn-secondary" onclick="navigate(-1)">Previous</button>
-                <button type="submit" class="btn btn-success">Submit</button>
+                <button id="submitBtn" type="button" onclick="checkDataAndSubmit()" class="btn btn-success">Submit</button>
             </div>
         </div>
     </form>
