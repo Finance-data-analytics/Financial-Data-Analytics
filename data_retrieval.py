@@ -51,7 +51,7 @@ def get_data_stocks(tickers, isins, start_date, end_date):
     successful_isin = []
     data_list = []
     i=0
-    from neoma import cache
+    from project import cache
     for index, (ticker, isin) in enumerate(zip(tickers, isins)):
         i+=1
         progress = (i / len(tickers)) * 100
@@ -77,12 +77,10 @@ def get_data_stocks(tickers, isins, start_date, end_date):
 
         except Exception as e:
             print(f"Failed to retrieve data for {ticker}/{isin}: {e}")
-
     if data_list:
         all_data = pd.concat(data_list, axis=1)
     else:
         all_data = pd.DataFrame()
-
     return all_data, successful_retrievals, successful_isin
 
 
@@ -95,9 +93,9 @@ def generate_plotting_data():
     isin = all_stocks['isin'][:100].tolist()
     list_ticker = [str(ticker) for ticker in ticker]
 
-    index_data, successful_index = get_data_crypto(index_symbol, '2018-01-01', today() - timedelta(days=1))
-    crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2018-01-01', today() - timedelta(days=1))
-    stocks_data, successful_symbols,successful_isin = get_data_stocks(list_ticker, isin, '2018-01-01', today() - timedelta(days=1))
+    index_data, successful_index = get_data_crypto(index_symbol, '2018-01-01', today() - timedelta(days=3))
+    crypto_data, successful_crypto = get_data_crypto(crypto_symbols, '2018-01-01', today() - timedelta(days=3))
+    stocks_data, successful_symbols,successful_isin = get_data_stocks(list_ticker, isin, '2018-01-01', today() - timedelta(days=3))
 
     index_daily_returns = calculate_returns(index_data)
     crypto_daily_returns = calculate_returns(crypto_data)

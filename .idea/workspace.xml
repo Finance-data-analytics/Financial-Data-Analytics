@@ -5,17 +5,131 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41395ae9-0214-43b7-bfa0-51968c561495" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Financial-Data-Analytics.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Financial-Data-Analytics.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SQL/users.sql" beforeDir="false" afterPath="$PROJECT_DIR$/SQL/users.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cryptos_market_cap.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/cryptos_market_cap.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_retrieval.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/session_file/2029240f6d1128be89ddc32729463129" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/session_file/2029240f6d1128be89ddc32729463129" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/session_file/c09675c5d5a682ebcca66d352aaafc61" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/static/JS/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/static/JS/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/static/css/survey.css" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/static/css/survey.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neoma/templates/build_portfolio.html" beforeDir="false" afterPath="$PROJECT_DIR$/neoma/templates/build_portfolio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/00e4f441069352b5db7423b857928408" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/0b42aee6478170e0746bb63b987ff7bb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/0cfa8fdb2cf573106d4b0330821a9213" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/0d637b1ae132f511a6bd5eb34f2cb203" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/0f2ffe1b24895da1bc9373b760d68810" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/11902eaf6f6c3c65d406bdee524140ba" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/14cb53ec725059b225f19efe2cb562dd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/14e507fb351a1770a7e71926f6fda690" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/17335110c527e270aedcb43e505320b5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/18660ced813c6381b9eb50ccd3bcd257" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/1b65f155115910e866681ff42da478bd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/1b73cc21c78c6d2991032282be37c3aa" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/1c2a3489540452c19aa34ff57ca5af66" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/1d81d64e395d3b6e6eaaebd39d0933ea" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/1f66cb750a5b5dfa05c3494b05f6e7bb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/2029240f6d1128be89ddc32729463129" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/273d3dbaac4259e7d470437cc5cbc0f8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/286246d986f4df3aaad2bcb80918a508" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/291eaf70c6aecbb159be8c20a71fddfe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/29769492ed46f5646d56d2703ba7e7f5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/2b17c15feb3d166ebf58d7e2e08561a4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/317ab360a4d028a6a107c61560270eb0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/32028e983ba5d73c8ad19e61ad97fdc4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/34f95f8ebb6aa1e2b2c4d4dae7a32f8f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/361e3c36ee2f99aacb4f8f8a6f98ecd8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/36a50ba7e1db8fee1048d923275aac64" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/3776a5ea4be110cc71618b4bcb893258" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/39f05bd9dc10505d5589442ec38b8b32" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/3dae373cf25b3140dd2f06d712845a8f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/4069b0d2f6f0548f19cfc5e7a14fd9e8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/4252abd487f29ef8963a504975ba2fd0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/440b3ef790760715b93275628b227227" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/4964ffa8306912716e4431f4457dc1a6" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/49d920f9caaf853bee29e7a52ea9494e" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/4b537da1834240d8bff6c872880649eb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/5f4a5387f603da37ed277e5dbade7d0d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/5fe59bb3c1f9e911512d08dab0787c1a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/628dfbaa902d4c41ebbc1491879f05fc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/628fa04d0e8ed64ea8a9725fbb05be8f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/62987b0ea0cc996ada5c6008adc36a82" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/68156d4ec84998df7fc6afe4721b8a33" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/6acbccf8fb3bd04e67b71a8644721254" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/7014ea9e866875a9cf08f762ffe548a9" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/7279f55368306404ea7fba69e8ac260a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/73a92699486174fee58b4fbdf9bcbf41" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/757d0c972c3088cbcc6f3c7779030577" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/75c38e6ff2dd10d072cf5a87fd1848bf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/76e197a466cbffec61db7651c611a31e" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/78d470c64ad84fce91519af85b30b10c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/799236e2e380923ad86612195fdf3d5b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/7df25961e5519d053011ade2f811b2da" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/84018dbc25ef653fe529ac30c80f6d46" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/8854fd16437c3032f33fc1f46cac0882" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/8cea8f60293ce3a558ba5882c00a4a95" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/8d0387d628a09a78131847da6d6c3d59" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/8d15368ceced6a9389b3e4fb7a055876" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/8fa8d55447b5be98200b0312a4ddb3fe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/95ba8611236b73542d4f7c9e46ac877d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/960fd97c11f931a3313e32a897fcce37" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/9637f18b6f69000a7ad27cae414a89db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/979b57e64d5c031736e357ec48d31682" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/9d507d46da3ba23e67e8d4ede5089e95" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/9ea67964b5a429748f055f021e51d014" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/a2bbc397aa25660235070562cc5df6ee" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/a5ff0d5c42c09baefe341b97feca964b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/a796456d83bebd04426048d2c1af85ee" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/a8b25bada795de509ceaf57b33d729bd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/adb0756e56092b499aecd81c4d29beda" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/b0a383497ec44f01a017f78d0ec6cbbd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/b8ee1680248911f355559125d44253fb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/b9442994ae097405110578aa2c8daac0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/ba631e84b11c6ae0231e21be4be025e5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/ba6f1cf11ef087f94ed98b2042eec3c5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/bcc2627d0dcf9b948035d6f5e6eead6a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/c5c48d9a494457acec03712210c7b738" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/d4962796e7f30a1bc598beb1b3f549e3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/d9672824659698ac731504ac0638f3de" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/de2d0cb6c6d7539f36889b8e598f16d7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/df3471bacb34bac8fbf416d802f387e8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/e0b870f5d1af4bf4d7aec0126c38b2e8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/e122a721f6872ff29e3cbb94d4ed009f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/e9987bdf17b3911fefcf9247a97e50d0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/ecb76db4b34c1e943dd3d3165552a955" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/eea724a3ca730d644c0e40376037115c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/eeef59d168cf9dc54ffa7cd7cf0b3f1f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/f220f8da8ca9a49b5941187a3a7e10b4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/f643b700b62a7fca071c1a7254fcae2d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/f6a06d5d6e49dc0e6057b30fac763c83" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/f6b4b5935b367dfc67cfa7f9b96192f7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/session_file/fe400a88487bf5f57870f0a24c678bf7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/JS/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/JS/script.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/myPortfolio.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/myPortfolio.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/plot_choosen_portfolio.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/plot_choosen_portfolio.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/plot_portfolio.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/plot_portfolio.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/css/survey.css" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/css/survey.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/Logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/Logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/account.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/account.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/euro.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/euro.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/excel_export_logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/excel_export_logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/hub.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/hub.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/imageIphone.png" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/imageIphone.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/phone.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/phone.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/static/images/rocket.svg" beforeDir="false" afterPath="$PROJECT_DIR$/project/static/images/rocket.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/build_portfolio.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/build_portfolio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/myPortfolio.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/myPortfolio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/plot_choosen_portfolio.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/plot_choosen_portfolio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/plot_portfolios.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/plot_portfolios.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neoma/templates/seeDetails.html" beforeDir="false" afterPath="$PROJECT_DIR$/project/templates/seeDetails.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rendements_et_risques.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/rendements_et_risques.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +145,17 @@
         <option value="Python Script" />
         <option value="HTML File" />
       </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -84,6 +209,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Flask server.Financial-Data-Analytics.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
@@ -94,6 +220,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -114,12 +241,13 @@
       <recent name="$PROJECT_DIR$/neoma/templates" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.run">
+  <component name="RunManager" selected="Flask server.Financial-Data-Analytics">
     <configuration name="login.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/HTML &amp; PHP/login.php">
       <method v="2" />
     </configuration>
     <configuration name="Financial-Data-Analytics" type="PythonConfigurationType" factoryName="Python">
       <module name="Financial-Data-Analytics" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -142,6 +270,7 @@
     </configuration>
     <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Financial-Data-Analytics" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -164,12 +293,13 @@
     </configuration>
     <configuration name="Financial-Data-Analytics" type="Python.FlaskServer">
       <module name="Financial-Data-Analytics" />
-      <option name="target" value="$PROJECT_DIR$/neoma/__init__.py" />
+      <option name="target" value="$PROJECT_DIR$/project/__init__.py" />
       <option name="targetType" value="PATH" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -182,6 +312,13 @@
         <item itemvalue="Python.run" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -251,7 +388,21 @@
       <workItem from="1700664485981" duration="7026000" />
       <workItem from="1700741155824" duration="6380000" />
       <workItem from="1700747572101" duration="13291000" />
-      <workItem from="1700769652383" duration="6646000" />
+      <workItem from="1700769652383" duration="6880000" />
+      <workItem from="1700816113948" duration="55000" />
+      <workItem from="1700816368831" duration="3716000" />
+      <workItem from="1700822149877" duration="952000" />
+      <workItem from="1700840702185" duration="167000" />
+      <workItem from="1701089408933" duration="21000" />
+      <workItem from="1705499418947" duration="150000" />
+      <workItem from="1706091824717" duration="326000" />
+      <workItem from="1706094874426" duration="58000" />
+      <workItem from="1706094940739" duration="50000" />
+      <workItem from="1707728381859" duration="147000" />
+      <workItem from="1707750241128" duration="100000" />
+      <workItem from="1708073324306" duration="54000" />
+      <workItem from="1708341368603" duration="358000" />
+      <workItem from="1708341738185" duration="86000" />
     </task>
     <servers />
   </component>
@@ -297,10 +448,11 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$run.coverage" NAME="run Coverage Results" MODIFIED="1700777236955" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1700440066209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/flask/neoma" />
+    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$test.coverage" NAME="test Coverage Results" MODIFIED="1700589125922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Financial_Data_Analytics$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1698659326429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Financial_Data_Analytics$main.coverage" NAME="main Coverage Results" MODIFIED="1700435238250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$test.coverage" NAME="test Coverage Results" MODIFIED="1700589125922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$run.coverage" NAME="run Coverage Results" MODIFIED="1700822741258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1700440066209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/flask/neoma" />
+    <SUITE FILE_PATH="coverage/Financial_Data_Analytics$Financial_Data_Analytics.coverage" NAME="Financial-Data-Analytics Coverage Results" MODIFIED="1708341676707" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

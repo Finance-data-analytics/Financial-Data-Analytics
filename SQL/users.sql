@@ -40,7 +40,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `_password_hash`, `name`, `birthdate`, `picprofile`) VALUES
-(3, 'romain.bastiani.23@neoma-bs.com', '$2b$12$JkzuOIxj33SCOlIEdVPzM.YR6zaeqYaPyqTXZeylVbSvGLJR779iy', 'Romain', '2000-04-03', NULL);
+(3, 'romain.bastiani.23@project-bs.com', '$2b$12$JkzuOIxj33SCOlIEdVPzM.YR6zaeqYaPyqTXZeylVbSvGLJR779iy', 'Romain', '2000-04-03', NULL);
 
 --
 -- Index pour les tables exportées
