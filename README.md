@@ -4,19 +4,19 @@
 
 ## Features
 
-- 📊 **Investor Profiling**: A quiz to assess the investor’s risk tolerance and preferences.
-- 🔄 **Monte Carlo Simulation**: Simulates thousands of scenarios to recommend the best portfolio allocation.
-- 🔐 **User Authentication**: Secure user login and session management powered by a database.
-- 🎨 **Interactive User Interface**: Built with HTML, CSS, and JavaScript for a sleek and responsive design.
-- 💡 **Dynamic Portfolio Recommendations**: Real-time, tailored recommendations based on the investor's profile.
+- **Investor Profiling**: A quiz to assess the investor’s risk tolerance and preferences.
+- **Monte Carlo Simulation**: Simulates thousands of scenarios to recommend the best portfolio allocation.
+- **User Authentication**: Secure user login and session management powered by a database.
+- **Interactive User Interface**: Built with HTML, CSS, and JavaScript for a sleek and responsive design.
+- **Dynamic Portfolio Recommendations**: Real-time, tailored recommendations based on the investor's profile.
 
 ## Technologies Used
 
-- 🐍 **Python**: Backend logic and data processing.
-- 🌐 **Flask**: Framework for building scalable web applications.
-- 🎨 **HTML & CSS**: Structuring and styling the user interface.
-- ⚡ **JavaScript**: Enhancing interactivity and user experience.
-- 🗄️ **SQL**: Managing and securely storing user data.
+- **Python**: Backend logic and data processing.
+- **Flask**: Framework for building scalable web applications.
+- **HTML & CSS**: Structuring and styling the user interface.
+- **JavaScript**: Enhancing interactivity and user experience.
+- **SQL**: Managing and securely storing user data.
 
 ## How It Works
 
@@ -64,6 +64,6 @@ This platform was developed as part of a **school project** to demonstrate our a
 
 ## Future Enhancements
 
-- 🧮 **Advanced Analytics**: Incorporating more detailed metrics and visualizations for portfolio evaluation.
-- 🌎 **Data Expansion**: Integrating additional data sources for more accurate and diverse simulations.
-- 🖌️ **UI/UX Improvements**: Further enhancing user engagement and usability.
+- **Advanced Analytics**: Incorporating more detailed metrics and visualizations for portfolio evaluation.
+- **Data Expansion**: Integrating additional data sources for more accurate and diverse simulations.
+- **UI/UX Improvements**: Further enhancing user engagement and usability.
